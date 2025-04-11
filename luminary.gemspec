@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec', '~> 3.12'
   s.add_development_dependency 'rake', '~> 13.0'
   s.add_development_dependency 'rubocop', '~> 1.50'
+  s.add_development_dependency 'dotenv', '~> 2.8'
 
   # Optional dependencies
   s.add_development_dependency 'ruby-openai', '~> 6.3'

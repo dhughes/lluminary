@@ -6,4 +6,5 @@
 /pkg/
 /spec/reports/
 /tmp/
-.rspec_status 
+.rspec_status
+.env 

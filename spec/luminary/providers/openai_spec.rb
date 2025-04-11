@@ -1,51 +1,46 @@
-require 'luminary'
+require 'spec_helper'
 
 RSpec.describe Luminary::Providers::OpenAI do
-  let(:config) { { api_key: 'test-key', model: 'gpt-3.5-turbo' } }
-  let(:provider) { described_class.new(config) }
-  let(:mock_client) { instance_double(::OpenAI::Client) }
-
-  before do
-    allow(::OpenAI::Client).to receive(:new).and_return(mock_client)
+  let(:api_key) { 'test_key' }
+  let(:provider) { described_class.new(api_key: api_key) }
+  let(:task) { double('Task') }
+  let(:client) { instance_double(OpenAI::Client) }
+  let(:prompt) { "Test prompt" }
+  let(:response) do
+    {
+      "choices" => [
+        {
+          "message" => {
+            "content" => '{"summary": "Test response"}'
+          }
+        }
+      ]
+    }
   end
 
-  describe '#initialize' do
-    it 'creates an OpenAI client with the provided API key' do
-      expect(::OpenAI::Client).to receive(:new).with(api_key: 'test-key')
-      described_class.new(api_key: 'test-key')
-    end
+  before do
+    allow(OpenAI::Client).to receive(:new).with(access_token: api_key).and_return(client)
+    allow(client).to receive(:chat).and_return(response)
   end
 
   describe '#call' do
-    let(:prompt) { 'Test prompt' }
-    let(:mock_response) do
-      {
-        'choices' => [
-          {
-            'message' => {
-              'content' => 'Test response'
-            }
-          }
-        ]
-      }
-    end
-
-    before do
-      allow(mock_client).to receive(:chat).and_return(mock_response)
-    end
-
     it 'calls the OpenAI API with the correct parameters' do
-      expect(mock_client).to receive(:chat).with(
+      expect(client).to receive(:chat).with(
         parameters: {
-          model: 'gpt-3.5-turbo',
-          messages: [{ role: 'user', content: prompt }]
+          model: "gpt-3.5-turbo",
+          messages: [{ role: "user", content: prompt }],
+          response_format: { type: "json_object" }
         }
       )
-      provider.call(prompt: prompt)
+
+      provider.call(prompt, task)
     end
 
-    it 'returns the content from the response' do
-      expect(provider.call(prompt: prompt)).to eq('Test response')
+    it 'returns both raw and parsed responses' do
+      result = provider.call(prompt, task)
+      expect(result).to be_an(Array)
+      expect(result.first).to eq('{"summary": "Test response"}')
+      expect(result.last).to eq({ "summary" => "Test response" })
     end
   end
 end 

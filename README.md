@@ -1,10 +1,11 @@
 # Luminary
 
-A Ruby framework for building LLM-powered applications.
+A Ruby framework for building LLM-powered applications with structured outputs.
 
 ## Features
 
 - Task-based architecture for LLM interactions
+- Automatic JSON response formatting based on output schemas
 - Input and output schema validation
 - Provider abstraction for different LLM services
 - Built-in support for OpenAI
@@ -29,7 +30,7 @@ bundle install
 ### Basic Task
 
 ```ruby
-class MyTask < Luminary::Task
+class SummarizeText < Luminary::Task
   use_provider :openai, api_key: ENV['OPENAI_API_KEY']
 
   input_schema do
@@ -40,13 +41,37 @@ class MyTask < Luminary::Task
     string :summary
   end
 
-  def prompt
-    "Summarize the following text: #{text}"
+  private
+
+  def task_prompt
+    "Summarize the following text in one short sentence:\n\n#{text}"
   end
 end
 
-result = MyTask.call(text: "Your text here")
+# Use the task
+result = SummarizeText.call(text: "Your text here")
 puts result.output.summary
+```
+
+### Output Schema
+
+The output schema defines the structure of the LLM's response. Luminary automatically formats the prompt to ensure the LLM returns JSON matching your schema:
+
+```ruby
+class AnalyzeText < Luminary::Task
+  output_schema do
+    string :sentiment
+    string :key_points
+    integer :word_count
+  end
+end
+
+# LLM will respond with:
+# {
+#   "sentiment": "positive",
+#   "key_points": "...",
+#   "word_count": 42
+# }
 ```
 
 ### Examples
@@ -54,7 +79,7 @@ puts result.output.summary
 See the `examples/` directory for complete working examples:
 
 - `summarize_text.rb`: A task that summarizes text using OpenAI
-- `run_summarize.rb`: A script demonstrating how to use the summarization task
+- `analyze_text.rb`: A task that performs text analysis with multiple output fields
 
 ## Development
 

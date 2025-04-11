@@ -5,25 +5,34 @@
 - [x] Implement Task base class
 - [x] Add input and output schema validation
 - [x] Create OpenAI provider implementation
-- [x] Add example summarization task
+- [x] Add example tasks
 - [x] Update README with usage instructions and examples
 - [x] Add environment configuration support
+- [x] Implement automatic JSON response formatting
+- [x] Clean up provider interface
 
 ## In Progress
-- [ ] Add more example tasks
-- [ ] Improve error handling and validation
-- [ ] Add logging and monitoring capabilities
+- [ ] Add input validation using schemas
+- [ ] Add support for all JSON data types in schemas
+- [ ] Add error handling for invalid responses
 
 ## Future Tasks
 - [ ] Add support for additional LLM providers (Anthropic, Google, etc.)
 - [ ] Implement task chaining and composition
 - [ ] Add caching layer for API responses
-- [ ] Create development tools and generators
 - [ ] Add rate limiting and retry mechanisms
 - [ ] Implement streaming responses
 - [ ] Add comprehensive test coverage
 - [ ] Create documentation website
 - [ ] Add CI/CD pipeline
+- [ ] Add schema validation for provider responses
+- [ ] Support nested objects in schemas
+- [ ] Add array type support in schemas
+- [ ] Add development tools and generators
+- [ ] Add logging and monitoring
+- [ ] Support async/background processing
+- [ ] Add provider-specific configuration options
+- [ ] Add response templating system
 
 ## Task Interface
 - [x] Input/Output Schema DSL
