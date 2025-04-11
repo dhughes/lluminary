@@ -15,10 +15,10 @@
     end
   end
   ```
-- [ ] Result Object
+- [x] Result Object
   - [x] Access to raw LLM response via `result.raw_response`
   - [ ] Access to validated inputs via `result.input`
-  - [ ] Access to validated outputs via `result.output`
+  - [x] Access to validated outputs via `result.output`
   - [ ] Success/failure status via `result.success?`
   - [ ] Error messages via `result.errors`
 - [ ] Validation
@@ -63,7 +63,7 @@
 
 ## Core Features
 - [x] Input schema definition
-- [ ] Output schema definition
+- [x] Output schema definition
 - [ ] Prompt generation
 - [ ] Response validation
 - [ ] Error handling

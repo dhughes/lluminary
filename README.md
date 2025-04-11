@@ -28,8 +28,14 @@ Tasks are the core building blocks of Luminary. Each task represents a single in
 
 ```ruby
 class SummarizeText < Luminary::Task
+  # Define the inputs your task expects
   input_schema do
     string :text
+  end
+
+  # Define the outputs your task will return
+  output_schema do
+    string :summary
   end
 
   def prompt
@@ -39,7 +45,12 @@ end
 
 # Using the task
 result = SummarizeText.call(text: "A long piece of text to summarize...")
+
+# Access the raw LLM response
 puts result.raw_response
+
+# Access the structured output
+puts result.output.summary
 ```
 
 ### Input Schema
@@ -57,6 +68,21 @@ class MyTask < Luminary::Task
     "Process this text: #{text}"
   end
 end
+```
+
+### Output Schema
+
+You can define the structured outputs your task will return:
+
+```ruby
+class MyTask < Luminary::Task
+  output_schema do
+    string :summary  # Defines a string output named 'summary'
+  end
+end
+
+result = MyTask.call(text: "some text")
+puts result.output.summary  # Access the output field
 ```
 
 ## Development
