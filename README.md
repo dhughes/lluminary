@@ -28,6 +28,9 @@ Tasks are the core building blocks of Luminary. Each task represents a single in
 
 ```ruby
 class SummarizeText < Luminary::Task
+  # Specify which LLM provider to use
+  use_provider :test # Use the test provider for development/testing
+
   # Define the inputs your task expects
   input_schema do
     string :text
@@ -51,6 +54,20 @@ puts result.raw_response
 
 # Access the structured output
 puts result.output.summary
+```
+
+### Providers
+
+Luminary supports different LLM providers. You can specify which provider to use at the task level:
+
+```ruby
+class MyTask < Luminary::Task
+  # Use the test provider for development/testing
+  use_provider :test
+
+  # Or use a custom provider with configuration
+  use_provider CustomProvider, api_key: ENV['API_KEY']
+end
 ```
 
 ### Input Schema
