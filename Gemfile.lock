@@ -8,9 +8,23 @@ GEM
   specs:
     ast (2.4.3)
     diff-lcs (1.6.1)
+    dotenv (2.8.1)
+    event_stream_parser (1.0.0)
+    faraday (2.13.0)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-multipart (1.1.0)
+      multipart-post (~> 2.0)
+    faraday-net_http (3.4.0)
+      net-http (>= 0.5.0)
     json (2.10.2)
     language_server-protocol (3.17.0.4)
     lint_roller (1.1.0)
+    logger (1.7.0)
+    multipart-post (2.4.1)
+    net-http (0.6.0)
+      uri
     parallel (1.26.3)
     parser (3.3.7.4)
       ast (~> 2.4.1)
@@ -47,19 +61,26 @@ GEM
     rubocop-ast (1.44.0)
       parser (>= 3.3.7.2)
       prism (~> 1.4)
+    ruby-openai (6.5.0)
+      event_stream_parser (>= 0.3.0, < 2.0.0)
+      faraday (>= 1)
+      faraday-multipart (>= 1)
     ruby-progressbar (1.13.0)
     unicode-display_width (3.1.4)
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)
+    uri (1.0.3)
 
 PLATFORMS
   arm64-darwin-24
 
 DEPENDENCIES
+  dotenv (~> 2.8)
   luminary!
   rake (~> 13.0)
   rspec (~> 3.12)
   rubocop (~> 1.50)
+  ruby-openai (~> 6.3)
 
 BUNDLED WITH
    2.4.19

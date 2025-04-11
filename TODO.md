@@ -74,6 +74,26 @@
   - [x] Provider configuration
   - [x] use_provider DSL
   - [ ] OpenAI provider
+    - [ ] Add ruby-openai gem as optional dependency
+    - [ ] Basic provider implementation
+      - [ ] Initialize OpenAI client
+      - [ ] Handle basic chat completion
+      - [ ] Extract response content
+    - [ ] Configuration
+      - [ ] API key handling
+      - [ ] Model selection
+      - [ ] Default model setting
+    - [ ] Error handling
+      - [ ] Rate limit handling
+      - [ ] Authentication errors
+      - [ ] Network errors
+    - [ ] Testing
+      - [ ] Unit tests with mocked client
+      - [ ] Integration tests (marked)
+    - [ ] Optional features
+      - [ ] Support for completion API
+      - [ ] Advanced parameters (temperature, max_tokens)
+      - [ ] Streaming support
   - [ ] Amazon Bedrock
   - [ ] Anthropic
   - [ ] Google Vertex AI

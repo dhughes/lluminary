@@ -56,4 +56,35 @@ RSpec.describe Luminary::Task do
       expect(task_class.provider).to eq(custom_provider)
     end
   end
+
+  describe '.use_provider' do
+    context 'with :test provider' do
+      let(:task_with_test) do
+        Class.new(described_class) do
+          use_provider :test
+        end
+      end
+
+      it 'sets the test provider' do
+        expect(task_with_test.provider).to be_a(Luminary::Providers::TestProvider)
+      end
+    end
+
+    context 'with a custom provider class' do
+      let(:custom_provider_class) do
+        Class.new(Luminary::Providers::Base)
+      end
+
+      let(:task_with_custom) do
+        provider_class = custom_provider_class
+        Class.new(described_class) do
+          use_provider provider_class, api_key: 'test-key'
+        end
+      end
+
+      it 'instantiates the provider with config' do
+        expect(task_with_custom.provider).to be_a(custom_provider_class)
+      end
+    end
+  end
 end 

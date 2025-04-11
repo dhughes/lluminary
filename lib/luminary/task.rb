@@ -26,6 +26,19 @@ module Luminary
       def provider=(provider)
         @provider = provider
       end
+
+      def use_provider(provider_type, **config)
+        provider_instance = case provider_type
+        when :test
+          Providers::TestProvider.new
+        when Class
+          provider_type.new(config)
+        else
+          raise ArgumentError, "Unknown provider type: #{provider_type}"
+        end
+
+        self.provider = provider_instance
+      end
     end
 
     def initialize(inputs = {})
