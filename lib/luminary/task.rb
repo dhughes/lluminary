@@ -1,7 +1,23 @@
 module Luminary
   class Task
-    def self.call
-      new.call
+    class << self
+      def input_schema(&block)
+        @input_schema = InputSchema.new
+        @input_schema.instance_eval(&block)
+      end
+
+      def input_definitions
+        @input_schema&.inputs || {}
+      end
+    end
+
+    def initialize(inputs = {})
+      @inputs = inputs
+      define_input_methods
+    end
+
+    def self.call(inputs = {})
+      new(inputs).call
     end
 
     def call
@@ -10,6 +26,18 @@ module Luminary
 
     def prompt
       raise NotImplementedError, "Subclasses must implement #prompt"
+    end
+
+    def input
+      @inputs
+    end
+
+    private
+
+    def define_input_methods
+      self.class.input_definitions.each_key do |name|
+        define_singleton_method(name) { @inputs[name] }
+      end
     end
   end
 
