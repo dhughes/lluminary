@@ -22,17 +22,41 @@ $ gem install luminary
 
 ## Usage
 
-### Basic Task
+### Defining Tasks
+
+Tasks are the core building blocks of Luminary. Each task represents a single interaction with an LLM.
 
 ```ruby
-class MyTask < Luminary::Task
+class SummarizeText < Luminary::Task
+  input_schema do
+    string :text
+  end
+
   def prompt
-    "Say hello world"
+    "Summarize the following text: #{text}"
   end
 end
 
-result = MyTask.call
-puts result.raw_response  # => "hello world"
+# Using the task
+result = SummarizeText.call(text: "A long piece of text to summarize...")
+puts result.raw_response
+```
+
+### Input Schema
+
+You can define the inputs your task expects using the input schema DSL:
+
+```ruby
+class MyTask < Luminary::Task
+  input_schema do
+    string :text  # Defines a string input named 'text'
+  end
+
+  def prompt
+    # Access inputs directly as methods
+    "Process this text: #{text}"
+  end
+end
 ```
 
 ## Development

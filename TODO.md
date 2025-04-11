@@ -1,7 +1,7 @@
 # Luminary TODO
 
 ## Task Interface
-- [ ] Input/Output Schema DSL
+- [x] Input/Output Schema DSL
   ```ruby
   class MyTask < Luminary::Task
     input_schema do
@@ -16,9 +16,9 @@
   end
   ```
 - [ ] Result Object
+  - [x] Access to raw LLM response via `result.raw_response`
   - [ ] Access to validated inputs via `result.input`
   - [ ] Access to validated outputs via `result.output`
-  - [ ] Access to raw LLM response via `result.raw_response`
   - [ ] Success/failure status via `result.success?`
   - [ ] Error messages via `result.errors`
 - [ ] Validation
@@ -31,38 +31,38 @@
   - [ ] Global configuration
 
 ## Data Types
-- [ ] String
-  - Basic string input/output
-  - Length validation
-  - Required/optional
+- [x] String
+  - [x] Basic string input/output
+  - [ ] Length validation
+  - [ ] Required/optional
 - [ ] Integer
-  - Basic integer input/output
-  - Range validation
-  - Required/optional
+  - [ ] Basic integer input/output
+  - [ ] Range validation
+  - [ ] Required/optional
 - [ ] Boolean
-  - Basic boolean input/output
-  - Required/optional
+  - [ ] Basic boolean input/output
+  - [ ] Required/optional
 - [ ] Float
-  - Basic float input/output
-  - Range validation
-  - Precision validation
-  - Required/optional
+  - [ ] Basic float input/output
+  - [ ] Range validation
+  - [ ] Precision validation
+  - [ ] Required/optional
 - [ ] Array
-  - Basic array input/output
-  - Length validation
-  - Typed arrays (array of strings, etc.)
-  - Required/optional
+  - [ ] Basic array input/output
+  - [ ] Length validation
+  - [ ] Typed arrays (array of strings, etc.)
+  - [ ] Required/optional
 - [ ] Hash
-  - Basic hash input/output
-  - Schema validation
-  - Required/optional
+  - [ ] Basic hash input/output
+  - [ ] Schema validation
+  - [ ] Required/optional
 - [ ] Date
-  - Basic date input/output
-  - Format validation
-  - Required/optional
+  - [ ] Basic date input/output
+  - [ ] Format validation
+  - [ ] Required/optional
 
 ## Core Features
-- [ ] Input schema definition
+- [x] Input schema definition
 - [ ] Output schema definition
 - [ ] Prompt generation
 - [ ] Response validation
