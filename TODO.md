@@ -1,5 +1,35 @@
 # Luminary TODO
 
+## Task Interface
+- [ ] Input/Output Schema DSL
+  ```ruby
+  class MyTask < Luminary::Task
+    input_schema do
+      string :text
+      validates :text, presence: true
+    end
+
+    output_schema do
+      string :summary
+      validates :summary, presence: true
+    end
+  end
+  ```
+- [ ] Result Object
+  - [ ] Access to validated inputs via `result.input`
+  - [ ] Access to validated outputs via `result.output`
+  - [ ] Access to raw LLM response via `result.raw_response`
+  - [ ] Success/failure status via `result.success?`
+  - [ ] Error messages via `result.errors`
+- [ ] Validation
+  - [ ] Input validation before execution
+  - [ ] Output validation after LLM response
+  - [ ] Automatic retry with improved prompts on validation failure
+- [ ] Configuration
+  - [ ] Task-specific configuration (max retries, etc.)
+  - [ ] LLM provider configuration
+  - [ ] Global configuration
+
 ## Data Types
 - [ ] String
   - Basic string input/output
