@@ -18,18 +18,18 @@ RSpec.describe Luminary::Task do
   end
 
   describe '.call' do
-    it 'returns a result with a raw response' do
-      result = task_class.call
-      expect(result.raw_response).to eq("hello world")
-      expect(result.output.summary).to eq("hello world")
+    it 'returns a result with a raw response from the provider' do
+      result = task_class.call(text: "hello")
+      expect(result.raw_response).to eq("Test response to: Say: hello")
+      expect(result.output.summary).to eq("Test response to: Say: hello")
     end
   end
 
   describe 'string input' do
     it 'allows providing a string input' do
       result = task_class.call(text: "hello")
-      expect(result.raw_response).to eq("hello world")
-      expect(result.output.summary).to eq("hello world")
+      expect(result.raw_response).to eq("Test response to: Say: hello")
+      expect(result.output.summary).to eq("Test response to: Say: hello")
     end
 
     it 'makes the input available in the prompt' do
@@ -41,7 +41,19 @@ RSpec.describe Luminary::Task do
   describe 'string output' do
     it 'returns the output in the result' do
       result = task_class.call(text: "hello")
-      expect(result.output.summary).to eq("hello world")
+      expect(result.output.summary).to eq("Test response to: Say: hello")
+    end
+  end
+
+  describe '.provider' do
+    it 'defaults to TestProvider' do
+      expect(task_class.provider).to be_a(Luminary::Providers::TestProvider)
+    end
+
+    it 'allows setting a custom provider' do
+      custom_provider = double('CustomProvider')
+      task_class.provider = custom_provider
+      expect(task_class.provider).to eq(custom_provider)
     end
   end
 end 

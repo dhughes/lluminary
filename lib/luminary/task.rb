@@ -18,6 +18,14 @@ module Luminary
       def output_definitions
         @output_schema&.outputs || {}
       end
+
+      def provider
+        @provider ||= Providers::TestProvider.new
+      end
+
+      def provider=(provider)
+        @provider = provider
+      end
     end
 
     def initialize(inputs = {})
@@ -30,9 +38,10 @@ module Luminary
     end
 
     def call
+      response = self.class.provider.call(prompt: prompt)
       Result.new(
-        raw_response: "hello world",
-        output: { summary: "hello world" }
+        raw_response: response,
+        output: { summary: response }
       )
     end
 
