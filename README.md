@@ -22,16 +22,22 @@ $ gem install luminary
 
 ## Usage
 
-```ruby
-require 'luminary'
+### Basic Task
 
-# For now, just a hello world
-puts Luminary.hello
+```ruby
+class MyTask < Luminary::Task
+  def prompt
+    "Say hello world"
+  end
+end
+
+result = MyTask.call
+puts result.raw_response  # => "hello world"
 ```
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests.
+After checking out the repo, run `bundle install` to install dependencies. Then, run `rake spec` to run the tests.
 
 ## Contributing
 
