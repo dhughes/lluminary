@@ -9,6 +9,15 @@ module Luminary
       def input_definitions
         @input_schema&.inputs || {}
       end
+
+      def output_schema(&block)
+        @output_schema = OutputSchema.new
+        @output_schema.instance_eval(&block)
+      end
+
+      def output_definitions
+        @output_schema&.outputs || {}
+      end
     end
 
     def initialize(inputs = {})
@@ -21,7 +30,10 @@ module Luminary
     end
 
     def call
-      Result.new(raw_response: "hello world")
+      Result.new(
+        raw_response: "hello world",
+        output: { summary: "hello world" }
+      )
     end
 
     def prompt
@@ -38,14 +50,6 @@ module Luminary
       self.class.input_definitions.each_key do |name|
         define_singleton_method(name) { @inputs[name] }
       end
-    end
-  end
-
-  class Result
-    attr_reader :raw_response
-
-    def initialize(raw_response:)
-      @raw_response = raw_response
     end
   end
 end 
