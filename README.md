@@ -1,6 +1,14 @@
 # Luminary
 
-A framework for building LLM-powered applications in Ruby.
+A Ruby framework for building LLM-powered applications.
+
+## Features
+
+- Task-based architecture for LLM interactions
+- Input and output schema validation
+- Provider abstraction for different LLM services
+- Built-in support for OpenAI
+- Easy to extend with custom providers
 
 ## Installation
 
@@ -11,32 +19,23 @@ gem 'luminary'
 ```
 
 And then execute:
-```bash
-$ bundle install
-```
 
-Or install it yourself as:
 ```bash
-$ gem install luminary
+bundle install
 ```
 
 ## Usage
 
-### Defining Tasks
-
-Tasks are the core building blocks of Luminary. Each task represents a single interaction with an LLM.
+### Basic Task
 
 ```ruby
-class SummarizeText < Luminary::Task
-  # Specify which LLM provider to use
-  use_provider :test # Use the test provider for development/testing
+class MyTask < Luminary::Task
+  use_provider :openai, api_key: ENV['OPENAI_API_KEY']
 
-  # Define the inputs your task expects
   input_schema do
     string :text
   end
 
-  # Define the outputs your task will return
   output_schema do
     string :summary
   end
@@ -46,70 +45,39 @@ class SummarizeText < Luminary::Task
   end
 end
 
-# Using the task
-result = SummarizeText.call(text: "A long piece of text to summarize...")
-
-# Access the raw LLM response
-puts result.raw_response
-
-# Access the structured output
+result = MyTask.call(text: "Your text here")
 puts result.output.summary
 ```
 
-### Providers
+### Examples
 
-Luminary supports different LLM providers. You can specify which provider to use at the task level:
+See the `examples/` directory for complete working examples:
 
-```ruby
-class MyTask < Luminary::Task
-  # Use the test provider for development/testing
-  use_provider :test
-
-  # Or use a custom provider with configuration
-  use_provider CustomProvider, api_key: ENV['API_KEY']
-end
-```
-
-### Input Schema
-
-You can define the inputs your task expects using the input schema DSL:
-
-```ruby
-class MyTask < Luminary::Task
-  input_schema do
-    string :text  # Defines a string input named 'text'
-  end
-
-  def prompt
-    # Access inputs directly as methods
-    "Process this text: #{text}"
-  end
-end
-```
-
-### Output Schema
-
-You can define the structured outputs your task will return:
-
-```ruby
-class MyTask < Luminary::Task
-  output_schema do
-    string :summary  # Defines a string output named 'summary'
-  end
-end
-
-result = MyTask.call(text: "some text")
-puts result.output.summary  # Access the output field
-```
+- `summarize_text.rb`: A task that summarizes text using OpenAI
+- `run_summarize.rb`: A script demonstrating how to use the summarization task
 
 ## Development
 
-After checking out the repo, run `bundle install` to install dependencies. Then, run `rake spec` to run the tests.
+After checking out the repo, run `bundle install` to install dependencies.
+
+### Running Tests
+
+```bash
+bundle exec rspec
+```
+
+### Environment Setup
+
+Create a `.env` file with your API keys:
+
+```
+OPENAI_API_KEY=your_api_key_here
+```
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub.
+Bug reports and pull requests are welcome on GitHub at https://github.com/yourusername/luminary.
 
 ## License
 
-The gem is available as open source under the terms of the MIT License. 
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT). 

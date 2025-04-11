@@ -1,4 +1,29 @@
-# Luminary TODO
+# Luminary TODO List
+
+## Completed Tasks
+- [x] Set up basic project structure
+- [x] Implement Task base class
+- [x] Add input and output schema validation
+- [x] Create OpenAI provider implementation
+- [x] Add example summarization task
+- [x] Update README with usage instructions and examples
+- [x] Add environment configuration support
+
+## In Progress
+- [ ] Add more example tasks
+- [ ] Improve error handling and validation
+- [ ] Add logging and monitoring capabilities
+
+## Future Tasks
+- [ ] Add support for additional LLM providers (Anthropic, Google, etc.)
+- [ ] Implement task chaining and composition
+- [ ] Add caching layer for API responses
+- [ ] Create development tools and generators
+- [ ] Add rate limiting and retry mechanisms
+- [ ] Implement streaming responses
+- [ ] Add comprehensive test coverage
+- [ ] Create documentation website
+- [ ] Add CI/CD pipeline
 
 ## Task Interface
 - [x] Input/Output Schema DSL
