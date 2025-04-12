@@ -36,5 +36,27 @@ RSpec.describe Lluminary::Providers::OpenAI do
         parsed: { 'summary' => 'Test response' }
       })
     end
+
+    context 'when the response is not valid JSON' do
+      let(:mock_response) do
+        {
+          'choices' => [
+            {
+              'message' => {
+                'content' => 'not valid json'
+              }
+            }
+          ]
+        }
+      end
+
+      it 'returns raw response with nil parsed value' do
+        response = provider.call(prompt, task)
+        expect(response).to eq({
+          raw: 'not valid json',
+          parsed: nil
+        })
+      end
+    end
   end
 end 

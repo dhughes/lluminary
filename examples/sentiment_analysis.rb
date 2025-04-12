@@ -14,6 +14,7 @@ class SentimentAnalysis < Lluminary::Task
 
   input_schema do
     string :text, description: "The text to analyze for sentiment"
+    validates :text, presence: true
   end
 
   output_schema do

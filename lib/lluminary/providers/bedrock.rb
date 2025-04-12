@@ -1,5 +1,6 @@
 require 'aws-sdk-bedrockruntime'
 require 'json'
+require_relative '../provider_error'
 
 require 'pry-byebug'
 
@@ -31,16 +32,16 @@ module Lluminary
           ]
         )
 
-        content = response.dig(:output, :message, :content).first.text
+        content = response.dig(:output, :message, :content, 0, :text)
         
-        begin
-          { 
-            raw: content, 
-            parsed: JSON.parse(content) 
-          }
-        rescue JSON::ParserError => e
-          raise ProviderError, "Failed to parse JSON response: #{e.message}"
-        end
+        { 
+          raw: content,
+          parsed: begin
+            JSON.parse(content) if content
+          rescue JSON::ParserError
+            nil
+          end
+        }
       end
     end
   end

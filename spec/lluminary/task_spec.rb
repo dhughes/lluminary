@@ -44,12 +44,13 @@ RSpec.describe Lluminary::Task do
     it 'includes schema descriptions in the prompt' do
       result = task_class.call(message: "hello")
       expected_schema = <<~SCHEMA
-        You must respond with a valid JSON object with the following fields:
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
 
         summary (string): A brief summary of the message
         Example: "your summary here"
 
-        Your response should look like this:
+        Your response must be ONLY this JSON object:
         {
           "summary": "your summary here"
         }
@@ -80,12 +81,13 @@ RSpec.describe Lluminary::Task do
     it 'includes basic schema in the prompt' do
       result = task_without_descriptions.call(message: "hello")
       expected_schema = <<~SCHEMA
-        You must respond with a valid JSON object with the following fields:
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
 
         summary (string)
         Example: "your summary here"
 
-        Your response should look like this:
+        Your response must be ONLY this JSON object:
         {
           "summary": "your summary here"
         }
@@ -128,12 +130,13 @@ RSpec.describe Lluminary::Task do
     it 'generates a schema example with descriptions' do
       task = task_class.new(message: "test")
       expected_output = <<~SCHEMA
-        You must respond with a valid JSON object with the following fields:
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
 
         summary (string): A brief summary of the message
         Example: "your summary here"
 
-        Your response should look like this:
+        Your response must be ONLY this JSON object:
         {
           "summary": "your summary here"
         }
@@ -160,12 +163,13 @@ RSpec.describe Lluminary::Task do
 
       task = task_without_descriptions.new(message: "test")
       expected_output = <<~SCHEMA
-        You must respond with a valid JSON object with the following fields:
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
 
         summary (string)
         Example: "your summary here"
 
-        Your response should look like this:
+        Your response must be ONLY this JSON object:
         {
           "summary": "your summary here"
         }

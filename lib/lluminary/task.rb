@@ -173,11 +173,12 @@ module Lluminary
       end
 
       <<~SCHEMA.chomp
-        You must respond with a valid JSON object with the following fields:
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
 
         #{field_descriptions}
 
-        Your response should look like this:
+        Your response must be ONLY this JSON object:
         #{JSON.pretty_generate(example_json)}
       SCHEMA
     end

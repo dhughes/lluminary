@@ -118,6 +118,13 @@
 ## Core Features
 - [x] Input schema definition
 - [x] Output schema definition
+- [ ] Performance metrics and timing
+  - [ ] Add execution time tracking
+  - [ ] Include token usage statistics
+  - [ ] Add provider-specific metrics
+  - [ ] Make metrics accessible via result object
+  - [ ] Add optional detailed logging
+  - [ ] Consider adding cost estimation
 - [ ] Prompt optimization system
   - [ ] Default prompt optimizer
     - [ ] Generic prompt formatting
