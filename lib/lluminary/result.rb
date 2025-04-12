@@ -1,6 +1,6 @@
 require 'ostruct'
 
-module Luminary
+module Lluminary
   class Result
     attr_reader :raw_response, :output, :prompt
 

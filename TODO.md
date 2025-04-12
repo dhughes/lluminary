@@ -1,4 +1,4 @@
-# Luminary TODO List
+# Lluminary TODO List
 
 ## Completed Tasks
 - [x] Set up basic project structure
@@ -48,7 +48,7 @@
 ## Task Interface
 - [x] Input/Output Schema DSL
   ```ruby
-  class MyTask < Luminary::Task
+  class MyTask < Lluminary::Task
     input_schema do
       string :text
       validates :text, presence: true

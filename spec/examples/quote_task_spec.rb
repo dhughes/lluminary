@@ -19,8 +19,8 @@ RSpec.describe QuoteTask do
 
     it 'returns a valid result object' do
       result = described_class.call
-      expect(result).to be_a(Luminary::Task)
-      expect(result.input).to be_a(Luminary::SchemaModel)
+      expect(result).to be_a(Lluminary::Task)
+      expect(result.input).to be_a(Lluminary::SchemaModel)
       expect(result.input.valid?).to be true
     end
   end

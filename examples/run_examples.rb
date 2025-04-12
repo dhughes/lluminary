@@ -5,7 +5,7 @@ Dotenv.load
 # Add the lib directory to the load path
 $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
-require 'luminary'
+require 'lluminary'
 require_relative 'summarize_text'
 require_relative 'analyze_text'
 require_relative 'word_counter'

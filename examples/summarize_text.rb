@@ -1,6 +1,6 @@
-require 'luminary'
+require 'lluminary'
 
-class SummarizeText < Luminary::Task
+class SummarizeText < Lluminary::Task
   use_provider :openai, api_key: ENV['OPENAI_API_KEY']
 
   input_schema do

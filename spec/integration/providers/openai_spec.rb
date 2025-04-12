@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Luminary::Providers::OpenAI do
+RSpec.describe Lluminary::Providers::OpenAI do
   let(:api_key) { ENV['OPENAI_API_KEY'] }
   let(:provider) { described_class.new(api_key: api_key) }
   let(:task) { double('Task') }

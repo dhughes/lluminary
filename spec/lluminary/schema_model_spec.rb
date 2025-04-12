@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Luminary::SchemaModel do
+RSpec.describe Lluminary::SchemaModel do
   describe '.build' do
     let(:fields) do
       {

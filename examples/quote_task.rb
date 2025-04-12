@@ -1,6 +1,6 @@
-require 'luminary'
+require 'lluminary'
 
-class QuoteTask < Luminary::Task
+class QuoteTask < Lluminary::Task
   use_provider :openai, api_key: ENV['OPENAI_API_KEY']
 
   output_schema do

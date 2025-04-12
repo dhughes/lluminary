@@ -1,4 +1,4 @@
-module Luminary
+module Lluminary
   module Providers
     class Base
       attr_reader :config

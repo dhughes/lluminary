@@ -1,4 +1,6 @@
-# Luminary
+# Lluminary
+
+<img src="lluminary_logo.png" height="150" />
 
 A Ruby framework for building LLM-powered applications with structured outputs.
 
@@ -18,7 +20,7 @@ A Ruby framework for building LLM-powered applications with structured outputs.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'luminary'
+gem 'lluminary'
 ```
 
 And then execute:
@@ -32,7 +34,7 @@ bundle install
 ### Basic Task
 
 ```ruby
-class SummarizeText < Luminary::Task
+class SummarizeText < Lluminary::Task
   use_provider :openai, api_key: ENV['OPENAI_API_KEY']
 
   input_schema do
@@ -60,7 +62,7 @@ puts result.output.summary
 The schema system supports optional descriptions for each field. These descriptions help the LLM understand exactly what each field should contain:
 
 ```ruby
-class AnalyzeText < Luminary::Task
+class AnalyzeText < Lluminary::Task
   output_schema do
     string :sentiment, description: "The overall emotional tone (positive, negative, or neutral)"
     string :key_points, description: "The main ideas or arguments presented in the text"
@@ -85,7 +87,7 @@ end
 Tasks support input validation through the schema system. You can add validations to your input schema:
 
 ```ruby
-class WordCounter < Luminary::Task
+class WordCounter < Lluminary::Task
   input_schema do
     string :text
     integer :min_length
@@ -150,7 +152,7 @@ OPENAI_API_KEY=your_api_key_here
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/yourusername/luminary.
+Bug reports and pull requests are welcome on GitHub at https://github.com/yourusername/lluminary.
 
 ## License
 

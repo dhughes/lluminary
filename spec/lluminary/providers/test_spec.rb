@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'luminary/providers/test'
+require 'lluminary/providers/test'
 
-RSpec.describe Luminary::Providers::Test do
+RSpec.describe Lluminary::Providers::Test do
   let(:provider) { described_class.new }
   let(:prompt) { "Test prompt" }
   let(:task_class) { double("TaskClass", output_fields: { summary: { type: :string } }) }

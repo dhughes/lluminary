@@ -1,4 +1,4 @@
-module Luminary
+module Lluminary
   module Providers
     class Test < Base
       def initialize(**config)

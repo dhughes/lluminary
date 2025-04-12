@@ -1,6 +1,6 @@
-require 'luminary'
+require 'lluminary'
 
-RSpec.describe Luminary::Providers::Base do
+RSpec.describe Lluminary::Providers::Base do
   describe '#initialize' do
     it 'accepts configuration options' do
       config = { api_key: 'test_key', model: 'test_model' }

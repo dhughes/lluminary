@@ -1,6 +1,6 @@
-require_relative '../lib/luminary'
+require_relative '../lib/lluminary'
 
-class WordCounter < Luminary::Task
+class WordCounter < Lluminary::Task
   use_provider(:openai, api_key: ENV['OPENAI_API_KEY'])
 
   input_schema do

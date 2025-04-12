@@ -1,6 +1,6 @@
-require 'luminary'
+require 'lluminary'
 
-RSpec.describe Luminary::Result do
+RSpec.describe Lluminary::Result do
   let(:raw_response) { "Test response" }
   let(:output) { { summary: "Test summary" } }
   let(:prompt) { "Test prompt" }

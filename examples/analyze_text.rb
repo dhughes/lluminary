@@ -1,6 +1,6 @@
-require 'luminary'
+require 'lluminary'
 
-class AnalyzeText < Luminary::Task
+class AnalyzeText < Lluminary::Task
   use_provider :openai, api_key: ENV['OPENAI_API_KEY']
 
   input_schema do

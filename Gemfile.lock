@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    luminary (0.1.0)
+    lluminary (0.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -114,7 +114,7 @@ PLATFORMS
 DEPENDENCIES
   activemodel (~> 7.1.0)
   dotenv (~> 2.8)
-  luminary!
+  lluminary!
   pry-byebug
   rake (~> 13.0)
   rspec (~> 3.12)

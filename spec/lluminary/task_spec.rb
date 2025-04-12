@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Luminary::Task do
+RSpec.describe Lluminary::Task do
   let(:task_class) do
     Class.new(described_class) do
       input_schema do
@@ -96,7 +96,7 @@ RSpec.describe Luminary::Task do
 
   describe '.provider' do
     it 'defaults to Test provider' do
-      expect(task_class.provider).to be_a(Luminary::Providers::Test)
+      expect(task_class.provider).to be_a(Lluminary::Providers::Test)
     end
 
     it 'allows setting a custom provider' do
@@ -108,12 +108,12 @@ RSpec.describe Luminary::Task do
 
   describe '.use_provider' do
     it 'with :test provider sets the test provider' do
-      expect(task_with_test.provider).to be_a(Luminary::Providers::Test)
+      expect(task_with_test.provider).to be_a(Lluminary::Providers::Test)
     end
 
     it 'with :openai instantiates OpenAI provider with config' do
       task_class.use_provider(:openai, api_key: 'test')
-      expect(task_class.provider).to be_a(Luminary::Providers::OpenAI)
+      expect(task_class.provider).to be_a(Lluminary::Providers::OpenAI)
       expect(task_class.provider.config).to eq(api_key: 'test')
     end
 
@@ -197,7 +197,7 @@ RSpec.describe Luminary::Task do
 
     it 'raises error for invalid string input' do
       task = task_with_types.new(name: 123, age: 30)
-      expect { task.send(:validate_input) }.to raise_error(Luminary::ValidationError, "Name must be a String")
+      expect { task.send(:validate_input) }.to raise_error(Lluminary::ValidationError, "Name must be a String")
     end
 
     it 'validates integer input type' do
@@ -207,7 +207,7 @@ RSpec.describe Luminary::Task do
 
     it 'raises error for invalid integer input' do
       task = task_with_types.new(name: "John", age: "30")
-      expect { task.send(:validate_input) }.to raise_error(Luminary::ValidationError, "Age must be an Integer")
+      expect { task.send(:validate_input) }.to raise_error(Lluminary::ValidationError, "Age must be an Integer")
     end
   end
 
@@ -237,7 +237,7 @@ RSpec.describe Luminary::Task do
 
     it 'wraps input in a SchemaModel instance' do
       result = task_with_schema.call(text: "hello", min_length: 3)
-      expect(result.input).to be_a(Luminary::SchemaModel)
+      expect(result.input).to be_a(Lluminary::SchemaModel)
       expect(result.input.text).to eq("hello")
       expect(result.input.min_length).to eq(3)
     end
@@ -268,7 +268,7 @@ RSpec.describe Luminary::Task do
     it 'raises ValidationError for invalid input when using call!' do
       expect {
         task_with_schema.call!(text: nil, min_length: nil)
-      }.to raise_error(Luminary::ValidationError, "Text can't be blank, Min length can't be blank, Min length is not a number")
+      }.to raise_error(Lluminary::ValidationError, "Text can't be blank, Min length can't be blank, Min length is not a number")
     end
   end
 
@@ -298,8 +298,8 @@ RSpec.describe Luminary::Task do
 
     it 'returns a valid result object' do
       result = quote_task.call
-      expect(result).to be_a(Luminary::Task)
-      expect(result.input).to be_a(Luminary::SchemaModel)
+      expect(result).to be_a(Lluminary::Task)
+      expect(result.input).to be_a(Lluminary::SchemaModel)
       expect(result.input.valid?).to be true
     end
   end

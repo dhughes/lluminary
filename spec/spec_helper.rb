@@ -1,4 +1,4 @@
 require 'dotenv'
 Dotenv.load
 
-require 'luminary' 
+require 'lluminary' 

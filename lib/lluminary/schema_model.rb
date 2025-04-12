@@ -1,6 +1,6 @@
 require 'active_model'
 
-module Luminary
+module Lluminary
   class SchemaModel
     include ActiveModel::Validations
 

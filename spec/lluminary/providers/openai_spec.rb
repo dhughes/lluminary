@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Luminary::Providers::OpenAI do
+RSpec.describe Lluminary::Providers::OpenAI do
   let(:config) { { api_key: 'test-key' } }
   let(:provider) { described_class.new(**config) }
 

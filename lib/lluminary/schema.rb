@@ -1,7 +1,7 @@
 require 'active_model'
 require_relative 'schema_model'
 
-module Luminary
+module Lluminary
   class Schema
     def initialize
       @fields = {}

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Luminary::Schema do
+RSpec.describe Lluminary::Schema do
   let(:schema) { described_class.new }
 
   describe '#initialize' do

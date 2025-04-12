@@ -1,7 +1,7 @@
 require 'openai'
 require 'json'
 
-module Luminary
+module Lluminary
   module Providers
     class OpenAI < Base
       attr_reader :client

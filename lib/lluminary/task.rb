@@ -3,7 +3,7 @@ require_relative 'schema'
 require_relative 'validation_error'
 require 'json'
 
-module Luminary
+module Lluminary
   class Task
     class << self
       def input_schema(&block)
