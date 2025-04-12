@@ -1,17 +1,15 @@
 module Luminary
   module Providers
     class Base
-      def initialize(config = {})
+      attr_reader :config
+
+      def initialize(**config)
         @config = config
       end
 
-      def call(prompt:)
+      def call(prompt, task)
         raise NotImplementedError, "Subclasses must implement #call"
       end
-
-      private
-
-      attr_reader :config
     end
   end
 end 

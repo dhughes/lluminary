@@ -4,9 +4,9 @@ require 'json'
 module Luminary
   module Providers
     class OpenAI < Base
-      def initialize(api_key:, **options)
-        @client = ::OpenAI::Client.new(access_token: api_key)
-        @options = options
+      def initialize(**config)
+        super
+        @client = ::OpenAI::Client.new(access_token: config[:api_key])
       end
 
       def call(prompt, task)

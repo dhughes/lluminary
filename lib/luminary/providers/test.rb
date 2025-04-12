@@ -1,8 +1,8 @@
 module Luminary
   module Providers
     class Test < Base
-      def initialize(**options)
-        @options = options
+      def initialize(**config)
+        super
       end
 
       def call(prompt, task)
