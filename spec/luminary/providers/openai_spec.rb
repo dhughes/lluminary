@@ -25,19 +25,20 @@ RSpec.describe Luminary::Providers::OpenAI do
 
   describe '#call' do
     it 'calls the OpenAI API with the correct parameters' do
-      expect(client).to receive(:chat).with(
+      provider.call(prompt, task)
+
+      expect(client).to have_received(:chat).with(
         parameters: {
           model: "gpt-3.5-turbo",
           messages: [{ role: "user", content: prompt }],
           response_format: { type: "json_object" }
         }
       )
-
-      provider.call(prompt, task)
     end
 
     it 'returns both raw and parsed responses' do
       result = provider.call(prompt, task)
+      
       expect(result).to be_an(Array)
       expect(result.first).to eq('{"summary": "Test response"}')
       expect(result.last).to eq({ "summary" => "Test response" })

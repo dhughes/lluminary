@@ -10,11 +10,13 @@
 - [x] Add environment configuration support
 - [x] Implement automatic JSON response formatting
 - [x] Clean up provider interface
+- [x] Improve test structure and mocking patterns
 
 ## In Progress
 - [ ] Add input validation using schemas
 - [ ] Add support for all JSON data types in schemas
 - [ ] Add error handling for invalid responses
+- [ ] Refactor provider response format to use hash/object instead of array
 
 ## Future Tasks
 - [ ] Add support for additional LLM providers (Anthropic, Google, etc.)
@@ -98,7 +100,22 @@
 ## Core Features
 - [x] Input schema definition
 - [x] Output schema definition
-- [ ] Prompt generation
+- [ ] Prompt optimization system
+  - [ ] Default prompt optimizer
+    - [ ] Generic prompt formatting
+    - [ ] Schema information integration
+    - [ ] Basic instructions
+  - [ ] Model-specific prompt optimizers
+    - [ ] Support for different models across providers
+    - [ ] Custom formatting for specific models
+    - [ ] Provider-agnostic optimization
+  - [ ] Custom prompt optimizer support
+    - [ ] Interface for user-defined optimizers
+    - [ ] Documentation and examples
+  - [ ] Optimization features
+    - [ ] Schema-aware formatting
+    - [ ] Model-specific instructions
+    - [ ] Context and examples integration
 - [ ] Response validation
 - [ ] Error handling
 - [ ] Retry logic
