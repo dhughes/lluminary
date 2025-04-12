@@ -56,4 +56,26 @@ RSpec.describe Luminary::Schema do
       expect(first_call).to be(second_call)
     end
   end
+
+  describe '#validate' do
+    let(:schema) do
+      described_class.new.tap do |s|
+        s.string(:name)
+        s.integer(:age)
+      end
+    end
+
+    it 'returns no errors when all values match their field types' do
+      errors = schema.validate(name: "John", age: 30)
+      expect(errors).to be_empty
+    end
+
+    it 'returns errors for type mismatches' do
+      errors = schema.validate(name: 123, age: "30")
+      expect(errors).to contain_exactly(
+        "name must be a String",
+        "age must be an Integer"
+      )
+    end
+  end
 end 
