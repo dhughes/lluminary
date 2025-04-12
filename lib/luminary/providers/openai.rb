@@ -4,6 +4,8 @@ require 'json'
 module Luminary
   module Providers
     class OpenAI < Base
+      attr_reader :client
+
       def initialize(**config)
         super
         @client = ::OpenAI::Client.new(access_token: config[:api_key])
