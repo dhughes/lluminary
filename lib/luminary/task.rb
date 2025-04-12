@@ -1,5 +1,6 @@
 require 'ostruct'
 require_relative 'schema'
+require_relative 'validation_error'
 require 'json'
 
 module Luminary
@@ -79,7 +80,21 @@ module Luminary
     private
 
     def validate_input
-      # TODO: Implement input validation using schema
+      self.class.input_fields.each do |name, field|
+        value = @input[name]
+        next if value.nil? # Skip validation for nil values
+
+        case field[:type]
+        when :string
+          unless value.is_a?(String)
+            raise ValidationError, "#{name} must be a String"
+          end
+        when :integer
+          unless value.is_a?(Integer)
+            raise ValidationError, "#{name} must be an Integer"
+          end
+        end
+      end
     end
 
     def process_response(response)

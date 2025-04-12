@@ -173,4 +173,41 @@ RSpec.describe Luminary::Task do
       expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
     end
   end
+
+  describe '#validate_input' do
+    let(:task_with_types) do
+      Class.new(described_class) do
+        input_schema do
+          string :name
+          integer :age
+        end
+
+        private
+
+        def task_prompt
+          "Test prompt"
+        end
+      end
+    end
+
+    it 'validates string input type' do
+      task = task_with_types.new(name: "John", age: 30)
+      expect { task.send(:validate_input) }.not_to raise_error
+    end
+
+    it 'raises error for invalid string input' do
+      task = task_with_types.new(name: 123, age: 30)
+      expect { task.send(:validate_input) }.to raise_error(Luminary::ValidationError, "name must be a String")
+    end
+
+    it 'validates integer input type' do
+      task = task_with_types.new(name: "John", age: 30)
+      expect { task.send(:validate_input) }.not_to raise_error
+    end
+
+    it 'raises error for invalid integer input' do
+      task = task_with_types.new(name: "John", age: "30")
+      expect { task.send(:validate_input) }.to raise_error(Luminary::ValidationError, "age must be an Integer")
+    end
+  end
 end 

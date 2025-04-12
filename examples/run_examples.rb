@@ -34,5 +34,5 @@ puts result.output.analysis
 puts "#> Running WordCounter example"
 
 result = WordCounter.call(text: text, min_length: 4)
-binding.pry
+
 puts result.output
