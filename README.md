@@ -118,9 +118,11 @@ class AnalyzeText < Lluminary::Task
 end
 ```
 
-### Input Validation
+### Input and Output Validation
 
-Tasks support input validation through the schema system using ActiveModel validations. This means you have access to all standard ActiveModel validations:
+Tasks support validation through the schema system using ActiveModel validations. This means you have access to all standard ActiveModel validations for both input and output schemas.
+
+#### Input Validation
 
 ```ruby
 class WordCounter < Lluminary::Task
@@ -151,7 +153,32 @@ Common validations include:
 
 For a complete list of validations, see the [ActiveModel Validations documentation](https://guides.rubyonrails.org/active_record_validations.html).
 
-### Accessing Validation Results
+#### Output Validation
+
+Output validation ensures that the LLM's response meets your requirements. The same validation rules available for input schemas can be used in output schemas:
+
+```ruby
+class AnalyzeText < Lluminary::Task
+  use_provider :openai
+
+  output_schema do
+    string :sentiment, description: "The overall emotional tone"
+    validates :sentiment, inclusion: { in: %w[positive negative neutral] }
+    
+    string :key_points, description: "The main ideas or arguments"
+    validates :key_points, presence: true
+    
+    integer :word_count, description: "Total number of words"
+    validates :word_count, numericality: { greater_than: 0 }
+  end
+end
+```
+
+Note: Custom validation methods and classes are not yet supported. This feature is planned for a future release. Additionally, future updates will include:
+- Automatic validation rule sharing with the LLM to guide responses
+- Retry mechanisms for failed output validation
+
+#### Accessing Validation Results
 
 You can check validation results and access input/output values through the result object:
 
@@ -169,14 +196,12 @@ result.input.text   # => "input text value"
 result.output.valid?  # => true/false
 result.output.errors # => ActiveModel::Errors object
 
-# Access output values defined in input_schema
+# Access output values defined in output_schema
 result.output.summary # => "output summary value"
 
 # Access raw LLM response (available even when validation fails)
 result.raw_response # => Raw response from the LLM
 ```
-
-Note: Custom validation methods and classes are not yet supported. This feature planned for the future.
 
 ## Running Examples
 
