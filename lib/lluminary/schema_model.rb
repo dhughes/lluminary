@@ -10,6 +10,12 @@ module Lluminary
       @attributes = attributes.transform_keys(&:to_s)
     end
 
+    def to_s
+      attrs = attributes.dup
+      attrs.delete('raw_response')
+      "#<#{self.class.name} #{attrs.inspect}>"
+    end
+
     def self.build(fields:, validations:)
       Class.new(self) do
         # Add accessors for each field
