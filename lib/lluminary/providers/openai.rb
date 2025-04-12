@@ -1,5 +1,6 @@
 require 'openai'
 require 'json'
+require_relative '../provider_error'
 
 module Lluminary
   module Providers
@@ -20,16 +21,16 @@ module Lluminary
           }
         )
 
-        content = response.dig("choices", 0, "message", "content")
+        content = response.dig('choices', 0, 'message', 'content')
         
-        begin
-          { 
-            raw: content, 
-            parsed: JSON.parse(content) 
-          }
-        rescue JSON::ParserError => e
-          raise ProviderError, "Failed to parse JSON response: #{e.message}"
-        end
+        { 
+          raw: content,
+          parsed: begin
+            JSON.parse(content) if content
+          rescue JSON::ParserError
+            nil
+          end
+        }
       end
     end
   end
