@@ -10,10 +10,11 @@ A Ruby framework for building LLM-powered applications with structured outputs.
 - Automatic JSON response formatting based on output schemas
 - Input and output schema validation
 - Provider abstraction for different LLM services
-- Built-in support for OpenAI
+- Built-in support for OpenAI and AWS Bedrock
 - Easy to extend with custom providers
 - Field descriptions for better LLM understanding
 - Rich result objects with access to prompts and responses
+- Global and task-specific provider configuration
 
 ## Installation
 
@@ -29,13 +30,57 @@ And then execute:
 bundle install
 ```
 
+## Configuration
+
+Lluminary supports both global and task-specific provider configurations. Global configurations are set once and can be overridden per task.
+
+### Global Configuration
+
+Create a configuration file (e.g., `config/lluminary.rb`) in your application:
+
+```ruby
+require 'lluminary'
+
+Lluminary.configure do |config|
+  # OpenAI Configuration
+  config.provider(:openai, 
+    api_key: ENV['OPENAI_API_KEY']
+  )
+
+  # AWS Bedrock Configuration
+  config.provider(:bedrock,
+    access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+    secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+    region: ENV['AWS_REGION']
+  )
+end
+```
+
+### Task-Specific Configuration
+
+Tasks can use the global configuration or override it with their own settings:
+
+```ruby
+# Using global configuration
+class DefaultConfigTask < Lluminary::Task
+  use_provider :openai  # Uses the global OpenAI configuration
+end
+
+# Overriding global configuration
+class CustomConfigTask < Lluminary::Task
+  use_provider :openai, api_key: 'custom-key'  # Overrides the global OpenAI configuration
+end
+```
+
 ## Usage
 
 ### Basic Task
 
+Here's a complete example of a task that uses the global configuration:
+
 ```ruby
 class SummarizeText < Lluminary::Task
-  use_provider :openai, api_key: ENV['OPENAI_API_KEY']
+  use_provider :openai  # Uses the global OpenAI configuration
 
   input_schema do
     string :text, description: "The text to be summarized"
@@ -63,23 +108,14 @@ The schema system supports optional descriptions for each field. These descripti
 
 ```ruby
 class AnalyzeText < Lluminary::Task
+  use_provider :openai  # Uses the global OpenAI configuration
+
   output_schema do
     string :sentiment, description: "The overall emotional tone (positive, negative, or neutral)"
     string :key_points, description: "The main ideas or arguments presented in the text"
     integer :word_count, description: "Total number of words in the text"
   end
 end
-
-# LLM will receive a prompt that includes:
-#
-# sentiment (string): The overall emotional tone (positive, negative, or neutral)
-# Example: "your sentiment here"
-#
-# key_points (string): The main ideas or arguments presented in the text
-# Example: "your key_points here"
-#
-# word_count (integer): Total number of words in the text
-# Example: 0
 ```
 
 ### Input Validation
@@ -88,6 +124,8 @@ Tasks support input validation through the schema system. You can add validation
 
 ```ruby
 class WordCounter < Lluminary::Task
+  use_provider :openai  # Uses the global OpenAI configuration
+
   input_schema do
     string :text
     integer :min_length
@@ -96,64 +134,60 @@ class WordCounter < Lluminary::Task
     validates :min_length, presence: true, numericality: { greater_than: 0 }
   end
 end
-
-# Using call to handle validation errors gracefully
-result = WordCounter.call(text: nil, min_length: nil)
-result.input.valid?  # => false
-result.input.errors.full_messages  # => ["Text can't be blank", "Min length can't be blank", ...]
-result.output  # => nil (task not executed due to validation failure)
-
-# Using call! to raise validation errors
-WordCounter.call!(text: nil, min_length: nil)  # raises ValidationError
 ```
 
-The `call` method returns a result object that allows you to check validation status and errors, while `call!` raises a `ValidationError` if validation fails. This gives you flexibility in how you want to handle validation failures.
+## Running Examples
 
-### Result Objects
+The examples in the `examples/` directory demonstrate various Lluminary features. To run them:
 
-Tasks return rich result objects that provide access to:
+1. Create a `.env` file in the project root with the required environment variables:
+   ```bash
+   # OpenAI Configuration (required for OpenAI examples)
+   OPENAI_API_KEY=your_openai_api_key
 
-```ruby
-result = AnalyzeText.call(text: "Your text here")
+   # AWS Bedrock Configuration (required for Bedrock examples)
+   AWS_ACCESS_KEY_ID=your_aws_access_key
+   AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+   AWS_REGION=your_aws_region
+   ```
 
-result.input          # Access the validated input model
-result.input.valid?   # Check if input is valid
-result.input.errors   # Access validation errors
-result.output        # Access the parsed output fields
-result.raw_response  # The raw JSON response from the LLM
-result.prompt        # The full prompt sent to the LLM
-```
+2. Run an example:
+   ```bash
+   ruby examples/summarize_text.rb
+   ```
 
-### Examples
+Note: You only need to configure the providers you plan to use. For example, if you only want to run OpenAI examples, you only need to set the `OPENAI_API_KEY`.
 
-See the `examples/` directory for complete working examples:
+## Provider Configuration Options
 
-- `summarize_text.rb`: A task that summarizes text using OpenAI
-- `analyze_text.rb`: A task that performs text analysis with multiple output fields
-- `word_counter.rb`: A task that counts words and finds the longest word
+### OpenAI Provider
+
+| Option | Required | Default | Description |
+|--------|----------|---------|-------------|
+| `api_key` | Yes | - | Your OpenAI API key |
+
+### AWS Bedrock Provider
+
+| Option | Required | Default | Description |
+|--------|----------|---------|-------------|
+| `access_key_id` | Yes | - | Your AWS access key ID |
+| `secret_access_key` | Yes | - | Your AWS secret access key |
+| `region` | Yes | - | The AWS region to use |
 
 ## Development
 
-After checking out the repo, run `bundle install` to install dependencies.
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-### Running Tests
-
-```bash
-bundle exec rspec
-```
-
-### Environment Setup
-
-Create a `.env` file with your API keys:
-
-```
-OPENAI_API_KEY=your_api_key_here
-```
+To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/yourusername/lluminary.
+Bug reports and pull requests are welcome on GitHub at https://github.com/yourusername/lluminary. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/yourusername/lluminary/blob/master/CODE_OF_CONDUCT.md).
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT). 
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+
+## Code of Conduct
+
+Everyone interacting in the Lluminary project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/yourusername/lluminary/blob/master/CODE_OF_CONDUCT.md). 

@@ -298,4 +298,10 @@
   - [ ] Document required gem dependencies for each provider
   - [ ] Add dependency checks when providers are initialized
   - [ ] Add helpful error messages when provider gems aren't installed
-  - [ ] Consider creating separate provider gems (e.g. lluminary-openai, lluminary-bedrock) 
+  - [ ] Consider creating separate provider gems (e.g. lluminary-openai, lluminary-bedrock)
+- [ ] Add provider-specific configuration options
+  - [ ] Add default provider setting
+    - [ ] Allow setting default provider in global config
+    - [ ] Make tasks use default provider when none specified
+    - [ ] Add tests for default provider behavior
+    - [ ] Update documentation for default provider 
