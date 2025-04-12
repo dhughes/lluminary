@@ -1,5 +1,4 @@
-require 'dotenv'
-Dotenv.load
+require_relative 'config'
 
 # Add the lib directory to the load path
 $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
@@ -7,7 +6,7 @@ $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 require 'lluminary'
 
 class SummarizeText < Lluminary::Task
-  use_provider :openai, api_key: ENV['OPENAI_API_KEY']
+  use_provider :openai
 
   input_schema do
     string :text

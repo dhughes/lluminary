@@ -1,5 +1,4 @@
-require 'dotenv'
-Dotenv.load
+require_relative 'config'
 
 # Add the lib directory to the load path
 $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
@@ -7,10 +6,7 @@ $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 require 'lluminary'
 
 class SentimentAnalysis < Lluminary::Task
-  use_provider :bedrock, 
-    access_key_id: ENV['AWS_ACCESS_KEY_ID'], 
-    secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'], 
-    region: ENV['AWS_REGION']
+  use_provider :bedrock
 
   input_schema do
     string :text, description: "The text to analyze for sentiment"

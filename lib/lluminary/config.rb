@@ -5,7 +5,11 @@ module Lluminary
     end
 
     def configure
-      yield configurator
+      yield self
+    end
+
+    def provider(name, **options)
+      @providers[name.to_sym] = options
     end
 
     def provider_config(provider_name)
@@ -14,22 +18,6 @@ module Lluminary
 
     def reset!
       @providers = {}
-    end
-
-    private
-
-    def configurator
-      @configurator ||= Configurator.new(self)
-    end
-
-    class Configurator
-      def initialize(config)
-        @config = config
-      end
-
-      def provider(name, **options)
-        @config.instance_variable_get(:@providers)[name.to_sym] = options
-      end
     end
   end
 end 
