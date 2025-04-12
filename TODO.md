@@ -16,6 +16,11 @@
 
 ## In Progress
 - [ ] Add support for all JSON data types in schemas
+  - [ ] Consider using input schema descriptions to enhance LLM prompts
+    - [ ] Explore how input field descriptions could provide context to the LLM
+    - [ ] Consider adding validation rules to the prompt context
+    - [ ] Evaluate if this would help the LLM better understand input constraints
+    - [ ] Consider adding examples from the schema to the prompt
 
 ## Future Tasks
 - [ ] Add support for additional LLM providers (Anthropic, Google, etc.)

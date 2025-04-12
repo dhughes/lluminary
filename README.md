@@ -120,21 +120,52 @@ end
 
 ### Input Validation
 
-Tasks support input validation through the schema system. You can add validations to your input schema:
+Tasks support input validation through the schema system using ActiveModel validations. This means you have access to all standard ActiveModel validations:
 
 ```ruby
 class WordCounter < Lluminary::Task
-  use_provider :openai  # Uses the global OpenAI configuration
+  use_provider :openai
 
   input_schema do
     string :text
     integer :min_length
+    string :language, description: "The language of the text"
 
+    # Standard validations
     validates :text, presence: true
     validates :min_length, presence: true, numericality: { greater_than: 0 }
+    
+    # Format validation
+    validates :language, format: { with: /\A[a-z]{2}\z/, message: "must be a two-letter language code" }
+    
+    # Custom validation
+    validate :text_length_greater_than_min
+
+    private
+
+    def text_length_greater_than_min
+      if text && min_length && text.length < min_length
+        errors.add(:text, "must be at least #{min_length} characters long")
+      end
+    end
   end
 end
 ```
+
+Common validations include:
+- `presence`: Ensures a value is provided
+- `numericality`: Validates numeric values
+- `format`: Validates against a regular expression
+- `inclusion`: Ensures a value is in a given set
+- `length`: Validates string length
+- `uniqueness`: Ensures a value is unique
+- Custom validations using the `validate` method
+
+For a complete list of validations, see the [ActiveModel Validations documentation](https://guides.rubyonrails.org/active_record_validations.html).
+
+## Running Examples
+
+The examples in the `examples/`
 
 ## Running Examples
 
