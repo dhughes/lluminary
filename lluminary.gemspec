@@ -9,11 +9,15 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
   s.required_ruby_version = '>= 2.7.0'
 
+  # Runtime dependencies
+  s.add_runtime_dependency 'activemodel', '~> 7.1.0'
+  s.add_runtime_dependency 'ruby-openai', '~> 6.3'  # Required for OpenAI provider
+  s.add_runtime_dependency 'aws-sdk-bedrockruntime', '~> 1.0'  # Required for AWS Bedrock provider
+
+  # Development dependencies
   s.add_development_dependency 'rspec', '~> 3.12'
   s.add_development_dependency 'rake', '~> 13.0'
   s.add_development_dependency 'rubocop', '~> 1.50'
   s.add_development_dependency 'dotenv', '~> 2.8'
-
-  # Optional dependencies
-  s.add_development_dependency 'ruby-openai', '~> 6.3'
+  s.add_development_dependency 'pry-byebug', '~> 3.10'
 end 

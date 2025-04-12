@@ -24,6 +24,9 @@ module Lluminary
         when :test
           require_relative 'providers/test'
           Providers::Test
+        when :bedrock
+          require_relative 'providers/bedrock'
+          Providers::Bedrock
         else
           raise ArgumentError, "Unknown provider: #{provider_name}"
         end

@@ -1,9 +1,7 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
+# gem "rails"
+
 gemspec
-
-group :development do
-  gem "pry-byebug"
-end
-
-gem 'activemodel', '~> 7.1.0' 

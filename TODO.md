@@ -285,4 +285,10 @@
   - [ ] Add model selection based on task requirements
   - [ ] Support for cost/performance optimization
   - [ ] Support for fallback providers
-  - [ ] Support for provider-specific model selection 
+  - [ ] Support for provider-specific model selection
+- [ ] Provider Dependencies
+  - [ ] Make LLM provider dependencies optional (not bundled with gem)
+  - [ ] Document required gem dependencies for each provider
+  - [ ] Add dependency checks when providers are initialized
+  - [ ] Add helpful error messages when provider gems aren't installed
+  - [ ] Consider creating separate provider gems (e.g. lluminary-openai, lluminary-bedrock) 

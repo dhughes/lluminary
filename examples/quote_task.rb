@@ -1,3 +1,9 @@
+require 'dotenv'
+Dotenv.load
+
+# Add the lib directory to the load path
+$LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
+
 require 'lluminary'
 
 class QuoteTask < Lluminary::Task
@@ -20,3 +26,11 @@ class QuoteTask < Lluminary::Task
     PROMPT
   end
 end 
+
+if __FILE__ == $0
+  puts "#> Running QuoteTask example"
+
+  result = QuoteTask.call
+
+  puts result.output
+end
