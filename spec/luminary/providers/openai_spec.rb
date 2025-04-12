@@ -36,12 +36,12 @@ RSpec.describe Luminary::Providers::OpenAI do
       )
     end
 
-    it 'returns both raw and parsed responses' do
+    it 'returns a hash with raw and parsed responses' do
       result = provider.call(prompt, task)
       
-      expect(result).to be_an(Array)
-      expect(result.first).to eq('{"summary": "Test response"}')
-      expect(result.last).to eq({ "summary" => "Test response" })
+      expect(result).to be_a(Hash)
+      expect(result[:raw]).to eq('{"summary": "Test response"}')
+      expect(result[:parsed]).to eq({ "summary" => "Test response" })
     end
   end
 end 

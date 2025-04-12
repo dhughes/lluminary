@@ -21,8 +21,10 @@ module Luminary
         content = response.dig("choices", 0, "message", "content")
         
         begin
-          parsed = JSON.parse(content)
-          [content, parsed]
+          { 
+            raw: content, 
+            parsed: JSON.parse(content) 
+          }
         rescue JSON::ParserError => e
           raise ProviderError, "Failed to parse JSON response: #{e.message}"
         end

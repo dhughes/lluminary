@@ -86,14 +86,9 @@ module Luminary
     end
 
     def process_response(response)
-      if response.is_a?(Array) && response.length == 2
-        @raw_response, @parsed_response = response
-        @output = OpenStruct.new(@parsed_response)
-      else
-        @raw_response = response
-        @parsed_response = response
-        @output = OpenStruct.new(summary: response)
-      end
+      @raw_response = response[:raw]
+      @parsed_response = response[:parsed]
+      @output = OpenStruct.new(@parsed_response)
     end
 
     def define_input_methods

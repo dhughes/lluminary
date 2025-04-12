@@ -7,8 +7,8 @@ RSpec.describe Luminary::Providers::OpenAI do
 
   it "successfully calls the OpenAI API" do
     result = provider.call("Please respond with a JSON object containing a greeting field.", task)
-    expect(result).to be_an(Array)
-    expect(result.first).to be_a(String)
-    expect(result.last).to be_a(Hash)
+    expect(result).to be_a(Hash)
+    expect(result[:raw]).to be_a(String)
+    expect(result[:parsed]).to be_a(Hash)
   end
 end 

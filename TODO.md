@@ -10,13 +10,11 @@
 - [x] Add environment configuration support
 - [x] Implement automatic JSON response formatting
 - [x] Clean up provider interface
-- [x] Improve test structure and mocking patterns
 
 ## In Progress
 - [ ] Add input validation using schemas
 - [ ] Add support for all JSON data types in schemas
 - [ ] Add error handling for invalid responses
-- [ ] Refactor provider response format to use hash/object instead of array
 
 ## Future Tasks
 - [ ] Add support for additional LLM providers (Anthropic, Google, etc.)

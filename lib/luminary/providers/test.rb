@@ -7,7 +7,10 @@ module Luminary
 
       def call(prompt, task)
         content = '{"summary": "Test response"}'
-        [content, JSON.parse(content)]
+        { 
+          raw: content, 
+          parsed: JSON.parse(content) 
+        }
       end
     end
   end
