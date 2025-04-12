@@ -59,16 +59,16 @@ RSpec.describe Luminary::Task do
       expect(task_with_test.provider).to be_a(Luminary::Providers::Test)
     end
 
-    it 'with a custom provider class instantiates the provider with config' do
-      custom_provider_class = Class.new(Luminary::Providers::Base) do
-        def initialize(**config)
-          @config = config
-        end
-      end
+    it 'with :openai instantiates OpenAI provider with config' do
+      task_class.use_provider(:openai, api_key: 'test')
+      expect(task_class.provider).to be_a(Luminary::Providers::OpenAI)
+      expect(task_class.provider.config).to eq(api_key: 'test')
+    end
 
-      task_class.use_provider(custom_provider_class, api_key: 'test')
-      expect(task_class.provider).to be_a(custom_provider_class)
-      expect(task_class.provider.instance_variable_get(:@config)).to eq(api_key: 'test')
+    it 'raises ArgumentError for unknown provider' do
+      expect {
+        task_class.use_provider(:unknown)
+      }.to raise_error(ArgumentError, "Unknown provider: unknown")
     end
   end
 end 

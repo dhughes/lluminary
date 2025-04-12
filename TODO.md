@@ -33,6 +33,11 @@
 - [ ] Support async/background processing
 - [ ] Add provider-specific configuration options
 - [ ] Add response templating system
+- [ ] Consider adding support for custom providers
+  - [ ] Define clear interface requirements
+  - [ ] Add validation for custom provider implementations
+  - [ ] Document provider creation process
+  - [ ] Add examples of custom providers
 
 ## Task Interface
 - [x] Input/Output Schema DSL
