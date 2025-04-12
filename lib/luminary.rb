@@ -4,7 +4,6 @@ require_relative 'luminary/input_schema'
 require_relative 'luminary/output_schema'
 require_relative 'luminary/task'
 require_relative 'luminary/providers/base'
-require_relative 'luminary/providers/test_provider'
 require_relative 'luminary/providers/openai'
 
 module Luminary

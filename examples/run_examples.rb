@@ -6,7 +6,7 @@ $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
 require 'luminary'
 require_relative 'summarize_text'
-
+require_relative 'analyze_text'
 text = <<~TEXT
     In a quiet village nestled between rolling hills and whispering pines, there lived a buff-colored cat named Fig. His coat shimmered like warm sand in the sun, and he spent his days stretched across stone walls and window ledges, a golden blur of contentment. Though the village children adored him and his elderly owner gave him all the cream he could want, Fig often found himself gazing beyond the fields, wondering if life held something more than naps and the occasional sparrow chase. One morning, as the dew still clung to the grass, Fig slipped out through the garden gate and padded off toward the unknown.
 
@@ -15,7 +15,16 @@ text = <<~TEXT
     Eventually, Fig returned to his village, not with the swagger of a conquering hero, but with the calm poise of someone who had seen the world and understood it a little better. He resumed his favorite perch by the window, basking in the morning light, but now he listened closer to birdsong, lingered longer with the children, and purred not just for pleasure, but in gratitude. The meaning of life, Fig had learned, wasn’t a secret to be discovered—it was in every step, every scent, every shared glance. And from that day on, the little buff-colored cat lived not just comfortably, but deeply.
 TEXT
 
-# Run the task
+
+puts "#> Running SummarizeText example"
+
 result = SummarizeText.call(text: text)
 
-puts result.output.summary 
+puts result.output.summary
+
+puts "#> Running AnalyzeText example"
+
+result = AnalyzeText.call(text: text)
+
+puts result.output.analysis
+

@@ -14,6 +14,6 @@ class AnalyzeText < Luminary::Task
   private
 
   def task_prompt
-    "Analyze the following text and provide a brief analysis:\n\n#{text}"
+    "Analyze the following text and provide a brief thematic analysis:\n\n#{text}"
   end
 end 
