@@ -12,21 +12,41 @@ RSpec.describe Luminary::Schema do
   describe '#string' do
     it 'adds a string field to the schema' do
       schema.string(:name)
-      expect(schema.fields).to eq({ name: { type: :string } })
+      expect(schema.fields).to eq({ name: { type: :string, description: nil } })
+    end
+
+    it 'adds a string field with description' do
+      schema.string(:name, description: "The user's full name")
+      expect(schema.fields).to eq({ 
+        name: { 
+          type: :string,
+          description: "The user's full name"
+        } 
+      })
     end
   end
 
   describe '#integer' do
     it 'adds an integer field to the schema' do
       schema.integer(:count)
-      expect(schema.fields).to eq({ count: { type: :integer } })
+      expect(schema.fields).to eq({ count: { type: :integer, description: nil } })
+    end
+
+    it 'adds an integer field with description' do
+      schema.integer(:count, description: "The total number of items")
+      expect(schema.fields).to eq({ 
+        count: { 
+          type: :integer,
+          description: "The total number of items"
+        } 
+      })
     end
   end
 
   describe '#fields' do
     it 'returns the fields hash' do
       schema.string(:name)
-      expect(schema.fields).to eq({ name: { type: :string } })
+      expect(schema.fields).to eq({ name: { type: :string, description: nil } })
     end
 
     it 'returns the same hash instance' do

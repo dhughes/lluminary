@@ -101,21 +101,41 @@ module Luminary
 
     def json_schema_example
       fields = self.class.output_fields
-      example = fields.each_with_object({}) do |(name, field), hash|
+      return "{}" if fields.empty?
+
+      # Generate field descriptions
+      field_descriptions = fields.map do |name, field|
+        type = field[:type]
+        description = field[:description]
+        example = case type
+                 when :string
+                   "\"your #{name} here\""
+                 when :integer
+                   "0"
+                 end
+
+        description_line = description ? ": #{description}" : ""
+        "#{name} (#{type})#{description_line}\nExample: #{example}"
+      end.join("\n\n")
+
+      # Generate example JSON
+      example_json = fields.each_with_object({}) do |(name, field), hash|
         hash[name] = case field[:type]
-        when :string
-          "your #{name} here"
-        when :integer
-          0
-        when :boolean
-          true
-        when :array
-          []
-        when :object
-          {}
-        end
+                    when :string
+                      "your #{name} here"
+                    when :integer
+                      0
+                    end
       end
-      JSON.pretty_generate(example)
+
+      <<~SCHEMA.chomp
+        You must respond with a valid JSON object with the following fields:
+
+        #{field_descriptions}
+
+        Your response should look like this:
+        #{JSON.pretty_generate(example_json)}
+      SCHEMA
     end
   end
 end 

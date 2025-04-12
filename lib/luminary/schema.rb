@@ -4,12 +4,12 @@ module Luminary
       @fields = {}
     end
 
-    def string(name)
-      @fields[name] = { type: :string }
+    def string(name, description: nil)
+      @fields[name] = { type: :string, description: description }
     end
 
-    def integer(name)
-      @fields[name] = { type: :integer }
+    def integer(name, description: nil)
+      @fields[name] = { type: :integer, description: description }
     end
 
     def fields

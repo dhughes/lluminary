@@ -4,11 +4,11 @@ RSpec.describe Luminary::Task do
   let(:task_class) do
     Class.new(described_class) do
       input_schema do
-        string :message
+        string :message, description: "The text message to process"
       end
 
       output_schema do
-        string :summary
+        string :summary, description: "A brief summary of the message"
       end
 
       private
@@ -69,6 +69,56 @@ RSpec.describe Luminary::Task do
       expect {
         task_class.use_provider(:unknown)
       }.to raise_error(ArgumentError, "Unknown provider: unknown")
+    end
+  end
+
+  describe '#json_schema_example' do
+    it 'generates a schema example with descriptions' do
+      task = task_class.new(message: "test")
+      expected_output = <<~SCHEMA
+        You must respond with a valid JSON object with the following fields:
+
+        summary (string): A brief summary of the message
+        Example: "your summary here"
+
+        Your response should look like this:
+        {
+          "summary": "your summary here"
+        }
+      SCHEMA
+      expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
+    end
+
+    it 'generates a schema example without descriptions' do
+      task_without_descriptions = Class.new(described_class) do
+        input_schema do
+          string :message
+        end
+
+        output_schema do
+          string :summary
+        end
+
+        private
+
+        def task_prompt
+          "Say: #{message}"
+        end
+      end
+
+      task = task_without_descriptions.new(message: "test")
+      expected_output = <<~SCHEMA
+        You must respond with a valid JSON object with the following fields:
+
+        summary (string)
+        Example: "your summary here"
+
+        Your response should look like this:
+        {
+          "summary": "your summary here"
+        }
+      SCHEMA
+      expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
     end
   end
 end 

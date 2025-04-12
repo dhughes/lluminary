@@ -79,10 +79,12 @@
   - [x] Basic string input/output
   - [ ] Length validation
   - [ ] Required/optional
+  - [ ] Example values
 - [ ] Integer
   - [ ] Basic integer input/output
   - [ ] Range validation
   - [ ] Required/optional
+  - [ ] Example values
 - [ ] Boolean
   - [ ] Basic boolean input/output
   - [ ] Required/optional
