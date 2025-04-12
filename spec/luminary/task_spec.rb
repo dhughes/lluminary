@@ -40,6 +40,58 @@ RSpec.describe Luminary::Task do
       result = task_class.call(message: "hello")
       expect(result.output.summary).to eq("Test response")
     end
+
+    it 'includes schema descriptions in the prompt' do
+      result = task_class.call(message: "hello")
+      expected_schema = <<~SCHEMA
+        You must respond with a valid JSON object with the following fields:
+
+        summary (string): A brief summary of the message
+        Example: "your summary here"
+
+        Your response should look like this:
+        {
+          "summary": "your summary here"
+        }
+      SCHEMA
+      expect(result.prompt).to include(expected_schema.chomp)
+    end
+  end
+
+  describe '.call without descriptions' do
+    let(:task_without_descriptions) do
+      Class.new(described_class) do
+        input_schema do
+          string :message
+        end
+
+        output_schema do
+          string :summary
+        end
+
+        private
+
+        def task_prompt
+          "Say: #{message}"
+        end
+      end
+    end
+
+    it 'includes basic schema in the prompt' do
+      result = task_without_descriptions.call(message: "hello")
+      expected_schema = <<~SCHEMA
+        You must respond with a valid JSON object with the following fields:
+
+        summary (string)
+        Example: "your summary here"
+
+        Your response should look like this:
+        {
+          "summary": "your summary here"
+        }
+      SCHEMA
+      expect(result.prompt).to include(expected_schema.chomp)
+    end
   end
 
   describe '.provider' do

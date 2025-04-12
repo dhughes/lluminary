@@ -3,7 +3,8 @@ require 'luminary'
 RSpec.describe Luminary::Result do
   let(:raw_response) { "Test response" }
   let(:output) { { summary: "Test summary" } }
-  let(:result) { described_class.new(raw_response: raw_response, output: output) }
+  let(:prompt) { "Test prompt" }
+  let(:result) { described_class.new(raw_response: raw_response, output: output, prompt: prompt) }
 
   describe '#raw_response' do
     it 'returns the raw response' do
@@ -19,6 +20,12 @@ RSpec.describe Luminary::Result do
 
     it 'allows accessing output fields as methods' do
       expect(result.output.summary).to eq(output[:summary])
+    end
+  end
+
+  describe '#prompt' do
+    it 'returns the prompt' do
+      expect(result.prompt).to eq(prompt)
     end
   end
 end 

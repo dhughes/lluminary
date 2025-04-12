@@ -72,7 +72,6 @@ module Luminary
       base_prompt = <<~PROMPT
         #{task_prompt}
 
-        You must respond with a valid JSON object in the following format:
         #{json_schema_example}
       PROMPT
     end
@@ -87,6 +86,7 @@ module Luminary
       @raw_response = response[:raw]
       @parsed_response = response[:parsed]
       @output = OpenStruct.new(@parsed_response)
+      @prompt = prompt
     end
 
     def define_input_methods
@@ -136,6 +136,14 @@ module Luminary
         Your response should look like this:
         #{JSON.pretty_generate(example_json)}
       SCHEMA
+    end
+
+    def to_result
+      Result.new(
+        raw_response: @raw_response,
+        output: @parsed_response,
+        prompt: @prompt
+      )
     end
   end
 end 
