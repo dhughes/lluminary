@@ -22,7 +22,7 @@ TEXT
 puts "#> Running SummarizeText example"
 
 result = SummarizeText.call(text: text)
-
+binding.pry
 puts result.output.summary
 
 puts "#> Running AnalyzeText example"

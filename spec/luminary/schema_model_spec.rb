@@ -18,7 +18,11 @@ RSpec.describe Luminary::SchemaModel do
 
     let(:model_class) { described_class.build(fields: fields, validations: validations) }
 
-    it 'creates a class with ActiveModel::Validations' do
+    it 'creates a class that inherits from SchemaModel' do
+      expect(model_class.ancestors).to include(described_class)
+    end
+
+    it 'includes ActiveModel::Validations' do
       expect(model_class.ancestors).to include(ActiveModel::Validations)
     end
 

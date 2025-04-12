@@ -35,6 +35,10 @@ module Luminary
         new(input).call
       end
 
+      def call!(input)
+        new(input).call!
+      end
+
       def provider
         @provider ||= begin
           require_relative 'providers/test'
@@ -67,6 +71,18 @@ module Luminary
     end
 
     def call
+      if valid?
+        response = self.class.provider.call(prompt, self)
+        process_response(response)
+      else
+        @raw_response = nil
+        @parsed_response = nil
+        @output = nil
+      end
+      self
+    end
+
+    def call!
       validate_input!
       response = self.class.provider.call(prompt, self)
       process_response(response)

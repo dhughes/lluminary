@@ -80,6 +80,33 @@ end
 # Example: 0
 ```
 
+### Input Validation
+
+Tasks support input validation through the schema system. You can add validations to your input schema:
+
+```ruby
+class WordCounter < Luminary::Task
+  input_schema do
+    string :text
+    integer :min_length
+
+    validates :text, presence: true
+    validates :min_length, presence: true, numericality: { greater_than: 0 }
+  end
+end
+
+# Using call to handle validation errors gracefully
+result = WordCounter.call(text: nil, min_length: nil)
+result.input.valid?  # => false
+result.input.errors.full_messages  # => ["Text can't be blank", "Min length can't be blank", ...]
+result.output  # => nil (task not executed due to validation failure)
+
+# Using call! to raise validation errors
+WordCounter.call!(text: nil, min_length: nil)  # raises ValidationError
+```
+
+The `call` method returns a result object that allows you to check validation status and errors, while `call!` raises a `ValidationError` if validation fails. This gives you flexibility in how you want to handle validation failures.
+
 ### Result Objects
 
 Tasks return rich result objects that provide access to:
@@ -87,9 +114,12 @@ Tasks return rich result objects that provide access to:
 ```ruby
 result = AnalyzeText.call(text: "Your text here")
 
-result.output.sentiment     # Access the parsed output fields
-result.raw_response        # The raw JSON response from the LLM
-result.prompt             # The full prompt sent to the LLM
+result.input          # Access the validated input model
+result.input.valid?   # Check if input is valid
+result.input.errors   # Access validation errors
+result.output        # Access the parsed output fields
+result.raw_response  # The raw JSON response from the LLM
+result.prompt        # The full prompt sent to the LLM
 ```
 
 ### Examples

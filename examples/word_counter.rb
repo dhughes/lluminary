@@ -6,6 +6,9 @@ class WordCounter < Luminary::Task
   input_schema do
     string :text
     integer :min_length
+
+    validates :text, presence: true
+    validates :min_length, presence: true, numericality: { greater_than: 0 }
   end
 
   output_schema do

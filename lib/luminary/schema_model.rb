@@ -2,18 +2,16 @@ require 'active_model'
 
 module Luminary
   class SchemaModel
+    include ActiveModel::Validations
+
+    attr_reader :attributes
+
+    def initialize(attributes = {})
+      @attributes = attributes.transform_keys(&:to_s)
+    end
+
     def self.build(fields:, validations:)
-      Class.new do
-        include ActiveModel::Validations
-
-        # Initialize with attributes
-        define_method(:initialize) do |attributes = {}|
-          @attributes = attributes.transform_keys(&:to_s)
-        end
-
-        # Expose attributes
-        define_method(:attributes) { @attributes }
-
+      Class.new(self) do
         # Add accessors for each field
         fields.each_key do |name|
           define_method(name) { @attributes[name.to_s] }

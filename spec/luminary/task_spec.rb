@@ -217,6 +217,9 @@ RSpec.describe Luminary::Task do
         input_schema do
           string :text
           integer :min_length
+
+          validates :text, presence: true
+          validates :min_length, presence: true, numericality: { greater_than: 0 }
         end
 
         output_schema do
@@ -234,7 +237,7 @@ RSpec.describe Luminary::Task do
 
     it 'wraps input in a SchemaModel instance' do
       result = task_with_schema.call(text: "hello", min_length: 3)
-      expect(result.input).to be_a(ActiveModel::Validations)
+      expect(result.input).to be_a(Luminary::SchemaModel)
       expect(result.input.text).to eq("hello")
       expect(result.input.min_length).to eq(3)
     end
@@ -246,18 +249,26 @@ RSpec.describe Luminary::Task do
     end
 
     it 'returns validation errors for invalid input' do
-      task = task_with_schema.new(text: 123, min_length: "3")
-      expect(task.valid?).to be false
-      expect(task.input.errors.full_messages).to contain_exactly(
-        "Text must be a String",
-        "Min length must be an Integer"
+      result = task_with_schema.call(text: nil, min_length: nil)
+      expect(result.input.valid?).to be false
+      expect(result.input.errors.full_messages).to contain_exactly(
+        "Text can't be blank",
+        "Min length can't be blank",
+        "Min length is not a number"
       )
     end
 
-    it 'raises ValidationError for invalid input' do
+    it 'does not execute task when input is invalid' do
+      result = task_with_schema.call(text: nil, min_length: nil)
+      expect(result.raw_response).to be_nil
+      expect(result.parsed_response).to be_nil
+      expect(result.output).to be_nil
+    end
+
+    it 'raises ValidationError for invalid input when using call!' do
       expect {
-        task_with_schema.call(text: 123, min_length: "3")
-      }.to raise_error(Luminary::ValidationError, "Text must be a String, Min length must be an Integer")
+        task_with_schema.call!(text: nil, min_length: nil)
+      }.to raise_error(Luminary::ValidationError, "Text can't be blank, Min length can't be blank, Min length is not a number")
     end
   end
 end 

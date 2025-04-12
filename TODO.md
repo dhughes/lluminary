@@ -10,11 +10,12 @@
 - [x] Add environment configuration support
 - [x] Implement automatic JSON response formatting
 - [x] Clean up provider interface
+- [x] Add input validation using schemas
+- [x] Add validation error handling
+- [x] Add support for validation error checking via result objects
 
 ## In Progress
-- [ ] Add input validation using schemas
 - [ ] Add support for all JSON data types in schemas
-- [ ] Add error handling for invalid responses
 
 ## Future Tasks
 - [ ] Add support for additional LLM providers (Anthropic, Google, etc.)
@@ -63,10 +64,10 @@
   - [x] Access to raw LLM response via `result.raw_response`
   - [x] Access to validated inputs via `result.input`
   - [x] Access to validated outputs via `result.output`
-  - [ ] Success/failure status via `result.success?`
-  - [ ] Error messages via `result.errors`
-- [ ] Validation
-  - [ ] Input validation before execution
+  - [x] Success/failure status via `result.input.valid?`
+  - [x] Error messages via `result.input.errors`
+- [x] Validation
+  - [x] Input validation before execution
   - [ ] Output validation after LLM response
   - [ ] Automatic retry with improved prompts on validation failure
 - [ ] Configuration
@@ -78,13 +79,13 @@
 - [x] String
   - [x] Basic string input/output
   - [ ] Length validation
-  - [ ] Required/optional
-  - [ ] Example values
-- [ ] Integer
-  - [ ] Basic integer input/output
-  - [ ] Range validation
-  - [ ] Required/optional
-  - [ ] Example values
+  - [x] Required/optional
+  - [x] Example values
+- [x] Integer
+  - [x] Basic integer input/output
+  - [x] Range validation
+  - [x] Required/optional
+  - [x] Example values
 - [ ] Boolean
   - [ ] Basic boolean input/output
   - [ ] Required/optional
