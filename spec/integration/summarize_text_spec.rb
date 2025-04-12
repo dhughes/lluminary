@@ -12,9 +12,9 @@ RSpec.describe SummarizeText do
 
   it "returns JSON response" do
     result = described_class.call(text: text)
-    expect(result.raw_response).to be_a(String)
-    expect { JSON.parse(result.raw_response) }.not_to raise_error
-    json = JSON.parse(result.raw_response)
+    expect(result.output.raw_response).to be_a(String)
+    expect { JSON.parse(result.output.raw_response) }.not_to raise_error
+    json = JSON.parse(result.output.raw_response)
     expect(json).to have_key("summary")
     expect(json["summary"]).to eq(result.output.summary)
   end

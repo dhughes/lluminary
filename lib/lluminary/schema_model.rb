@@ -18,10 +18,24 @@ module Lluminary
           define_method("#{name}=") { |value| @attributes[name.to_s] = value }
         end
 
+        # Add raw_response field and validation
+        define_method(:raw_response) { @attributes['raw_response'] }
+        define_method(:raw_response=) { |value| @attributes['raw_response'] = value }
+
+        validate do |record|
+          if record.raw_response
+            begin
+              JSON.parse(record.raw_response)
+            rescue JSON::ParserError
+              record.errors.add(:raw_response, "must be valid JSON")
+            end
+          end
+        end
+
         # Add type validations
         validate do |record|
           record.attributes.each do |name, value|
-            next if value.nil?
+            next if value.nil? || name == 'raw_response'
 
             field = fields[name.to_sym]
             next unless field

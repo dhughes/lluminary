@@ -2,6 +2,12 @@ require 'active_model'
 require_relative 'schema_model'
 
 module Lluminary
+  class JsonValidator < ActiveModel::EachValidator
+    def validate_each(record, attribute, value)
+      record.errors.add(:base, "Response must be valid JSON") unless value.is_a?(Hash)
+    end
+  end
+
   class Schema
     def initialize
       @fields = {}

@@ -22,7 +22,7 @@ TEXT
 puts "#> Running SummarizeText example"
 
 result = SummarizeText.call(text: text)
-binding.pry
+
 puts result.output.summary
 
 puts "#> Running AnalyzeText example"
@@ -35,4 +35,4 @@ puts "#> Running WordCounter example"
 
 result = WordCounter.call(text: text, min_length: 4)
 
-puts result.output
+puts result.output # TODO: make this prettier

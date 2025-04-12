@@ -61,9 +61,13 @@ module Lluminary
       def input_schema_model
         @input_schema&.schema_model || Schema.new.schema_model
       end
+
+      def output_schema_model
+        @output_schema&.schema_model || Schema.new.schema_model
+      end
     end
 
-    attr_reader :input, :output, :raw_response, :parsed_response
+    attr_reader :input, :output, :parsed_response
 
     def initialize(input = {})
       @input = self.class.input_schema_model.new(input)
@@ -75,7 +79,6 @@ module Lluminary
         response = self.class.provider.call(prompt, self)
         process_response(response)
       else
-        @raw_response = nil
         @parsed_response = nil
         @output = nil
       end
@@ -116,9 +119,14 @@ module Lluminary
     end
 
     def process_response(response)
-      @raw_response = response[:raw]
       @parsed_response = response[:parsed]
-      @output = OpenStruct.new(@parsed_response)
+      @output = self.class.output_schema_model.new
+      @output.raw_response = response[:raw]
+
+      if @output.valid?
+        @output.attributes.merge!(@parsed_response) if @parsed_response.is_a?(Hash)
+      end
+
       @prompt = prompt
     end
 
@@ -173,7 +181,7 @@ module Lluminary
 
     def to_result
       Result.new(
-        raw_response: @raw_response,
+        raw_response: @output&.raw_response,
         output: @parsed_response,
         prompt: @prompt
       )

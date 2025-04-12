@@ -28,12 +28,12 @@ RSpec.describe Lluminary::Task do
   describe '.call' do
     it 'returns a result with a raw response from the provider' do
       result = task_class.call(message: "hello")
-      expect(result.raw_response).to eq('{"summary": "Test string value"}')
+      expect(result.output.raw_response).to eq('{"summary": "Test string value"}')
     end
 
     it 'string input allows providing a string input' do
       result = task_class.call(message: "hello")
-      expect(result.raw_response).to eq('{"summary": "Test string value"}')
+      expect(result.output.raw_response).to eq('{"summary": "Test string value"}')
     end
 
     it 'string output returns the output in the result' do
@@ -260,7 +260,6 @@ RSpec.describe Lluminary::Task do
 
     it 'does not execute task when input is invalid' do
       result = task_with_schema.call(text: nil, min_length: nil)
-      expect(result.raw_response).to be_nil
       expect(result.parsed_response).to be_nil
       expect(result.output).to be_nil
     end
@@ -269,6 +268,19 @@ RSpec.describe Lluminary::Task do
       expect {
         task_with_schema.call!(text: nil, min_length: nil)
       }.to raise_error(Lluminary::ValidationError, "Text can't be blank, Min length can't be blank, Min length is not a number")
+    end
+
+    it 'validates that the response is valid JSON' do
+      task = task_with_schema.new(text: "hello", min_length: 3)
+      allow(task.class.provider).to receive(:call).and_return({
+        raw: "not valid json at all",
+        parsed: nil
+      })
+
+      result = task.call
+      expect(result.input.valid?).to be true
+      expect(result.output.valid?).to be false
+      expect(result.output.errors.full_messages).to include("Raw response must be valid JSON")
     end
   end
 
