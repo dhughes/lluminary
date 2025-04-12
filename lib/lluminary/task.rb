@@ -31,7 +31,11 @@ module Lluminary
           raise ArgumentError, "Unknown provider: #{provider_name}"
         end
 
-        @provider = provider_class.new(**config)
+        # Merge global config with task-specific config
+        global_config = Lluminary.config.provider_config(provider_name)
+        merged_config = global_config.merge(config)
+
+        @provider = provider_class.new(**merged_config)
       end
 
       def call(input = {})
