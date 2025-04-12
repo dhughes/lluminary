@@ -73,9 +73,55 @@ RSpec.describe Luminary::Schema do
     it 'returns errors for type mismatches' do
       errors = schema.validate(name: 123, age: "30")
       expect(errors).to contain_exactly(
-        "name must be a String",
-        "age must be an Integer"
+        "Name must be a String",
+        "Age must be an Integer"
       )
+    end
+  end
+
+  describe 'ActiveModel validations' do
+    let(:schema) do
+      described_class.new.tap do |s|
+        s.string(:name)
+        s.integer(:age)
+
+        s.validates :name, presence: true
+        s.validates :age, numericality: { greater_than: 0 }
+      end
+    end
+
+    it 'generates a class that includes ActiveModel::Validations' do
+      schema_model = schema.schema_model
+      expect(schema_model.ancestors).to include(ActiveModel::Validations)
+    end
+
+    it 'adds accessors for defined fields' do
+      schema_model = schema.schema_model
+      instance = schema_model.new
+      instance.name = "John"
+      instance.age = 30
+      expect(instance.name).to eq("John")
+      expect(instance.age).to eq(30)
+    end
+
+    it 'validates presence' do
+      schema_model = schema.schema_model
+      instance = schema_model.new
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to include("Name can't be blank")
+    end
+
+    it 'validates numericality' do
+      schema_model = schema.schema_model
+      instance = schema_model.new(name: "John", age: 0)
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to include("Age must be greater than 0")
+    end
+
+    it 'returns true for valid instances' do
+      schema_model = schema.schema_model
+      instance = schema_model.new(name: "John", age: 30)
+      expect(instance.valid?).to be true
     end
   end
 end 

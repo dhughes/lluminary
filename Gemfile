@@ -4,4 +4,6 @@ gemspec
 
 group :development do
   gem "pry-byebug"
-end 
+end
+
+gem 'activemodel', '~> 7.1.0' 

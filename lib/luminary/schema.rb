@@ -1,7 +1,11 @@
+require 'active_model'
+require_relative 'schema_model'
+
 module Luminary
   class Schema
     def initialize
       @fields = {}
+      @validations = []
     end
 
     def string(name, description: nil)
@@ -16,24 +20,20 @@ module Luminary
       @fields
     end
 
-    def validate(values)
-      errors = []
-      values.each do |name, value|
-        field = @fields[name]
-        next unless field # Skip if field not defined in schema
+    def validates(*args, **options)
+      @validations << [args, options]
+    end
 
-        case field[:type]
-        when :string
-          unless value.is_a?(String)
-            errors << "#{name} must be a String"
-          end
-        when :integer
-          unless value.is_a?(Integer)
-            errors << "#{name} must be an Integer"
-          end
-        end
-      end
-      errors
+    def schema_model
+      @schema_model ||= SchemaModel.build(
+        fields: @fields,
+        validations: @validations
+      )
+    end
+
+    def validate(values)
+      instance = schema_model.new(values)
+      instance.valid? ? [] : instance.errors.full_messages
     end
   end
 end 
