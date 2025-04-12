@@ -10,6 +10,8 @@ A Ruby framework for building LLM-powered applications with structured outputs.
 - Provider abstraction for different LLM services
 - Built-in support for OpenAI
 - Easy to extend with custom providers
+- Field descriptions for better LLM understanding
+- Rich result objects with access to prompts and responses
 
 ## Installation
 
@@ -34,11 +36,11 @@ class SummarizeText < Luminary::Task
   use_provider :openai, api_key: ENV['OPENAI_API_KEY']
 
   input_schema do
-    string :text
+    string :text, description: "The text to be summarized"
   end
 
   output_schema do
-    string :summary
+    string :summary, description: "A concise one-sentence summary of the input text"
   end
 
   private
@@ -53,25 +55,41 @@ result = SummarizeText.call(text: "Your text here")
 puts result.output.summary
 ```
 
-### Output Schema
+### Schema Descriptions
 
-The output schema defines the structure of the LLM's response. Luminary automatically formats the prompt to ensure the LLM returns JSON matching your schema:
+The schema system supports optional descriptions for each field. These descriptions help the LLM understand exactly what each field should contain:
 
 ```ruby
 class AnalyzeText < Luminary::Task
   output_schema do
-    string :sentiment
-    string :key_points
-    integer :word_count
+    string :sentiment, description: "The overall emotional tone (positive, negative, or neutral)"
+    string :key_points, description: "The main ideas or arguments presented in the text"
+    integer :word_count, description: "Total number of words in the text"
   end
 end
 
-# LLM will respond with:
-# {
-#   "sentiment": "positive",
-#   "key_points": "...",
-#   "word_count": 42
-# }
+# LLM will receive a prompt that includes:
+#
+# sentiment (string): The overall emotional tone (positive, negative, or neutral)
+# Example: "your sentiment here"
+#
+# key_points (string): The main ideas or arguments presented in the text
+# Example: "your key_points here"
+#
+# word_count (integer): Total number of words in the text
+# Example: 0
+```
+
+### Result Objects
+
+Tasks return rich result objects that provide access to:
+
+```ruby
+result = AnalyzeText.call(text: "Your text here")
+
+result.output.sentiment     # Access the parsed output fields
+result.raw_response        # The raw JSON response from the LLM
+result.prompt             # The full prompt sent to the LLM
 ```
 
 ### Examples
@@ -80,6 +98,7 @@ See the `examples/` directory for complete working examples:
 
 - `summarize_text.rb`: A task that summarizes text using OpenAI
 - `analyze_text.rb`: A task that performs text analysis with multiple output fields
+- `word_counter.rb`: A task that counts words and finds the longest word
 
 ## Development
 
