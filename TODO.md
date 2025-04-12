@@ -38,6 +38,11 @@
   - [ ] Add validation for custom provider implementations
   - [ ] Document provider creation process
   - [ ] Add examples of custom providers
+- [ ] Improve task result output format
+  - [ ] Make `puts task.call(...)` show meaningful information
+  - [ ] Include input parameters in output
+  - [ ] Include output values in output
+  - [ ] Consider adding execution time and other metadata
 
 ## Task Interface
 - [x] Input/Output Schema DSL

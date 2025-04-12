@@ -8,6 +8,10 @@ module Luminary
       @fields[name] = { type: :string }
     end
 
+    def integer(name)
+      @fields[name] = { type: :integer }
+    end
+
     def fields
       @fields
     end

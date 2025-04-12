@@ -16,6 +16,13 @@ RSpec.describe Luminary::Schema do
     end
   end
 
+  describe '#integer' do
+    it 'adds an integer field to the schema' do
+      schema.integer(:count)
+      expect(schema.fields).to eq({ count: { type: :integer } })
+    end
+  end
+
   describe '#fields' do
     it 'returns the fields hash' do
       schema.string(:name)
