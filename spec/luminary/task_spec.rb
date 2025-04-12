@@ -271,4 +271,36 @@ RSpec.describe Luminary::Task do
       }.to raise_error(Luminary::ValidationError, "Text can't be blank, Min length can't be blank, Min length is not a number")
     end
   end
+
+  describe 'tasks without inputs' do
+    let(:quote_task) do
+      Class.new(described_class) do
+        use_provider :test
+
+        output_schema do
+          string :quote, description: "An inspirational quote"
+          string :author, description: "The person who said the quote"
+        end
+
+        private
+
+        def task_prompt
+          "Generate an inspirational quote and its author"
+        end
+      end
+    end
+
+    it 'can be called without any input parameters' do
+      result = quote_task.call
+      expect(result.output.quote).to be_a(String)
+      expect(result.output.author).to be_a(String)
+    end
+
+    it 'returns a valid result object' do
+      result = quote_task.call
+      expect(result).to be_a(Luminary::Task)
+      expect(result.input).to be_a(Luminary::SchemaModel)
+      expect(result.input.valid?).to be true
+    end
+  end
 end 

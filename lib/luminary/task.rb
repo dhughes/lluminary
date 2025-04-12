@@ -31,11 +31,11 @@ module Luminary
         @provider = provider_class.new(**config)
       end
 
-      def call(input)
+      def call(input = {})
         new(input).call
       end
 
-      def call!(input)
+      def call!(input = {})
         new(input).call!
       end
 
@@ -59,13 +59,13 @@ module Luminary
       end
 
       def input_schema_model
-        @input_schema&.schema_model
+        @input_schema&.schema_model || Schema.new.schema_model
       end
     end
 
     attr_reader :input, :output, :raw_response, :parsed_response
 
-    def initialize(input)
+    def initialize(input = {})
       @input = self.class.input_schema_model.new(input)
       define_input_methods
     end
@@ -79,6 +79,7 @@ module Luminary
         @parsed_response = nil
         @output = nil
       end
+
       self
     end
 
@@ -86,6 +87,7 @@ module Luminary
       validate_input!
       response = self.class.provider.call(prompt, self)
       process_response(response)
+      
       self
     end
 
