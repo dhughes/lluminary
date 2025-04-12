@@ -6,22 +6,31 @@ module Luminary
       end
 
       def call(prompt, task)
-        response = if task.class.output_fields.key?(:quote) && task.class.output_fields.key?(:author)
-          {
-            quote: "Life is what happens while you're busy making other plans",
-            author: "John Lennon"
-          }
-        else
-          {
-            summary: "Test response"
-          }
-        end
-
+        response = generate_response(task.class.output_fields)
         raw_response = JSON.pretty_generate(response).gsub(/\n\s*/, '')
         {
           raw: raw_response,
           parsed: JSON.parse(raw_response)
         }
+      end
+
+      private
+
+      def generate_response(fields)
+        fields.each_with_object({}) do |(name, field), hash|
+          hash[name] = generate_value(field[:type])
+        end
+      end
+
+      def generate_value(type)
+        case type
+        when :string
+          "Test #{type} value"
+        when :integer
+          0
+        else
+          raise "Unsupported type: #{type}"
+        end
       end
     end
   end
