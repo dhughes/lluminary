@@ -31,6 +31,11 @@
   - [ ] Document local provider setup and configuration
   - [ ] Add examples of using local models
   - [ ] Consider performance recommendations for local models
+- [ ] Revisit custom validation support
+  - [ ] Add support for custom validation methods
+  - [ ] Add support for custom validation classes
+  - [ ] Document custom validation patterns
+  - [ ] Add examples of custom validations
 - [ ] Implement task chaining and composition
 - [ ] Add caching layer for API responses
 - [ ] Add rate limiting and retry mechanisms

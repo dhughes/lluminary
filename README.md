@@ -137,17 +137,6 @@ class WordCounter < Lluminary::Task
     
     # Format validation
     validates :language, format: { with: /\A[a-z]{2}\z/, message: "must be a two-letter language code" }
-    
-    # Custom validation
-    validate :text_length_greater_than_min
-
-    private
-
-    def text_length_greater_than_min
-      if text && min_length && text.length < min_length
-        errors.add(:text, "must be at least #{min_length} characters long")
-      end
-    end
   end
 end
 ```
@@ -159,13 +148,35 @@ Common validations include:
 - `inclusion`: Ensures a value is in a given set
 - `length`: Validates string length
 - `uniqueness`: Ensures a value is unique
-- Custom validations using the `validate` method
 
 For a complete list of validations, see the [ActiveModel Validations documentation](https://guides.rubyonrails.org/active_record_validations.html).
 
-## Running Examples
+### Accessing Validation Results
 
-The examples in the `examples/`
+You can check validation results and access input/output values through the result object:
+
+```ruby
+result = SomeTask.call(input_params)
+
+# Check input validation
+result.input.valid?  # => true/false
+result.input.errors # => ActiveModel::Errors object
+
+# Access input values defined in input_schema
+result.input.text   # => "input text value"
+
+# Check output validation
+result.output.valid?  # => true/false
+result.output.errors # => ActiveModel::Errors object
+
+# Access output values defined in input_schema
+result.output.summary # => "output summary value"
+
+# Access raw LLM response (available even when validation fails)
+result.raw_response # => Raw response from the LLM
+```
+
+Note: Custom validation methods and classes are not yet supported. This feature planned for the future.
 
 ## Running Examples
 
@@ -221,4 +232,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Lluminary project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/yourusername/lluminary/blob/master/CODE_OF_CONDUCT.md). 
+Everyone interacting in the Lluminary project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/yourusername/lluminary/blob/master/CODE_OF_CONDUCT.md).
