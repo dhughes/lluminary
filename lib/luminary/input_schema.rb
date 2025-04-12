@@ -1,5 +1,7 @@
 module Luminary
   class InputSchema
+    attr_reader :inputs
+
     def initialize
       @inputs = {}
     end

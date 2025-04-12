@@ -1,12 +1,13 @@
 require 'luminary'
+require 'spec_helper'
 
 RSpec.describe Luminary::OutputSchema do
   let(:schema) { described_class.new }
 
   describe '#string' do
-    it 'defines a string output that can be accessed' do
-      schema.string(:summary)
-      expect(schema.outputs[:summary]).to eq({ type: :string })
+    it 'adds a string output to the schema' do
+      schema.string(:name)
+      expect(schema.outputs).to eq({ name: { type: :string } })
     end
 
     it 'allows defining multiple string outputs' do
@@ -18,10 +19,15 @@ RSpec.describe Luminary::OutputSchema do
 
   describe '#outputs' do
     it 'returns a copy of the outputs hash' do
-      schema.string(:summary)
-      outputs = schema.outputs
-      outputs[:summary] = :modified
-      expect(schema.outputs[:summary]).to eq({ type: :string })
+      schema.string(:name)
+      original = schema.outputs
+      schema.string(:age)
+      
+      expect(original).to eq({ name: { type: :string } })
+      expect(schema.outputs).to eq({ 
+        name: { type: :string },
+        age: { type: :string }
+      })
     end
   end
 end 

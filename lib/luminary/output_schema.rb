@@ -1,5 +1,7 @@
 module Luminary
   class OutputSchema
+    attr_reader :outputs
+
     def initialize
       @outputs = {}
     end
