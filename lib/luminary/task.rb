@@ -15,9 +15,6 @@ module Luminary
         @output_schema.instance_eval(&block)
       end
 
-      # TODO: Consider adding support for custom providers in the future
-      # This would allow users to create their own provider implementations
-      # while ensuring they follow the required interface
       def use_provider(provider_name, **config)
         provider_class = case provider_name
         when :openai
