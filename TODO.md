@@ -19,6 +19,13 @@
 
 ## Future Tasks
 - [ ] Add support for additional LLM providers (Anthropic, Google, etc.)
+- [ ] Add support for local LLM providers
+  - [ ] Integrate with Ollama for local model support
+  - [ ] Add support for LM Studio
+  - [ ] Add support for LocalAI
+  - [ ] Document local provider setup and configuration
+  - [ ] Add examples of using local models
+  - [ ] Consider performance recommendations for local models
 - [ ] Implement task chaining and composition
 - [ ] Add caching layer for API responses
 - [ ] Add rate limiting and retry mechanisms
