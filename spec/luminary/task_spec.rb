@@ -28,17 +28,17 @@ RSpec.describe Luminary::Task do
   describe '.call' do
     it 'returns a result with a raw response from the provider' do
       result = task_class.call(message: "hello")
-      expect(result.raw_response).to eq('{"summary": "Test response"}')
+      expect(result.raw_response).to eq('{"summary": "Test string value"}')
     end
 
     it 'string input allows providing a string input' do
       result = task_class.call(message: "hello")
-      expect(result.raw_response).to eq('{"summary": "Test response"}')
+      expect(result.raw_response).to eq('{"summary": "Test string value"}')
     end
 
     it 'string output returns the output in the result' do
       result = task_class.call(message: "hello")
-      expect(result.output.summary).to eq("Test response")
+      expect(result.output.summary).to eq("Test string value")
     end
 
     it 'includes schema descriptions in the prompt' do
