@@ -197,7 +197,7 @@ RSpec.describe Luminary::Task do
 
     it 'raises error for invalid string input' do
       task = task_with_types.new(name: 123, age: 30)
-      expect { task.send(:validate_input) }.to raise_error(Luminary::ValidationError, "name must be a String")
+      expect { task.send(:validate_input) }.to raise_error(Luminary::ValidationError, "Name must be a String")
     end
 
     it 'validates integer input type' do
@@ -207,7 +207,57 @@ RSpec.describe Luminary::Task do
 
     it 'raises error for invalid integer input' do
       task = task_with_types.new(name: "John", age: "30")
-      expect { task.send(:validate_input) }.to raise_error(Luminary::ValidationError, "age must be an Integer")
+      expect { task.send(:validate_input) }.to raise_error(Luminary::ValidationError, "Age must be an Integer")
+    end
+  end
+
+  describe 'SchemaModel integration' do
+    let(:task_with_schema) do
+      Class.new(described_class) do
+        input_schema do
+          string :text
+          integer :min_length
+        end
+
+        output_schema do
+          string :longest_word
+          integer :word_count
+        end
+
+        private
+
+        def task_prompt
+          "Test prompt"
+        end
+      end
+    end
+
+    it 'wraps input in a SchemaModel instance' do
+      result = task_with_schema.call(text: "hello", min_length: 3)
+      expect(result.input).to be_a(ActiveModel::Validations)
+      expect(result.input.text).to eq("hello")
+      expect(result.input.min_length).to eq(3)
+    end
+
+    it 'validates input using SchemaModel' do
+      result = task_with_schema.call(text: "hello", min_length: 3)
+      expect(result.input.valid?).to be true
+      expect(result.input.errors).to be_empty
+    end
+
+    it 'returns validation errors for invalid input' do
+      task = task_with_schema.new(text: 123, min_length: "3")
+      expect(task.valid?).to be false
+      expect(task.input.errors.full_messages).to contain_exactly(
+        "Text must be a String",
+        "Min length must be an Integer"
+      )
+    end
+
+    it 'raises ValidationError for invalid input' do
+      expect {
+        task_with_schema.call(text: 123, min_length: "3")
+      }.to raise_error(Luminary::ValidationError, "Text must be a String, Min length must be an Integer")
     end
   end
 end 

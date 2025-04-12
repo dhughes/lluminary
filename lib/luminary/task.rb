@@ -53,20 +53,34 @@ module Luminary
       def output_fields
         @output_schema&.fields || {}
       end
+
+      def input_schema_model
+        @input_schema&.schema_model
+      end
     end
 
     attr_reader :input, :output, :raw_response, :parsed_response
 
     def initialize(input)
-      @input = OpenStruct.new(input)
+      @input = self.class.input_schema_model.new(input)
       define_input_methods
     end
 
     def call
-      validate_input
+      validate_input!
       response = self.class.provider.call(prompt, self)
       process_response(response)
       self
+    end
+
+    def valid?
+      @input.valid?
+    end
+
+    def validate_input!
+      unless @input.valid?
+        raise ValidationError, @input.errors.full_messages.join(", ")
+      end
     end
 
     def prompt
@@ -80,21 +94,7 @@ module Luminary
     private
 
     def validate_input
-      self.class.input_fields.each do |name, field|
-        value = @input[name]
-        next if value.nil? # Skip validation for nil values
-
-        case field[:type]
-        when :string
-          unless value.is_a?(String)
-            raise ValidationError, "#{name} must be a String"
-          end
-        when :integer
-          unless value.is_a?(Integer)
-            raise ValidationError, "#{name} must be an Integer"
-          end
-        end
-      end
+      validate_input!
     end
 
     def process_response(response)
@@ -106,7 +106,7 @@ module Luminary
 
     def define_input_methods
       self.class.input_fields.each_key do |name|
-        define_singleton_method(name) { @input[name] }
+        define_singleton_method(name) { @input.attributes[name.to_s] }
       end
     end
 
