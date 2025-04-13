@@ -429,4 +429,52 @@ RSpec.describe Lluminary::Task do
       expect(result.input.valid?).to be true
     end
   end
+
+  describe 'datetime handling' do
+    let(:task_with_datetime) do
+      Class.new(described_class) do
+        use_provider :test
+
+        output_schema do
+          datetime :event_time, description: "When the event occurred"
+        end
+
+        private
+
+        def task_prompt
+          "Test prompt"
+        end
+      end
+    end
+
+    it 'converts ISO8601 datetime strings to DateTime objects' do
+      task = task_with_datetime.new
+      allow(task.class.provider).to receive(:call).and_return({
+        raw: '{"event_time": "2024-01-01T12:00:00+00:00"}',
+        parsed: { "event_time" => "2024-01-01T12:00:00+00:00" }
+      })
+
+      result = task.call
+      expect(result.output.valid?).to be true
+      expect(result.output.event_time).to be_a(DateTime)
+      expect(result.output.event_time.year).to eq(2024)
+      expect(result.output.event_time.month).to eq(1)
+      expect(result.output.event_time.day).to eq(1)
+      expect(result.output.event_time.hour).to eq(12)
+      expect(result.output.event_time.minute).to eq(0)
+      expect(result.output.event_time.second).to eq(0)
+    end
+
+    it 'handles invalid datetime strings' do
+      task = task_with_datetime.new
+      allow(task.class.provider).to receive(:call).and_return({
+        raw: '{"event_time": "not a valid datetime"}',
+        parsed: { "event_time" => "not a valid datetime" }
+      })
+
+      result = task.call
+      expect(result.output.valid?).to be false
+      expect(result.output.errors.full_messages).to include("Event time must be a DateTime")
+    end
+  end
 end 

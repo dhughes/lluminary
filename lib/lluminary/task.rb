@@ -131,7 +131,24 @@ module Lluminary
       @output.raw_response = response[:raw]
 
       # Merge the parsed response first, then validate
-      @output.attributes.merge!(@parsed_response) if @parsed_response.is_a?(Hash)
+      if @parsed_response.is_a?(Hash)
+        # Get datetime fields from schema
+        datetime_fields = self.class.output_fields.select { |_, field| field[:type] == :datetime }.keys
+
+        # Convert datetime fields
+        converted_response = @parsed_response.dup
+        datetime_fields.each do |field_name|
+          if converted_response.key?(field_name.to_s) && converted_response[field_name.to_s].is_a?(String)
+            begin
+              converted_response[field_name.to_s] = DateTime.parse(converted_response[field_name.to_s])
+            rescue ArgumentError
+              # Leave as string, validation will fail
+            end
+          end
+        end
+
+        @output.attributes.merge!(converted_response)
+      end
       
       # Validate after merging
       @output.valid?
