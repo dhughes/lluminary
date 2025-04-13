@@ -42,6 +42,10 @@ module Lluminary
       @validations << [args, options]
     end
 
+    def validations_for(field_name)
+      @validations.select { |args, _| args.include?(field_name) }
+    end
+
     def schema_model
       @schema_model ||= SchemaModel.build(
         fields: @fields,

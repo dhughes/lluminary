@@ -275,6 +275,303 @@ RSpec.describe Lluminary::Task do
       SCHEMA
       expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
     end
+
+    context 'validation descriptions' do
+      context 'presence validation' do
+        it 'includes presence validation description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              string :name, description: "The person's name"
+              validates :name, presence: true
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "name (string): The person's name\nValidation: must be present\nExample: \"your name here\""
+          )
+        end
+      end
+
+      context 'length validation' do
+        it 'includes minimum length validation description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              string :name, description: "The person's name"
+              validates :name, length: { minimum: 2 }
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "name (string): The person's name\nValidation: must be at least 2 characters\nExample: \"your name here\""
+          )
+        end
+
+        it 'includes maximum length validation description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              string :name, description: "The person's name"
+              validates :name, length: { maximum: 20 }
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "name (string): The person's name\nValidation: must be at most 20 characters\nExample: \"your name here\""
+          )
+        end
+
+        it 'includes range length validation description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              string :password, description: "The password"
+              validates :password, length: { in: 8..20 }
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "password (string): The password\nValidation: must be between 8 and 20 characters\nExample: \"your password here\""
+          )
+        end
+
+        it 'includes multiple length validations in description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              string :username, description: "The username"
+              validates :username, length: { 
+                minimum: 3,
+                maximum: 20
+              }
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "username (string): The username\nValidation: must be at least 3 characters, must be at most 20 characters\nExample: \"your username here\""
+          )
+        end
+      end
+
+      context 'numericality validation' do
+        it 'includes odd validation description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              integer :number, description: "Odd number"
+              validates :number, numericality: { odd: true }
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "number (integer): Odd number\nValidation: must be odd\nExample: 0"
+          )
+        end
+
+        it 'includes equal to validation description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              integer :level, description: "Level"
+              validates :level, numericality: { equal_to: 5 }
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "level (integer): Level\nValidation: must be equal to 5\nExample: 0"
+          )
+        end
+
+        it 'includes less than or equal to validation description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              integer :score, description: "Score"
+              validates :score, numericality: { less_than_or_equal_to: 100 }
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "score (integer): Score\nValidation: must be less than or equal to 100\nExample: 0"
+          )
+        end
+
+        it 'includes other than validation description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              integer :value, description: "Value"
+              validates :value, numericality: { other_than: 0 }
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "value (integer): Value\nValidation: must be other than 0\nExample: 0"
+          )
+        end
+
+        it 'includes in range validation description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              integer :rating, description: "Rating"
+              validates :rating, numericality: { in: 1..5 }
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "rating (integer): Rating\nValidation: must be in: 1, 2, 3, 4, 5\nExample: 0"
+          )
+        end
+
+        it 'includes multiple numericality validations in description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              integer :score, description: "Score"
+              validates :score, numericality: { 
+                greater_than: 0,
+                less_than_or_equal_to: 100
+              }
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "score (integer): Score\nValidation: must be greater than 0, must be less than or equal to 100\nExample: 0"
+          )
+        end
+
+        it 'includes multiple comparison validations in description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              integer :age, description: "Age"
+              validates :age, comparison: { 
+                greater_than: 0,
+                less_than: 120
+              }
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "age (integer): Age\nValidation: must be greater than 0, must be less than 120\nExample: 0"
+          )
+        end
+      end
+
+      context 'format validation' do
+        it 'includes format validation description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              string :email, description: "Email address"
+              validates :email, format: { with: /\A[^@\s]+@[^@\s]+\z/ }
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "email (string): Email address\nValidation: must match format: (?-mix:\\A[^@\\s]+@[^@\\s]+\\z)\nExample: \"your email here\""
+          )
+        end
+      end
+
+      context 'inclusion validation' do
+        it 'includes inclusion validation description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              string :role, description: "User role"
+              validates :role, inclusion: { in: %w[admin user guest] }
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "role (string): User role\nValidation: must be one of: admin, user, guest\nExample: \"your role here\""
+          )
+        end
+      end
+
+      context 'exclusion validation' do
+        it 'includes exclusion validation description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              string :status, description: "Status"
+              validates :status, exclusion: { in: %w[banned blocked] }
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "status (string): Status\nValidation: must not be one of: banned, blocked\nExample: \"your status here\""
+          )
+        end
+      end
+
+      context 'absence validation' do
+        it 'includes absence validation description' do
+          task_class = Class.new(described_class) do
+            output_schema do
+              string :deleted_at, description: "Deletion timestamp"
+              validates :deleted_at, absence: true
+            end
+
+            private
+            def task_prompt; "Test prompt"; end
+          end
+
+          task = task_class.new
+          expect(task.send(:json_schema_example)).to include(
+            "deleted_at (string): Deletion timestamp\nValidation: must be absent\nExample: \"your deleted_at here\""
+          )
+        end
+      end
+    end
   end
 
   describe '#validate_input' do
