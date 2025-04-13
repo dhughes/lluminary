@@ -162,10 +162,20 @@ module Lluminary
                    "0"
                  when :datetime
                    "\"2024-01-01T12:00:00+00:00\""
+                 when :boolean
+                   "true"
+                 when :float
+                   "0.0"
                  end
 
         description_line = description ? ": #{description}" : ""
-        "#{name} (#{type})#{description_line}\nExample: #{example}"
+        type_description = case type
+                          when :datetime
+                            "datetime in ISO8601 format"
+                          else
+                            type.to_s
+                          end
+        "#{name} (#{type_description})#{description_line}\nExample: #{example}"
       end.join("\n\n")
 
       # Generate example JSON
@@ -177,6 +187,10 @@ module Lluminary
                       0
                     when :datetime
                       "2024-01-01T12:00:00+00:00"
+                    when :boolean
+                      true
+                    when :float
+                      0.0
                     end
       end
 

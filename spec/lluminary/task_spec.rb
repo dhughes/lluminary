@@ -166,12 +166,78 @@ RSpec.describe Lluminary::Task do
         You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
         The JSON object must contain the following fields:
 
-        start_time (datetime): When the event starts
+        start_time (datetime in ISO8601 format): When the event starts
         Example: "2024-01-01T12:00:00+00:00"
 
         Your response must be ONLY this JSON object:
         {
           "start_time": "2024-01-01T12:00:00+00:00"
+        }
+      SCHEMA
+      expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
+    end
+
+    it 'generates a schema example with boolean field' do
+      task_with_boolean = Class.new(described_class) do
+        input_schema do
+          string :message
+        end
+
+        output_schema do
+          boolean :is_valid, description: "Whether the input is valid"
+        end
+
+        private
+
+        def task_prompt
+          "Say: #{message}"
+        end
+      end
+
+      task = task_with_boolean.new(message: "test")
+      expected_output = <<~SCHEMA
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
+
+        is_valid (boolean): Whether the input is valid
+        Example: true
+
+        Your response must be ONLY this JSON object:
+        {
+          "is_valid": true
+        }
+      SCHEMA
+      expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
+    end
+
+    it 'generates a schema example with float field' do
+      task_with_float = Class.new(described_class) do
+        input_schema do
+          string :message
+        end
+
+        output_schema do
+          float :score, description: "The confidence score"
+        end
+
+        private
+
+        def task_prompt
+          "Say: #{message}"
+        end
+      end
+
+      task = task_with_float.new(message: "test")
+      expected_output = <<~SCHEMA
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
+
+        score (float): The confidence score
+        Example: 0.0
+
+        Your response must be ONLY this JSON object:
+        {
+          "score": 0.0
         }
       SCHEMA
       expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
