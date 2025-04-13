@@ -41,7 +41,8 @@ module Lluminary
         # Add type validations
         validate do |record|
           record.attributes.each do |name, value|
-            next if value.nil? || name == 'raw_response'
+            next if name == 'raw_response'
+            next if value.nil?
 
             field = fields[name.to_sym]
             next unless field
@@ -54,6 +55,10 @@ module Lluminary
             when :integer
               unless value.is_a?(Integer)
                 record.errors.add(name, "must be an Integer")
+              end
+            when :boolean
+              unless value == true || value == false
+                record.errors.add(name, "must be true or false")
               end
             end
           end

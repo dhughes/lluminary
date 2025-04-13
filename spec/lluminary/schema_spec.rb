@@ -43,6 +43,23 @@ RSpec.describe Lluminary::Schema do
     end
   end
 
+  describe '#boolean' do
+    it 'adds a boolean field to the schema' do
+      schema.boolean(:active)
+      expect(schema.fields).to eq({ active: { type: :boolean, description: nil } })
+    end
+
+    it 'adds a boolean field with description' do
+      schema.boolean(:active, description: "Whether the item is active")
+      expect(schema.fields).to eq({ 
+        active: { 
+          type: :boolean,
+          description: "Whether the item is active"
+        } 
+      })
+    end
+  end
+
   describe '#fields' do
     it 'returns the fields hash' do
       schema.string(:name)
@@ -76,6 +93,43 @@ RSpec.describe Lluminary::Schema do
         "Name must be a String",
         "Age must be an Integer"
       )
+    end
+
+    context 'with boolean fields' do
+      let(:schema) do
+        described_class.new.tap do |s|
+          s.boolean(:active)
+        end
+      end
+
+      it 'accepts true values' do
+        errors = schema.validate(active: true)
+        expect(errors).to be_empty
+      end
+
+      it 'accepts false values' do
+        errors = schema.validate(active: false)
+        expect(errors).to be_empty
+      end
+
+      it 'accepts nil values' do
+        errors = schema.validate(active: nil)
+        expect(errors).to be_empty
+      end
+
+      it 'returns errors for non-boolean values' do
+        errors = schema.validate(active: 'true')
+        expect(errors).to contain_exactly("Active must be true or false")
+
+        errors = schema.validate(active: 1)
+        expect(errors).to contain_exactly("Active must be true or false")
+      end
+
+      it 'can be required using presence validation' do
+        schema.validates :active, presence: true
+        errors = schema.validate(active: nil)
+        expect(errors).to contain_exactly("Active can't be blank")
+      end
     end
   end
 
