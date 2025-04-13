@@ -1,6 +1,7 @@
 require 'ostruct'
 require_relative 'schema'
 require_relative 'validation_error'
+require_relative 'field_description'
 require 'json'
 
 module Lluminary
@@ -172,116 +173,11 @@ module Lluminary
 
       # Generate field descriptions
       field_descriptions = fields.map do |name, field|
-        type = field[:type]
-        description = field[:description]
-        example = case type
-                 when :string
-                   "\"your #{name} here\""
-                 when :integer
-                   "0"
-                 when :datetime
-                   "\"2024-01-01T12:00:00+00:00\""
-                 when :boolean
-                   "true"
-                 when :float
-                   "0.0"
-                 end
-
-        description_line = description ? ": #{description}" : ""
-        type_description = case type
-                          when :datetime
-                            "datetime in ISO8601 format"
-                          else
-                            type.to_s
-                          end
-
         # Get validations for this field
         validations = self.class.instance_variable_get(:@output_schema)&.validations_for(name) || []
-        validation_descriptions = validations.map do |args, options|
-          case options.keys.first
-          when :absence
-            "must be absent"
-          when :comparison
-            descriptions = []
-            if options[:comparison][:greater_than]
-              descriptions << "must be greater than #{options[:comparison][:greater_than]}"
-            end
-            if options[:comparison][:greater_than_or_equal_to]
-              descriptions << "must be greater than or equal to #{options[:comparison][:greater_than_or_equal_to]}"
-            end
-            if options[:comparison][:equal_to]
-              descriptions << "must be equal to #{options[:comparison][:equal_to]}"
-            end
-            if options[:comparison][:less_than]
-              descriptions << "must be less than #{options[:comparison][:less_than]}"
-            end
-            if options[:comparison][:less_than_or_equal_to]
-              descriptions << "must be less than or equal to #{options[:comparison][:less_than_or_equal_to]}"
-            end
-            if options[:comparison][:other_than]
-              descriptions << "must be other than #{options[:comparison][:other_than]}"
-            end
-            descriptions.join(", ")
-          when :exclusion
-            "must not be one of: #{options[:exclusion][:in].join(', ')}"
-          when :format
-            "must match format: #{options[:format][:with]}"
-          when :inclusion
-            "must be one of: #{options[:inclusion][:in].join(', ')}"
-          when :length
-            descriptions = []
-            if options[:length][:minimum]
-              descriptions << "must be at least #{options[:length][:minimum]} characters"
-            end
-            if options[:length][:maximum]
-              descriptions << "must be at most #{options[:length][:maximum]} characters"
-            end
-            if options[:length][:is]
-              descriptions << "must be exactly #{options[:length][:is]} characters"
-            end
-            if options[:length][:in]
-              descriptions << "must be between #{options[:length][:in].min} and #{options[:length][:in].max} characters"
-            end
-            descriptions.join(", ")
-          when :numericality
-            descriptions = []
-            if options[:numericality][:greater_than]
-              descriptions << "must be greater than #{options[:numericality][:greater_than]}"
-            end
-            if options[:numericality][:greater_than_or_equal_to]
-              descriptions << "must be greater than or equal to #{options[:numericality][:greater_than_or_equal_to]}"
-            end
-            if options[:numericality][:equal_to]
-              descriptions << "must be equal to #{options[:numericality][:equal_to]}"
-            end
-            if options[:numericality][:less_than]
-              descriptions << "must be less than #{options[:numericality][:less_than]}"
-            end
-            if options[:numericality][:less_than_or_equal_to]
-              descriptions << "must be less than or equal to #{options[:numericality][:less_than_or_equal_to]}"
-            end
-            if options[:numericality][:other_than]
-              descriptions << "must be other than #{options[:numericality][:other_than]}"
-            end
-            if options[:numericality][:in]
-              descriptions << "must be in: #{options[:numericality][:in].to_a.join(', ')}"
-            end
-            if options[:numericality][:odd]
-              descriptions << "must be odd"
-            end
-            if options[:numericality][:even]
-              descriptions << "must be even"
-            end
-            descriptions.join(", ")
-          when :presence
-            "must be present"
-          end
-        end.compact
-
-        validation_text = validation_descriptions.any? ? "\nValidation: #{validation_descriptions.join(', ')}" : ""
-
-        "#{name} (#{type_description})#{description_line}#{validation_text}\nExample: #{example}"
-      end.join("\n\n")
+        field_with_validations = field.merge(validations: validations)
+        FieldDescription.new(name, field_with_validations).to_schema_s
+      end
 
       # Generate example JSON
       example_json = fields.each_with_object({}) do |(name, field), hash|
@@ -303,7 +199,7 @@ module Lluminary
         You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
         The JSON object must contain the following fields:
 
-        #{field_descriptions}
+        #{field_descriptions.join("\n\n")}
 
         Your response must be ONLY this JSON object:
         #{JSON.pretty_generate(example_json)}
@@ -318,4 +214,4 @@ module Lluminary
       )
     end
   end
-end 
+end
