@@ -72,6 +72,17 @@ Lluminary supports these field types:
    ```
    Validates that the value is a float or nil.
 
+5. **DateTime**  
+   Usage example:  
+   ```ruby
+   class EventTask < Lluminary::Task
+     input_schema do
+       datetime :start_time, description: "When the event starts"
+     end
+   end
+   ```
+   Validates that the value is a Ruby DateTime object. When used in output schemas, the LLM will be instructed to return dates in ISO8601 format (e.g., "2024-01-01T12:00:00+00:00"). The framework handles the conversion between DateTime objects and ISO8601 strings and back again automatically.
+
 All of these field definitions allow nil values by default, ensuring that optional data can be omitted.
 
 ### Validations

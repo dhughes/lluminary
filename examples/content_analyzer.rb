@@ -13,6 +13,8 @@ class ContentAnalyzer < Lluminary::Task
 
   output_schema do
     boolean :contains_type, description: "Whether the text contains the specified content type"
+
+    # validates :contains_type, presence: true
   end
 
   private
@@ -43,9 +45,11 @@ if __FILE__ == $0
 
   puts "##> Input"
   puts result.input
+  puts result.input.valid?
   
   puts "##> Output"
   puts result.output
+  puts result.output.valid?
 
   result = ContentAnalyzer.call(
     text: text,
@@ -54,7 +58,9 @@ if __FILE__ == $0
 
   puts "##> Input"
   puts result.input
+  puts result.input.valid?
   
   puts "##> Output"
   puts result.output
+  puts result.output.valid?
 end 

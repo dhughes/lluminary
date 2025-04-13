@@ -130,9 +130,11 @@ module Lluminary
       @output = self.class.output_schema_model.new
       @output.raw_response = response[:raw]
 
-      if @output.valid?
-        @output.attributes.merge!(@parsed_response) if @parsed_response.is_a?(Hash)
-      end
+      # Merge the parsed response first, then validate
+      @output.attributes.merge!(@parsed_response) if @parsed_response.is_a?(Hash)
+      
+      # Validate after merging
+      @output.valid?
 
       @prompt = prompt
     end
