@@ -16,6 +16,159 @@ A Ruby framework for building LLM-powered applications with structured outputs.
 - Rich result objects with access to prompts and responses
 - Global and task-specific provider configuration
 
+## Lluminary Schemas
+
+Lluminary Schemas allow you to define the structure and constraints for both the inputs and outputs of your application or LLM interactions. The schema provides:
+
+- A set of typed fields that indicate what form the data should take
+- A mechanism for validating and ensuring the data conforms to these expected types
+- A description of how an LLM should format its response (in the case of output schemas)
+
+### Input Types
+
+Lluminary supports these field types:
+
+1. **String**  
+   Usage example:  
+   ```ruby
+   class UserTask < Lluminary::Task
+     input_schema do
+       string :name, description: "The user's name"
+     end
+   end
+   ```
+   Allows any string value (including empty), or nil if specified.
+
+2. **Integer**  
+   Usage example:  
+   ```ruby
+   class UserTask < Lluminary::Task
+     input_schema do
+       integer :age, description: "The user's age"
+     end
+   end
+   ```
+   Validates that the value is an integer or nil.
+
+3. **Boolean**  
+   Usage example:  
+   ```ruby
+   class UserTask < Lluminary::Task
+     input_schema do
+       boolean :active, description: "Indicates if the user is active"
+     end
+   end
+   ```
+   Validates that the value is either true, false, or nil.
+
+4. **Float**  
+   Usage example:  
+   ```ruby
+   class ProductTask < Lluminary::Task
+     input_schema do
+       float :price, description: "The price of an item"
+     end
+   end
+   ```
+   Validates that the value is a float or nil.
+
+All of these field definitions allow nil values by default, ensuring that optional data can be omitted.
+
+### Validations
+
+Lluminary's validation system is built on top of ActiveModel validations, which will feel familiar to Rails developers. When you run a task, two things happen:
+
+1. First, Lluminary checks that all inputs match their defined types (string, integer, boolean, float)
+2. Then, ActiveModel validations are run to enforce additional constraints
+
+This means you can use most standard ActiveModel validations in your schemas. Here's an example:
+
+```ruby
+class UserTask < Lluminary::Task
+  input_schema do
+    string :name
+    integer :age
+    
+    validates :name, presence: true
+    validates :age, numericality: { greater_than: 0 }
+  end
+end
+```
+
+For a complete list of available validations, see the [ActiveModel Validations documentation](https://guides.rubyonrails.org/active_record_validations.html).
+
+Note: While you can use all standard ActiveModel validations, custom validation methods and classes are not yet supported. This feature is planned for a future release.
+
+### How Output Schemas Work
+
+Output schemas in Lluminary serve two important purposes:
+
+1. **LLM Instruction**: The schema is used to generate clear instructions for the LLM about:
+   - What fields it should return
+   - What type each field should be
+   - What each field means (through descriptions)
+   - Any validation rules that must be followed
+
+   This means you don't need to manually describe the expected output format in your prompt - Lluminary automatically includes this information based on your schema definition.
+
+2. **Response Validation**: After the LLM responds, the same schema is used to:
+   - Validate that the response matches the expected structure
+   - Ensure all fields are of the correct type
+   - Apply any ActiveModel validations to the returned data
+
+For example, when you define an output schema:
+```ruby
+class AnalysisTask < Lluminary::Task
+  output_schema do
+    string :title, description: "Suggested title"
+    float :score, description: "Confidence score"
+    
+    validates :score, numericality: { greater_than: 0, less_than: 1 }
+  end
+end
+```
+
+Lluminary will:
+1. Automatically include these field definitions and descriptions in the prompt to the LLM, eliminating the need for you to manually describe the expected output format
+2. After receiving the response, validate that:
+   - The `title` is a string
+   - The `score` is a float between 0 and 1
+   - All required fields are present
+
+You can check the validation results and access the output values:
+```ruby
+result = AnalysisTask.call(input_params)
+if result.output.valid?
+  puts result.output.title  # => "Hello World"
+  puts result.output.score  # => 0.98
+else
+  puts result.output.errors.full_messages
+end
+```
+
+### Viewing Input/Output and Validations
+
+When you create a task with schemas, Lluminary automatically handles validation and provides access to the results:
+
+```ruby
+class ProductTask < Lluminary::Task
+  input_schema do
+    integer :count
+    float :price
+  end
+end
+
+# Valid input example
+result = ProductTask.call(count: 5, price: nil)
+puts result.input.valid?  # => true
+puts result.input.errors.full_messages  # => []
+
+# Invalid input example
+result = ProductTask.call(count: "five", price: "ten")
+puts result.input.valid?  # => false
+puts result.input.errors.full_messages  # => ["Count must be an Integer", "Price must be a float"]
+```
+
 ## Installation
 
 Add this line to your application's Gemfile:
