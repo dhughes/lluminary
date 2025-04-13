@@ -6,7 +6,6 @@ $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
 require 'lluminary'
 
-
 Lluminary.configure do |config|
   config.provider(:openai, api_key: ENV['OPENAI_API_KEY'])
   

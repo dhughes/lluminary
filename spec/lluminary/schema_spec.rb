@@ -131,6 +131,64 @@ RSpec.describe Lluminary::Schema do
         expect(errors).to contain_exactly("Active can't be blank")
       end
     end
+
+    context 'with string fields' do
+      let(:schema) do
+        described_class.new.tap do |s|
+          s.string(:name)
+        end
+      end
+
+      it 'accepts string values' do
+        errors = schema.validate(name: "John")
+        expect(errors).to be_empty
+      end
+
+      it 'accepts nil values' do
+        errors = schema.validate(name: nil)
+        expect(errors).to be_empty
+      end
+
+      it 'returns errors for non-string values' do
+        errors = schema.validate(name: 123)
+        expect(errors).to contain_exactly("Name must be a String")
+      end
+
+      it 'can be required using presence validation' do
+        schema.validates :name, presence: true
+        errors = schema.validate(name: nil)
+        expect(errors).to contain_exactly("Name can't be blank")
+      end
+    end
+
+    context 'with integer fields' do
+      let(:schema) do
+        described_class.new.tap do |s|
+          s.integer(:age)
+        end
+      end
+
+      it 'accepts integer values' do
+        errors = schema.validate(age: 30)
+        expect(errors).to be_empty
+      end
+
+      it 'accepts nil values' do
+        errors = schema.validate(age: nil)
+        expect(errors).to be_empty
+      end
+
+      it 'returns errors for non-integer values' do
+        errors = schema.validate(age: "30")
+        expect(errors).to contain_exactly("Age must be an Integer")
+      end
+
+      it 'can be required using presence validation' do
+        schema.validates :age, presence: true
+        errors = schema.validate(age: nil)
+        expect(errors).to contain_exactly("Age can't be blank")
+      end
+    end
   end
 
   describe 'ActiveModel validations' do
