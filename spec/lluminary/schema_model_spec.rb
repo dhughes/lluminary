@@ -53,6 +53,26 @@ RSpec.describe Lluminary::SchemaModel do
       )
     end
 
+    it 'validates float types' do
+      fields = {
+        price: { type: :float, description: "The price" }
+      }
+      model_class = described_class.build(fields: fields, validations: [])
+      
+      # Test that nil is allowed
+      instance = model_class.new(price: nil)
+      expect(instance.valid?).to be true
+      
+      # Test invalid float value
+      instance = model_class.new(price: "not a float")
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to include("Price must be a float")
+      
+      # Test valid float value
+      instance = model_class.new(price: 12.34)
+      expect(instance.valid?).to be true
+    end
+
     it 'accepts valid attributes' do
       instance = model_class.new(name: "John", age: 30)
       expect(instance.valid?).to be true

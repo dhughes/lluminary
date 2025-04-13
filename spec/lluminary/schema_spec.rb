@@ -60,6 +60,23 @@ RSpec.describe Lluminary::Schema do
     end
   end
 
+  describe '#float' do
+    it 'adds a float field to the schema' do
+      schema.float(:price)
+      expect(schema.fields).to eq({ price: { type: :float, description: nil } })
+    end
+
+    it 'adds a float field with description' do
+      schema.float(:price, description: "The price of the item")
+      expect(schema.fields).to eq({ 
+        price: { 
+          type: :float,
+          description: "The price of the item"
+        } 
+      })
+    end
+  end
+
   describe '#fields' do
     it 'returns the fields hash' do
       schema.string(:name)

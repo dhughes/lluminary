@@ -26,6 +26,10 @@ module Lluminary
       @fields[name] = { type: :boolean, description: description }
     end
 
+    def float(name, description: nil)
+      @fields[name] = { type: :float, description: description }
+    end
+
     def fields
       @fields
     end

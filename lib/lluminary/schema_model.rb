@@ -60,6 +60,10 @@ module Lluminary
               unless value == true || value == false
                 record.errors.add(name, "must be true or false")
               end
+            when :float
+              unless value.is_a?(Float)
+                record.errors.add(name, "must be a float")
+              end
             end
           end
         end
