@@ -106,11 +106,16 @@
 - [ ] Boolean
   - [ ] Basic boolean input/output
   - [ ] Required/optional
-- [ ] Float
-  - [ ] Basic float input/output
-  - [ ] Range validation
-  - [ ] Precision validation
-  - [ ] Required/optional
+  - [ ] Float
+    - [ ] Basic float input/output
+    - [ ] Required/optional
+- [ ] Decimal
+  - [ ] Consider using BigDecimal for input validation
+  - [ ] Consider precision requirements for output validation
+  - [ ] Evaluate LLM output handling for numeric types
+  - [ ] Consider adding float type for less strict numeric validation
+  - [ ] Consider configuration options for numeric validation strictness
+  - [ ] Document numeric type best practices for LLM interactions
 - [ ] Array
   - [ ] Basic array input/output
   - [ ] Length validation
