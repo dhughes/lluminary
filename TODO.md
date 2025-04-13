@@ -106,9 +106,9 @@
 - [ ] Boolean
   - [ ] Basic boolean input/output
   - [ ] Required/optional
-  - [ ] Float
-    - [ ] Basic float input/output
-    - [ ] Required/optional
+- [ ] Float
+  - [ ] Basic float input/output
+  - [ ] Required/optional
 - [ ] Decimal
   - [ ] Consider using BigDecimal for input validation
   - [ ] Consider precision requirements for output validation
@@ -129,6 +129,13 @@
   - [ ] Basic date input/output
   - [ ] Format validation
   - [ ] Required/optional
+- [ ] DateTime
+  - [ ] Basic datetime input/output
+  - [ ] Required/optional
+  - [ ] Consider timezone handling
+    - [ ] Evaluate UTC normalization
+    - [ ] Consider timezone preservation
+    - [ ] Document timezone behavior
 
 ## Core Features
 - [x] Input schema definition

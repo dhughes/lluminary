@@ -77,6 +77,23 @@ RSpec.describe Lluminary::Schema do
     end
   end
 
+  describe '#datetime' do
+    it 'adds a datetime field to the schema' do
+      schema.datetime(:start_time)
+      expect(schema.fields).to eq({ start_time: { type: :datetime, description: nil } })
+    end
+
+    it 'adds a datetime field with description' do
+      schema.datetime(:start_time, description: "When the event starts")
+      expect(schema.fields).to eq({ 
+        start_time: { 
+          type: :datetime,
+          description: "When the event starts"
+        } 
+      })
+    end
+  end
+
   describe '#fields' do
     it 'returns the fields hash' do
       schema.string(:name)
@@ -88,6 +105,35 @@ RSpec.describe Lluminary::Schema do
       first_call = schema.fields
       second_call = schema.fields
       expect(first_call).to be(second_call)
+    end
+
+    context 'with datetime fields' do
+      let(:schema) do
+        described_class.new.tap do |s|
+          s.datetime(:start_time)
+        end
+      end
+
+      it 'accepts DateTime values' do
+        errors = schema.validate(start_time: DateTime.now)
+        expect(errors).to be_empty
+      end
+
+      it 'accepts nil values' do
+        errors = schema.validate(start_time: nil)
+        expect(errors).to be_empty
+      end
+
+      it 'returns errors for non-DateTime values' do
+        errors = schema.validate(start_time: "2024-01-01")
+        expect(errors).to contain_exactly("Start time must be a DateTime")
+      end
+
+      it 'can be required using presence validation' do
+        schema.validates :start_time, presence: true
+        errors = schema.validate(start_time: nil)
+        expect(errors).to contain_exactly("Start time can't be blank")
+      end
     end
   end
 

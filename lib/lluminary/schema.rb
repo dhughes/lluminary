@@ -30,6 +30,10 @@ module Lluminary
       @fields[name] = { type: :float, description: description }
     end
 
+    def datetime(name, description: nil)
+      @fields[name] = { type: :datetime, description: description }
+    end
+
     def fields
       @fields
     end

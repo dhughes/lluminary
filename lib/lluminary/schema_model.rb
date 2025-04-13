@@ -64,6 +64,10 @@ module Lluminary
               unless value.is_a?(Float)
                 record.errors.add(name, "must be a float")
               end
+            when :datetime
+              unless value.is_a?(DateTime)
+                record.errors.add(name, "must be a DateTime")
+              end
             end
           end
         end

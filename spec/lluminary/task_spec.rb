@@ -144,6 +144,39 @@ RSpec.describe Lluminary::Task do
       expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
     end
 
+    it 'generates a schema example with datetime field' do
+      task_with_datetime = Class.new(described_class) do
+        input_schema do
+          string :message
+        end
+
+        output_schema do
+          datetime :start_time, description: "When the event starts"
+        end
+
+        private
+
+        def task_prompt
+          "Say: #{message}"
+        end
+      end
+
+      task = task_with_datetime.new(message: "test")
+      expected_output = <<~SCHEMA
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
+
+        start_time (datetime): When the event starts
+        Example: "2024-01-01T12:00:00+00:00"
+
+        Your response must be ONLY this JSON object:
+        {
+          "start_time": "2024-01-01T12:00:00+00:00"
+        }
+      SCHEMA
+      expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
+    end
+
     it 'generates a schema example without descriptions' do
       task_without_descriptions = Class.new(described_class) do
         input_schema do
@@ -184,6 +217,7 @@ RSpec.describe Lluminary::Task do
         input_schema do
           string :name
           integer :age
+          datetime :start_time
         end
 
         private
@@ -195,23 +229,33 @@ RSpec.describe Lluminary::Task do
     end
 
     it 'validates string input type' do
-      task = task_with_types.new(name: "John", age: 30)
+      task = task_with_types.new(name: "John", age: 30, start_time: DateTime.now)
       expect { task.send(:validate_input) }.not_to raise_error
     end
 
     it 'raises error for invalid string input' do
-      task = task_with_types.new(name: 123, age: 30)
+      task = task_with_types.new(name: 123, age: 30, start_time: DateTime.now)
       expect { task.send(:validate_input) }.to raise_error(Lluminary::ValidationError, "Name must be a String")
     end
 
     it 'validates integer input type' do
-      task = task_with_types.new(name: "John", age: 30)
+      task = task_with_types.new(name: "John", age: 30, start_time: DateTime.now)
       expect { task.send(:validate_input) }.not_to raise_error
     end
 
     it 'raises error for invalid integer input' do
-      task = task_with_types.new(name: "John", age: "30")
+      task = task_with_types.new(name: "John", age: "30", start_time: DateTime.now)
       expect { task.send(:validate_input) }.to raise_error(Lluminary::ValidationError, "Age must be an Integer")
+    end
+
+    it 'validates datetime input type' do
+      task = task_with_types.new(name: "John", age: 30, start_time: DateTime.now)
+      expect { task.send(:validate_input) }.not_to raise_error
+    end
+
+    it 'raises error for invalid datetime input' do
+      task = task_with_types.new(name: "John", age: 30, start_time: "2024-01-01")
+      expect { task.send(:validate_input) }.to raise_error(Lluminary::ValidationError, "Start time must be a DateTime")
     end
   end
 

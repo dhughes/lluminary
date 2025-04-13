@@ -160,6 +160,8 @@ module Lluminary
                    "\"your #{name} here\""
                  when :integer
                    "0"
+                 when :datetime
+                   "\"2024-01-01T12:00:00+00:00\""
                  end
 
         description_line = description ? ": #{description}" : ""
@@ -173,6 +175,8 @@ module Lluminary
                       "your #{name} here"
                     when :integer
                       0
+                    when :datetime
+                      "2024-01-01T12:00:00+00:00"
                     end
       end
 
