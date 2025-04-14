@@ -168,19 +168,34 @@ module Lluminary
     end
 
     def json_schema_example
-      fields = self.class.output_fields
       return "{}" if fields.empty?
 
-      # Generate field descriptions
-      field_descriptions = fields.map do |name, field|
+      <<~SCHEMA.chomp
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
+
+        #{generate_field_descriptions}
+
+        Your response must be ONLY this JSON object:
+        #{example_json}
+      SCHEMA
+    end
+
+    def fields
+      @fields ||= self.class.output_fields
+    end
+
+    def generate_field_descriptions
+      fields.map do |name, field|
         # Get validations for this field
         validations = self.class.instance_variable_get(:@output_schema)&.validations_for(name) || []
         field_with_validations = field.merge(validations: validations)
         FieldDescription.new(name, field_with_validations).to_schema_s
-      end
+      end.join("\n\n")
+    end
 
-      # Generate example JSON
-      example_json = fields.each_with_object({}) do |(name, field), hash|
+    def example_json
+      json = fields.each_with_object({}) do |(name, field), hash|
         hash[name] = case field[:type]
                     when :string
                       "your #{name} here"
@@ -195,15 +210,7 @@ module Lluminary
                     end
       end
 
-      <<~SCHEMA.chomp
-        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
-        The JSON object must contain the following fields:
-
-        #{field_descriptions.join("\n\n")}
-
-        Your response must be ONLY this JSON object:
-        #{JSON.pretty_generate(example_json)}
-      SCHEMA
+      JSON.pretty_generate(json)
     end
 
     def to_result

@@ -208,15 +208,41 @@ require 'lluminary'
 Lluminary.configure do |config|
   # OpenAI Configuration
   config.provider(:openai, 
-    api_key: ENV['OPENAI_API_KEY']
+    api_key: ENV['OPENAI_API_KEY'],
+    model: 'gpt-4'  # Optional: specify which model to use
   )
 
   # AWS Bedrock Configuration
   config.provider(:bedrock,
     access_key_id: ENV['AWS_ACCESS_KEY_ID'],
     secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-    region: ENV['AWS_REGION']
+    region: ENV['AWS_REGION'],
+    model_id: 'meta.llama3-8b-instruct-v1:0'  # Optional: specify which model to use
   )
+end
+```
+
+### Model Configuration
+
+Each provider has a default model that will be used if none is specified: (At this point they were chosen arbitrarily.)
+
+- OpenAI: `gpt-3.5-turbo`
+- AWS Bedrock: `anthropic.claude-instant-v1`
+
+You can override the model at both the global configuration level and the task level:
+
+```ruby
+# Global configuration
+Lluminary.configure do |config|
+  config.provider(:openai, 
+    api_key: ENV['OPENAI_API_KEY'],
+    model: 'gpt-4'  # Use GPT-4 by defailt for all OpenAI tasks
+  )
+end
+
+# Task-specific configuration
+class HighQualityTask < Lluminary::Task
+  use_provider :openai, model: 'gpt-4'  # Override model for this specific task
 end
 ```
 
@@ -232,7 +258,7 @@ end
 
 # Overriding global configuration
 class CustomConfigTask < Lluminary::Task
-  use_provider :openai, api_key: 'custom-key'  # Overrides the global OpenAI configuration
+  use_provider :openai, api_key: 'custom-key', model: 'gpt-4'  # Overrides both API key and model
 end
 ```
 
