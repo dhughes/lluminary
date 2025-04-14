@@ -13,17 +13,20 @@
 - [x] Add input validation using schemas
 - [x] Add validation error handling
 - [x] Add support for validation error checking via result objects
+- [x] Add schema validation for provider responses
+- [x] Add datetime type support
 
 ## In Progress
 - [ ] Add support for all JSON data types in schemas
   - [ ] Consider using input schema descriptions to enhance LLM prompts
     - [ ] Explore how input field descriptions could provide context to the LLM
-    - [ ] Consider adding validation rules to the prompt context
+    - [x] Consider adding validation rules to the prompt context
     - [ ] Evaluate if this would help the LLM better understand input constraints
     - [ ] Consider adding examples from the schema to the prompt
 
 ## Future Tasks
-- [ ] Add support for additional LLM providers (Anthropic, Google, etc.)
+- [x] Add support for additional LLM providers (Anthropic, Google, etc.)
+  - [x] Add support for Amazon Bedrock
 - [ ] Add support for local LLM providers
   - [ ] Integrate with Ollama for local model support
   - [ ] Add support for LM Studio
@@ -37,29 +40,22 @@
   - [ ] Document custom validation patterns
   - [ ] Add examples of custom validations
 - [ ] Implement task chaining and composition
-- [ ] Add caching layer for API responses
 - [ ] Add rate limiting and retry mechanisms
 - [ ] Implement streaming responses
-- [ ] Add comprehensive test coverage
-- [ ] Create documentation website
-- [ ] Add CI/CD pipeline
-- [ ] Add schema validation for provider responses
+- [x] Add schema validation for provider responses
 - [ ] Support nested objects in schemas
 - [ ] Add array type support in schemas
-- [ ] Add development tools and generators
 - [ ] Add logging and monitoring
-- [ ] Support async/background processing
-- [ ] Add provider-specific configuration options
+- [x] Add provider-specific configuration options
 - [ ] Add response templating system
 - [ ] Consider adding support for custom providers
-  - [ ] Define clear interface requirements
+  - [x] Define clear interface requirements
   - [ ] Add validation for custom provider implementations
   - [ ] Document provider creation process
   - [ ] Add examples of custom providers
 - [ ] Improve task result output format
-  - [ ] Make `puts task.call(...)` show meaningful information
-  - [ ] Include input parameters in output
-  - [ ] Include output values in output
+  - [x] Include input parameters in output
+  - [x] Include output values in output
   - [ ] Consider adding execution time and other metadata
 
 ## Task Interface
@@ -85,17 +81,17 @@
   - [x] Error messages via `result.input.errors`
 - [x] Validation
   - [x] Input validation before execution
-  - [ ] Output validation after LLM response
+  - [x] Output validation after LLM response
   - [ ] Automatic retry with improved prompts on validation failure
 - [ ] Configuration
-  - [ ] Task-specific configuration (max retries, etc.)
-  - [ ] LLM provider configuration
-  - [ ] Global configuration
+  - [x] Task-specific configuration (max retries, etc.)
+  - [x] LLM provider configuration
+  - [x] Global configuration
 
 ## Data Types
 - [x] String
   - [x] Basic string input/output
-  - [ ] Length validation
+  - [x] Length validation
   - [x] Required/optional
   - [x] Example values
 - [x] Integer
@@ -103,12 +99,12 @@
   - [x] Range validation
   - [x] Required/optional
   - [x] Example values
-- [ ] Boolean
-  - [ ] Basic boolean input/output
-  - [ ] Required/optional
-- [ ] Float
-  - [ ] Basic float input/output
-  - [ ] Required/optional
+- [x] Boolean
+  - [x] Basic boolean input/output
+  - [x] Required/optional
+- [x] Float
+  - [x] Basic float input/output
+  - [x] Required/optional
 - [ ] Decimal
   - [ ] Consider using BigDecimal for input validation
   - [ ] Consider precision requirements for output validation
@@ -125,13 +121,13 @@
   - [ ] Basic hash input/output
   - [ ] Schema validation
   - [ ] Required/optional
-- [ ] Date
+- [ ] Date / Time
   - [ ] Basic date input/output
   - [ ] Format validation
   - [ ] Required/optional
-- [ ] DateTime
-  - [ ] Basic datetime input/output
-  - [ ] Required/optional
+- [x] DateTime
+  - [x] Basic datetime input/output
+  - [x] Required/optional
   - [ ] Consider timezone handling
     - [ ] Evaluate UTC normalization
     - [ ] Consider timezone preservation
@@ -146,11 +142,10 @@
   - [ ] Add provider-specific metrics
   - [ ] Make metrics accessible via result object
   - [ ] Add optional detailed logging
-  - [ ] Consider adding cost estimation
 - [ ] Prompt optimization system
   - [ ] Default prompt optimizer
     - [ ] Generic prompt formatting
-    - [ ] Schema information integration
+    - [x] Schema information integration
     - [ ] Basic instructions
   - [ ] Model-specific prompt optimizers
     - [ ] Support for different models across providers
@@ -160,39 +155,39 @@
     - [ ] Interface for user-defined optimizers
     - [ ] Documentation and examples
   - [ ] Optimization features
-    - [ ] Schema-aware formatting
+    - [x] Schema-aware formatting
     - [ ] Model-specific instructions
     - [ ] Context and examples integration
-- [ ] Response validation
-- [ ] Error handling
+- [x] Response validation
+- [x] Error handling
 - [ ] Retry logic
 - [x] Provider interface
   - [x] Base provider class
   - [x] Test provider
   - [x] Provider configuration
   - [x] use_provider DSL
-  - [ ] OpenAI provider
-    - [ ] Add ruby-openai gem as optional dependency
-    - [ ] Basic provider implementation
-      - [ ] Initialize OpenAI client
-      - [ ] Handle basic chat completion
-      - [ ] Extract response content
-    - [ ] Configuration
-      - [ ] API key handling
-      - [ ] Model selection
-      - [ ] Default model setting
-    - [ ] Error handling
+  - [x] OpenAI provider
+    - [x] Add ruby-openai gem as optional dependency
+    - [x] Basic provider implementation
+      - [x] Initialize OpenAI client
+      - [x] Handle basic chat completion
+      - [x] Extract response content
+    - [x] Configuration
+      - [x] API key handling
+      - [x] Model selection
+      - [x] Default model setting
+    - [x] Error handling
       - [ ] Rate limit handling
       - [ ] Authentication errors
       - [ ] Network errors
-    - [ ] Testing
-      - [ ] Unit tests with mocked client
+    - [x] Testing
+      - [x] Unit tests with mocked client
       - [ ] Integration tests (marked)
     - [ ] Optional features
       - [ ] Support for completion API
-      - [ ] Advanced parameters (temperature, max_tokens)
+      - [x] Advanced parameters (temperature, max_tokens)
       - [ ] Streaming support
-  - [ ] Amazon Bedrock
+  - [x] Amazon Bedrock
   - [ ] Anthropic
   - [ ] Google Vertex AI
 
