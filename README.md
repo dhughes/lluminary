@@ -2,7 +2,7 @@
 
 <img src="lluminary_logo.png" height="150" />
 
-A Ruby framework for building LLM-powered applications with structured outputs.
+A Ruby library for building LLM-powered applications with structured outputs.
 
 ## Features
 
@@ -81,7 +81,7 @@ Lluminary supports these field types:
      end
    end
    ```
-   Validates that the value is a Ruby DateTime object. When used in output schemas, the LLM will be instructed to return dates in ISO8601 format (e.g., "2024-01-01T12:00:00+00:00"). The framework handles the conversion between DateTime objects and ISO8601 strings and back again automatically.
+   Validates that the value is a Ruby DateTime object. When used in output schemas, the LLM will be instructed to return dates in ISO8601 format (e.g., "2024-01-01T12:00:00+00:00"). The library handles the conversion between DateTime objects and ISO8601 strings and back again automatically.
 
 All of these field definitions allow nil values by default, ensuring that optional data can be omitted.
 
