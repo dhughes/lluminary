@@ -116,7 +116,7 @@ RSpec.describe Lluminary::Task do
     it 'with :openai instantiates OpenAI provider with config' do
       task_class.use_provider(:openai, api_key: 'test')
       expect(task_class.provider).to be_a(Lluminary::Providers::OpenAI)
-      expect(task_class.provider.config).to eq(api_key: 'test')
+      expect(task_class.provider.config).to eq(api_key: 'test', model: 'gpt-4o')
     end
 
     it 'raises ArgumentError for unknown provider' do

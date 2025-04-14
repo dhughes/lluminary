@@ -3,14 +3,14 @@ Gem::Specification.new do |s|
   s.version     = '0.1.0'
   s.summary     = 'A framework for building LLM-powered applications'
   s.description = 'Lluminary is a framework for building applications that leverage Large Language Models. It provides a structured way to define tasks, manage prompts, and handle LLM interactions.'
-  s.authors     = ['Your Name']
-  s.email       = ['your.email@example.com']
+  s.authors     = ['Doug Hughes']
+  s.email       = ['doug@doughughes.net']
   s.files       = Dir['lib/**/*', 'spec/**/*']
   s.license     = 'MIT'
-  s.required_ruby_version = '>= 2.7.0'
+  s.required_ruby_version = '>= 3.0.0'
 
   # Runtime dependencies
-  s.add_runtime_dependency 'activemodel', '~> 7.1.0'
+  s.add_runtime_dependency 'activemodel', '>= 5.2'
   s.add_runtime_dependency 'ruby-openai', '~> 6.3'  # Required for OpenAI provider
   s.add_runtime_dependency 'aws-sdk-bedrockruntime', '~> 1.0'  # Required for AWS Bedrock provider
 

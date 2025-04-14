@@ -1,7 +1,7 @@
 require_relative 'config'
 
 class HistoricalEventAnalyzer < Lluminary::Task
-  use_provider :bedrock
+  use_provider :bedrock, model_id: 'anthropic.claude-instant-v1'
 
   input_schema do
     string :event_description, description: "A description of the historical event to analyze"
@@ -21,7 +21,7 @@ class HistoricalEventAnalyzer < Lluminary::Task
 
   def task_prompt
     <<~PROMPT
-      Analyze the following historical event and determine when it occurred. 
+      Analyze the following historical event and determine the date and time it occurred.
       Consider the time precision to the minute (not seconds). 
       Please also indicate whether the exact time of the event is known with certainty.
       
