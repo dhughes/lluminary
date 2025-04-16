@@ -4,17 +4,13 @@ require_relative "schema"
 require_relative "validation_error"
 require_relative "field_description"
 require "json"
+require_relative "models/base"
+require_relative "models/openai/gpt35_turbo"
+require_relative "models/bedrock/anthropic_claude_instant_v1"
 
 module Lluminary
   # Base class for all Lluminary tasks.
   # Provides the core functionality for defining and running LLM-powered tasks.
-  #
-  # @example Creating a custom task
-  #   class MyTask < Lluminary::Task
-  #     def run
-  #       # Task implementation
-  #     end
-  #   end
   class Task
     class << self
       def input_schema(&block)

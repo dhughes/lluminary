@@ -3,12 +3,7 @@
 module Lluminary
   # Configuration class for Lluminary framework.
   # Handles global settings and provider configurations.
-  #
-  # @example Setting up configuration
-  #   Lluminary.configure do |config|
-  #     config.provider = :openai
-  #     config.api_key = "your-api-key"
-  #   end
+
   class Config
     def initialize
       @providers = {}

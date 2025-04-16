@@ -113,9 +113,25 @@ RSpec.describe Lluminary::Task do
     it "with :openai instantiates OpenAI provider with config" do
       task_class.use_provider(:openai, api_key: "test")
       expect(task_class.provider).to be_a(Lluminary::Providers::OpenAI)
-      expect(task_class.provider.config).to eq(
+      expect(task_class.provider.config).to include(
         api_key: "test",
-        model: "gpt-3.5-turbo"
+        model: Lluminary::Models::OpenAi::Gpt35Turbo
+      )
+    end
+
+    it "with :bedrock instantiates Bedrock provider with config" do
+      task_class.use_provider(
+        :bedrock,
+        access_key_id: "test",
+        secret_access_key: "test",
+        region: "us-east-1"
+      )
+      expect(task_class.provider).to be_a(Lluminary::Providers::Bedrock)
+      expect(task_class.provider.config).to include(
+        access_key_id: "test",
+        secret_access_key: "test",
+        region: "us-east-1",
+        model: Lluminary::Models::Bedrock::AnthropicClaudeInstantV1
       )
     end
 

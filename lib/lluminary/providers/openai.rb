@@ -8,7 +8,7 @@ module Lluminary
     # Provider for OpenAI's GPT models.
     # Implements the Base provider interface for OpenAI's API.
     class OpenAI < Base
-      DEFAULT_MODEL = "gpt-3.5-turbo"
+      DEFAULT_MODEL = Models::OpenAi::Gpt35Turbo
 
       attr_reader :client, :config
 
@@ -22,7 +22,7 @@ module Lluminary
         response =
           @client.chat(
             parameters: {
-              model: config[:model],
+              model: model.name,
               messages: [{ role: "user", content: prompt }],
               response_format: {
                 type: "json_object"
@@ -41,6 +41,10 @@ module Lluminary
               nil
             end
         }
+      end
+
+      def model
+        @model ||= config[:model].new
       end
     end
   end

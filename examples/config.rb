@@ -8,13 +8,17 @@ $LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 require "lluminary"
 
 Lluminary.configure do |config|
-  config.provider(:openai, api_key: ENV["OPENAI_API_KEY"], model: "gpt-4o")
+  config.provider(
+    :openai,
+    api_key: ENV["OPENAI_API_KEY"],
+    model: Lluminary::Models::OpenAi::Gpt35Turbo
+  )
 
   config.provider(
     :bedrock,
     access_key_id: ENV["AWS_ACCESS_KEY_ID"],
     secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"],
     region: ENV["AWS_REGION"],
-    model_id: "meta.llama3-8b-instruct-v1:0"
+    model: Lluminary::Models::Bedrock::AnthropicClaudeInstantV1
   )
 end

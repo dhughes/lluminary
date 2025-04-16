@@ -3,20 +3,18 @@ require "aws-sdk-bedrockruntime"
 require "json"
 require_relative "../provider_error"
 
-require "pry-byebug"
-
 module Lluminary
   module Providers
     # Provider for AWS Bedrock models.
     # Implements the Base provider interface for AWS Bedrock's API.
     class Bedrock < Base
-      DEFAULT_MODEL_ID = "anthropic.claude-instant-v1"
+      DEFAULT_MODEL = Models::Bedrock::AnthropicClaudeInstantV1
 
       attr_reader :client, :config
 
       def initialize(**config)
         super
-        @config = { model_id: DEFAULT_MODEL_ID }.merge(config)
+        @config = { model: DEFAULT_MODEL }.merge(config)
 
         @client =
           Aws::BedrockRuntime::Client.new(
@@ -32,7 +30,7 @@ module Lluminary
       def call(prompt, _task)
         response =
           @client.converse(
-            model_id: config[:model_id],
+            model_id: model.name,
             messages: [{ role: "user", content: [{ text: prompt }] }]
           )
 
@@ -47,6 +45,10 @@ module Lluminary
               nil
             end
         }
+      end
+
+      def model
+        @model ||= config[:model].new
       end
     end
   end
