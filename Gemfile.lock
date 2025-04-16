@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    lluminary (0.1.0)
+    lluminary (0.1.1)
       activemodel (>= 5.2)
       aws-sdk-bedrockruntime (~> 1.0)
       ruby-openai (~> 6.3)
@@ -75,6 +75,7 @@ GEM
     parser (3.3.7.4)
       ast (~> 2.4.1)
       racc
+    prettier_print (1.2.1)
     prism (1.4.0)
     pry (0.15.2)
       coderay (~> 1.1)
@@ -119,6 +120,8 @@ GEM
       faraday-multipart (>= 1)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
+    syntax_tree (6.2.0)
+      prettier_print (>= 1.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (3.1.4)
@@ -136,6 +139,7 @@ DEPENDENCIES
   rake (~> 13.0)
   rspec (~> 3.12)
   rubocop (~> 1.50)
+  syntax_tree (~> 6.2)
 
 BUNDLED WITH
    2.4.19

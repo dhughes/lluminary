@@ -25,4 +25,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rubocop', '~> 1.50'
   s.add_development_dependency 'dotenv', '~> 2.8'
   s.add_development_dependency 'pry-byebug', '~> 3.10'
-end 
+  s.add_development_dependency 'syntax_tree', '~> 6.2'
+end
