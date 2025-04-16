@@ -12,7 +12,7 @@ module Lluminary
 
       def initialize(**config)
         super
-        @config = config
+        @config = { model: DEFAULT_MODEL }.merge(config)
         @client = ::OpenAI::Client.new(access_token: config[:api_key])
       end
 
@@ -20,7 +20,7 @@ module Lluminary
         response =
           @client.chat(
             parameters: {
-              model: config[:model] || DEFAULT_MODEL,
+              model: config[:model],
               messages: [{ role: "user", content: prompt }],
               response_format: {
                 type: "json_object"

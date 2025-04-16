@@ -14,7 +14,7 @@ module Lluminary
 
       def initialize(**config)
         super
-        @config = config
+        @config = { model_id: DEFAULT_MODEL_ID }.merge(config)
 
         @client =
           Aws::BedrockRuntime::Client.new(
@@ -30,7 +30,7 @@ module Lluminary
       def call(prompt, _task)
         response =
           @client.converse(
-            model_id: config[:model_id] || DEFAULT_MODEL_ID,
+            model_id: config[:model_id],
             messages: [{ role: "user", content: [{ text: prompt }] }]
           )
 

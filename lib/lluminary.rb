@@ -15,5 +15,9 @@ module Lluminary
     def configure
       yield config
     end
+
+    def reset_configuration
+      @config = Config.new
+    end
   end
 end
