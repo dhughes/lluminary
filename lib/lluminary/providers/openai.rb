@@ -1,6 +1,7 @@
-require 'openai'
-require 'json'
-require_relative '../provider_error'
+# frozen_string_literal: true
+require "openai"
+require "json"
+require_relative "../provider_error"
 
 module Lluminary
   module Providers
@@ -15,26 +16,30 @@ module Lluminary
         @client = ::OpenAI::Client.new(access_token: config[:api_key])
       end
 
-      def call(prompt, task)
-        response = @client.chat(
-          parameters: {
-            model: config[:model] || DEFAULT_MODEL,
-            messages: [{ role: "user", content: prompt }],
-            response_format: { type: "json_object" }
-          }
-        )
+      def call(prompt, _task)
+        response =
+          @client.chat(
+            parameters: {
+              model: config[:model] || DEFAULT_MODEL,
+              messages: [{ role: "user", content: prompt }],
+              response_format: {
+                type: "json_object"
+              }
+            }
+          )
 
-        content = response.dig('choices', 0, 'message', 'content')
-        
-        { 
+        content = response.dig("choices", 0, "message", "content")
+
+        {
           raw: content,
-          parsed: begin
-            JSON.parse(content) if content
-          rescue JSON::ParserError
-            nil
-          end
+          parsed:
+            begin
+              JSON.parse(content) if content
+            rescue JSON::ParserError
+              nil
+            end
         }
       end
     end
   end
-end 
+end

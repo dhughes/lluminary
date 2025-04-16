@@ -1,9 +1,10 @@
-require_relative 'config'
+# frozen_string_literal: true
+require_relative "config"
 
 # Add the lib directory to the load path
-$LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
+$LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 
-require 'lluminary'
+require "lluminary"
 
 class SentimentAnalysis < Lluminary::Task
   use_provider :bedrock
@@ -14,8 +15,10 @@ class SentimentAnalysis < Lluminary::Task
   end
 
   output_schema do
-    string :sentiment, description: "The overall sentiment (positive, negative, or neutral)"
-    string :explanation, description: "A brief explanation of the sentiment analysis"
+    string :sentiment,
+           description: "The overall sentiment (positive, negative, or neutral)"
+    string :explanation,
+           description: "A brief explanation of the sentiment analysis"
     integer :confidence, description: "Confidence score from 0-100"
   end
 
@@ -30,7 +33,7 @@ class SentimentAnalysis < Lluminary::Task
   end
 end
 
-if __FILE__ == $0
+if __FILE__ == $PROGRAM_NAME
   puts "#> Running SentimentAnalysis example"
 
   result = SentimentAnalysis.call(text: "I love this product!")

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Lluminary
   class Config
     def initialize
@@ -20,4 +21,4 @@ module Lluminary
       @providers = {}
     end
   end
-end 
+end

@@ -1,10 +1,12 @@
-require 'active_model'
-require_relative 'schema_model'
+# frozen_string_literal: true
+require "active_model"
+require_relative "schema_model"
 
 module Lluminary
   class JsonValidator < ActiveModel::EachValidator
-    def validate_each(record, attribute, value)
-      record.errors.add(:base, "Response must be valid JSON") unless value.is_a?(Hash)
+    def validate_each(record, _attribute, value)
+      return if value.is_a?(Hash)
+      record.errors.add(:base, "Response must be valid JSON")
     end
   end
 
@@ -34,9 +36,7 @@ module Lluminary
       @fields[name] = { type: :datetime, description: description }
     end
 
-    def fields
-      @fields
-    end
+    attr_reader :fields
 
     def validates(*args, **options)
       @validations << [args, options]
@@ -47,10 +47,8 @@ module Lluminary
     end
 
     def schema_model
-      @schema_model ||= SchemaModel.build(
-        fields: @fields,
-        validations: @validations
-      )
+      @schema_model ||=
+        SchemaModel.build(fields: @fields, validations: @validations)
     end
 
     def validate(values)
@@ -58,4 +56,4 @@ module Lluminary
       instance.valid? ? [] : instance.errors.full_messages
     end
   end
-end 
+end

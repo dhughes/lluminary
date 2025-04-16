@@ -1,8 +1,11 @@
-require 'spec_helper'
-require_relative '../../examples/analyze_text'
+# frozen_string_literal: true
+require "spec_helper"
+require_relative "../../examples/analyze_text"
 
 RSpec.describe AnalyzeText do
-  let(:text) { "Ruby is a dynamic, open source programming language with a focus on simplicity and productivity. It has an elegant syntax that is natural to read and easy to write." }
+  let(:text) do
+    "Ruby is a dynamic, open source programming language with a focus on simplicity and productivity. It has an elegant syntax that is natural to read and easy to write."
+  end
 
   it "analyzes text" do
     result = described_class.call(text: text)
@@ -18,4 +21,4 @@ RSpec.describe AnalyzeText do
     expect(json).to have_key("analysis")
     expect(json["analysis"]).to eq(result.output.analysis)
   end
-end 
+end

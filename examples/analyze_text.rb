@@ -1,29 +1,26 @@
-require_relative 'config'
+# frozen_string_literal: true
+require_relative "config"
 
 # Add the lib directory to the load path
-$LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
+$LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 
-require 'lluminary'
+require "lluminary"
 
 class AnalyzeText < Lluminary::Task
   use_provider :openai
 
-  input_schema do
-    string :text
-  end
+  input_schema { string :text }
 
-  output_schema do
-    string :analysis
-  end
+  output_schema { string :analysis }
 
   private
 
   def task_prompt
     "Analyze the following text and provide a brief thematic analysis:\n\n#{text}"
   end
-end 
+end
 
-if __FILE__ == $0
+if __FILE__ == $PROGRAM_NAME
   text = <<~TEXT
     In a quiet village nestled between rolling hills and whispering pines, there lived a buff-colored cat named Fig. His coat shimmered like warm sand in the sun, and he spent his days stretched across stone walls and window ledges, a golden blur of contentment. Though the village children adored him and his elderly owner gave him all the cream he could want, Fig often found himself gazing beyond the fields, wondering if life held something more than naps and the occasional sparrow chase. One morning, as the dew still clung to the grass, Fig slipped out through the garden gate and padded off toward the unknown.
 

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Lluminary
   module Providers
     class Base
@@ -12,4 +13,4 @@ module Lluminary
       end
     end
   end
-end 
+end

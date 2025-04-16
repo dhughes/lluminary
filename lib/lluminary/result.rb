@@ -1,4 +1,5 @@
-require 'ostruct'
+# frozen_string_literal: true
+require "ostruct"
 
 module Lluminary
   class Result
@@ -10,4 +11,4 @@ module Lluminary
       @prompt = prompt
     end
   end
-end 
+end

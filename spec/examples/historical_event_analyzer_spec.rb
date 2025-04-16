@@ -1,14 +1,16 @@
-require 'spec_helper'
-require_relative '../../examples/historical_event_analyzer'
-require 'pry-byebug'
+# frozen_string_literal: true
+require "spec_helper"
+require_relative "../../examples/historical_event_analyzer"
+require "pry-byebug"
 
 RSpec.describe HistoricalEventAnalyzer do
-  describe '#call' do
-    context 'with events that have known exact times' do
-      it 'returns the exact time of the human step on the moon' do
-        result = described_class.call(
-          event_description: "Neil Armstrong's first step onto the Moon"
-        )
+  describe "#call" do
+    context "with events that have known exact times" do
+      it "returns the exact time of the human step on the moon" do
+        result =
+          described_class.call(
+            event_description: "Neil Armstrong's first step onto the Moon"
+          )
 
         expect(result.output.valid?).to be true
         expect(result.output.event_datetime).to be_a(DateTime)
@@ -19,11 +21,12 @@ RSpec.describe HistoricalEventAnalyzer do
       end
     end
 
-    context 'with events that have approximate times' do
-      it 'returns midnight for the fall of the Roman Empire' do
-        result = described_class.call(
-          event_description: "Assassination of Julius Caesar"
-        )
+    context "with events that have approximate times" do
+      it "returns midnight for the fall of the Roman Empire" do
+        result =
+          described_class.call(
+            event_description: "Assassination of Julius Caesar"
+          )
 
         expect(result.output.valid?).to be true
         expect(result.output.event_datetime).to be_a(DateTime)
@@ -34,4 +37,4 @@ RSpec.describe HistoricalEventAnalyzer do
       end
     end
   end
-end 
+end

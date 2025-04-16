@@ -1,14 +1,17 @@
-require 'spec_helper'
-require 'lluminary/providers/test'
+# frozen_string_literal: true
+require "spec_helper"
+require "lluminary/providers/test"
 
 RSpec.describe Lluminary::Providers::Test do
   let(:provider) { described_class.new }
   let(:prompt) { "Test prompt" }
-  let(:task_class) { double("TaskClass", output_fields: { summary: { type: :string } }) }
+  let(:task_class) do
+    double("TaskClass", output_fields: { summary: { type: :string } })
+  end
   let(:task) { double("Task", class: task_class) }
 
-  describe '#call' do
-    it 'returns a hash with raw and parsed response' do
+  describe "#call" do
+    it "returns a hash with raw and parsed response" do
       response = provider.call(prompt, task)
 
       expect(response).to be_a(Hash)
@@ -16,7 +19,7 @@ RSpec.describe Lluminary::Providers::Test do
       expect(response[:parsed]).to eq({ "summary" => "Test string value" })
     end
 
-    it 'handles prompts with schema descriptions' do
+    it "handles prompts with schema descriptions" do
       prompt_with_schema = <<~PROMPT
         Test prompt
 
@@ -36,22 +39,24 @@ RSpec.describe Lluminary::Providers::Test do
       expect(response[:parsed]).to eq({ "summary" => "Test string value" })
     end
 
-    it 'generates integer values for integer fields' do
-      task_class = double("TaskClass", output_fields: { count: { type: :integer } })
+    it "generates integer values for integer fields" do
+      task_class =
+        double("TaskClass", output_fields: { count: { type: :integer } })
       task = double("Task", class: task_class)
-      
+
       response = provider.call(prompt, task)
       expect(response[:raw]).to eq('{"count": 0}')
       expect(response[:parsed]).to eq({ "count" => 0 })
     end
 
-    it 'raises error for unsupported types' do
-      task_class = double("TaskClass", output_fields: { value: { type: :unsupported } })
+    it "raises error for unsupported types" do
+      task_class =
+        double("TaskClass", output_fields: { value: { type: :unsupported } })
       task = double("Task", class: task_class)
-      
-      expect {
-        provider.call(prompt, task)
-      }.to raise_error("Unsupported type: unsupported")
+
+      expect { provider.call(prompt, task) }.to raise_error(
+        "Unsupported type: unsupported"
+      )
     end
   end
-end 
+end

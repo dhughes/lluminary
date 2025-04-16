@@ -1,46 +1,40 @@
-require 'spec_helper'
-require_relative '../../examples/price_analyzer'
+# frozen_string_literal: true
+require "spec_helper"
+require_relative "../../examples/price_analyzer"
 
 RSpec.describe PriceAnalyzer do
-  describe '#call' do
-    it 'returns a competitiveness score between 0.0 and 1.0 for a high-priced item' do
-      result = described_class.call(
-        product_name: "Entry LevelLuxury Watch",
-        price: 999.99
-      )
+  describe "#call" do
+    it "returns a competitiveness score between 0.0 and 1.0 for a high-priced item" do
+      result =
+        described_class.call(
+          product_name: "Entry LevelLuxury Watch",
+          price: 999.99
+        )
 
       expect(result.output.competitiveness_score).to be_a(Float)
       expect(result.output.competitiveness_score).to be_between(0.0, 1.0)
       expect(result.output.competitiveness_score).to be >= 0.5 # Lower priced luxury watch is more competitive
     end
 
-    it 'returns a higher competitiveness score for a reasonably priced item' do
-      result = described_class.call(
-        product_name: "Basic Watch",
-        price: 10049.99
-      )
+    it "returns a higher competitiveness score for a reasonably priced item" do
+      result =
+        described_class.call(product_name: "Basic Watch", price: 10_049.99)
 
       expect(result.output.competitiveness_score).to be_a(Float)
       expect(result.output.competitiveness_score).to be_between(0.0, 1.0)
       expect(result.output.competitiveness_score).to be <= 0.5 # Higher priced basic watch is less competitive
     end
 
-    it 'validates presence of product_name' do
-      expect {
-        described_class.call!(
-          product_name: "",
-          price: 49.99
-        )
-      }.to raise_error(Lluminary::ValidationError)
+    it "validates presence of product_name" do
+      expect do
+        described_class.call!(product_name: "", price: 49.99)
+      end.to raise_error(Lluminary::ValidationError)
     end
 
-    it 'validates presence of price' do
-      expect {
-        described_class.call!(
-          product_name: "Basic Watch",
-          price: nil
-        )
-      }.to raise_error(Lluminary::ValidationError)
+    it "validates presence of price" do
+      expect do
+        described_class.call!(product_name: "Basic Watch", price: nil)
+      end.to raise_error(Lluminary::ValidationError)
     end
   end
-end 
+end

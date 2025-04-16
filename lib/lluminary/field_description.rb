@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Lluminary
   class FieldDescription
     def initialize(name, field)
@@ -11,7 +12,9 @@ module Lluminary
       parts = []
       parts << "#{@name} (#{type_description})"
       parts << ": #{@description}" if @description
-      parts << " (#{validation_descriptions.join(', ')})" if validation_descriptions.any?
+      if validation_descriptions.any?
+        parts << " (#{validation_descriptions.join(", ")})"
+      end
       parts.join
     end
 
@@ -19,7 +22,9 @@ module Lluminary
       parts = []
       parts << "#{@name} (#{type_description})"
       parts << ": #{@description}" if @description
-      parts << "\nValidation: #{validation_descriptions.join(', ')}" if validation_descriptions.any?
+      if validation_descriptions.any?
+        parts << "\nValidation: #{validation_descriptions.join(", ")}"
+      end
       parts << "\nExample: #{example_value}"
       parts.join
     end
@@ -36,26 +41,28 @@ module Lluminary
     end
 
     def validation_descriptions
-      @validations.map do |_, options|
-        case options.keys.first
-        when :absence
-          "must be absent"
-        when :comparison
-          comparison_descriptions(options[:comparison])
-        when :exclusion
-          "must not be one of: #{options[:exclusion][:in].join(', ')}"
-        when :format
-          "must match format: #{options[:format][:with]}"
-        when :inclusion
-          "must be one of: #{options[:inclusion][:in].join(', ')}"
-        when :length
-          length_descriptions(options[:length])
-        when :numericality
-          numericality_descriptions(options[:numericality])
-        when :presence
-          "must be present"
+      @validations
+        .map do |_, options|
+          case options.keys.first
+          when :absence
+            "must be absent"
+          when :comparison
+            comparison_descriptions(options[:comparison])
+          when :exclusion
+            "must not be one of: #{options[:exclusion][:in].join(", ")}"
+          when :format
+            "must match format: #{options[:format][:with]}"
+          when :inclusion
+            "must be one of: #{options[:inclusion][:in].join(", ")}"
+          when :length
+            length_descriptions(options[:length])
+          when :numericality
+            numericality_descriptions(options[:numericality])
+          when :presence
+            "must be present"
+          end
         end
-      end.compact
+        .compact
     end
 
     def comparison_descriptions(options)
@@ -119,14 +126,10 @@ module Lluminary
         descriptions << "must be other than #{options[:other_than]}"
       end
       if options[:in]
-        descriptions << "must be in: #{options[:in].to_a.join(', ')}"
+        descriptions << "must be in: #{options[:in].to_a.join(", ")}"
       end
-      if options[:odd]
-        descriptions << "must be odd"
-      end
-      if options[:even]
-        descriptions << "must be even"
-      end
+      descriptions << "must be odd" if options[:odd]
+      descriptions << "must be even" if options[:even]
       descriptions.join(", ")
     end
 
@@ -145,4 +148,4 @@ module Lluminary
       end
     end
   end
-end 
+end

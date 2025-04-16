@@ -1,4 +1,5 @@
-require 'active_model'
+# frozen_string_literal: true
+require "active_model"
 
 module Lluminary
   class SchemaModel
@@ -12,7 +13,7 @@ module Lluminary
 
     def to_s
       attrs = attributes.dup
-      attrs.delete('raw_response')
+      attrs.delete("raw_response")
       "#<#{self.class.name} #{attrs.inspect}>"
     end
 
@@ -25,8 +26,10 @@ module Lluminary
         end
 
         # Add raw_response field and validation
-        define_method(:raw_response) { @attributes['raw_response'] }
-        define_method(:raw_response=) { |value| @attributes['raw_response'] = value }
+        define_method(:raw_response) { @attributes["raw_response"] }
+        define_method(:raw_response=) do |value|
+          @attributes["raw_response"] = value
+        end
 
         validate do |record|
           if record.raw_response
@@ -41,7 +44,7 @@ module Lluminary
         # Add type validations
         validate do |record|
           record.attributes.each do |name, value|
-            next if name == 'raw_response'
+            next if name == "raw_response"
             next if value.nil?
 
             field = fields[name.to_sym]
@@ -57,7 +60,7 @@ module Lluminary
                 record.errors.add(name, "must be an Integer")
               end
             when :boolean
-              unless value == true || value == false
+              unless [true, false].include?(value)
                 record.errors.add(name, "must be true or false")
               end
             when :float
@@ -73,9 +76,7 @@ module Lluminary
         end
 
         # Add ActiveModel validations
-        validations.each do |args, options|
-          validates(*args, **options)
-        end
+        validations.each { |args, options| validates(*args, **options) }
 
         # Set model name for error messages
         define_singleton_method(:model_name) do
@@ -84,4 +85,4 @@ module Lluminary
       end
     end
   end
-end 
+end
