@@ -12,12 +12,12 @@ class HistoricalEventAnalyzer < Lluminary::Task
   end
 
   output_schema do
-    datetime :event_datetime,
-             description:
-               "The exact date and time when the event occurred in the UTC timezone. If it is known, use the exact time to the minute, otherwise use midnight. Do not guess."
-    boolean :exact_time_is_known,
-            description:
-              "Whether the exact time to the minute of the event is known and well documented. If the exact time is not known, return false."
+    datetime :event_datetime, description: <<~DESCRIPTION
+                 The exact date and time when the event occurred in the UTC timezone. If it is known, use the exact time to the minute, otherwise use midnight. Do not guess.
+               DESCRIPTION
+    boolean :exact_time_is_known, description: <<~DESCRIPTION
+                Whether the exact time to the minute of the event is known and well documented. If the exact time is not known, return false.
+              DESCRIPTION
 
     validates :event_datetime, presence: true
     validates :exact_time_is_known, inclusion: { in: [true, false] }

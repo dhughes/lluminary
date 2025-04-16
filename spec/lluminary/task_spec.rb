@@ -344,9 +344,11 @@ RSpec.describe Lluminary::Task do
             end
 
           task = task_class.new
-          expect(task.send(:json_schema_example)).to include(
-            "password (string): The password\nValidation: must be between 8 and 20 characters\nExample: \"your password here\""
-          )
+          expect(task.send(:json_schema_example)).to include(<<~DESCRIPTION)
+              password (string): The password
+              Validation: must be between 8 and 20 characters
+              Example: "your password here"
+            DESCRIPTION
         end
 
         it "includes multiple length validations in description" do
@@ -363,9 +365,11 @@ RSpec.describe Lluminary::Task do
             end
 
           task = task_class.new
-          expect(task.send(:json_schema_example)).to include(
-            "username (string): The username\nValidation: must be at least 3 characters, must be at most 20 characters\nExample: \"your username here\""
-          )
+          expect(task.send(:json_schema_example)).to include(<<~DESCRIPTION)
+              username (string): The username
+              Validation: must be at least 3 characters, must be at most 20 characters
+              Example: "your username here"
+            DESCRIPTION
         end
       end
 
@@ -523,9 +527,19 @@ RSpec.describe Lluminary::Task do
             end
 
           task = task_class.new
-          expect(task.send(:json_schema_example)).to include(
-            "email (string): Email address\nValidation: must match format: (?-mix:\\A[^@\\s]+@[^@\\s]+\\z)\nExample: \"your email here\""
-          )
+          expect(task.send(:json_schema_example)).to eq(<<~SCHEMA.chomp)
+            You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+            The JSON object must contain the following fields:
+
+            email (string): Email address
+            Validation: must match format: (?-mix:\\A[^@\\s]+@[^@\\s]+\\z)
+            Example: "your email here"
+
+            Your response must be ONLY this JSON object:
+            {
+              "email": "your email here"
+            }
+          SCHEMA
         end
       end
 

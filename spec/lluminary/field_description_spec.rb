@@ -25,8 +25,9 @@ RSpec.describe Lluminary::FieldDescription do
         ]
       }
       description = described_class.new("test_field", field)
-      expected =
-        "test_field (string): A test field (must be at least 5 characters, must be at most 10 characters, must match format: /^[A-Z]+$/)"
+      expected = <<~DESCRIPTION.chomp
+          test_field (string): A test field (must be at least 5 characters, must be at most 10 characters, must match format: /^[A-Z]+$/)
+        DESCRIPTION
       expect(description.to_s).to eq(expected)
     end
   end

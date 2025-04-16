@@ -3,9 +3,9 @@ require "spec_helper"
 require_relative "../../examples/summarize_text"
 
 RSpec.describe SummarizeText do
-  let(:text) do
-    "Ruby is a dynamic, open source programming language with a focus on simplicity and productivity. It has an elegant syntax that is natural to read and easy to write."
-  end
+  let(:text) { <<~TEXT }
+      Ruby is a dynamic, open source programming language with a focus on simplicity and productivity. It has an elegant syntax that is natural to read and easy to write.
+    TEXT
 
   it "summarizes text" do
     result = described_class.call(text: text)

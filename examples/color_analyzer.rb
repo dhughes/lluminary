@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 require_relative "config"
 
-# This example was created to show that output validation works correctly. The prompt is intentionally vague to show that the output validator
-# will not allow any options other than the original 16 CSS Level 1 colors. (Orange, OrangeRed, etc) are not allowed.
+# This example was created to show that output validation works correctly. The prompt is intentionally vague
+# to show that the output validator can handle complex cases.
 class ColorAnalyzer < Lluminary::Task
   use_provider :bedrock
 
@@ -35,9 +35,9 @@ class ColorAnalyzer < Lluminary::Task
   end
 
   output_schema do
-    string :color_name,
-           description:
-             "The lower case CSS level 1 color name that best matches the described image. Originally CSS Level 1 only supported 16 colors, but modern CSS supports many more. We only want one of the 16 original ones."
+    string :color_name, description: <<~DESCRIPTION
+               The lower case CSS level 1 color name that best matches the described image. Originally CSS Level 1 only supported 16 colors, but modern CSS supports many more. We only want one of the 16 original ones.
+             DESCRIPTION
 
     validates :color_name, presence: true
     validates :color_name,
@@ -67,11 +67,9 @@ end
 if __FILE__ == $PROGRAM_NAME
   puts "#> Running ColorAnalyzer example"
 
-  result =
-    ColorAnalyzer.call(
-      image_description:
-        "A breathtaking sunset over the ocean. The sky is painted with vibrant reds, oranges, and pinks, fading into deep purples near the horizon. Clouds catch the light and appear to be on fire. The ocean reflects these warm hues, creating a shimmering path of light across the water. Small waves catch the last rays of sunlight, creating sparkling highlights. The scene is framed by silhouettes of distant palm trees against the colorful sky and azure ocean."
-    )
+  result = ColorAnalyzer.call(image_description: <<~DESCRIPTION)
+          A breathtaking sunset over the ocean. The sky is painted with vibrant reds, oranges, and pinks, fading into deep purples near the horizon. Clouds catch the light and appear to be on fire. The ocean reflects these warm hues, creating a shimmering path of light across the water. Small waves catch the last rays of sunlight, creating sparkling highlights. The scene is framed by silhouettes of distant palm trees against the colorful sky and azure ocean.
+        DESCRIPTION
 
   puts "##> Input"
   puts result.input
