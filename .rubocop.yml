@@ -1,2 +1,11 @@
 inherit_gem:
   syntax_tree: config/rubocop.yml
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 20
