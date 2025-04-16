@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 require_relative "config"
 
-# Add the lib directory to the load path
-$LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
-
-require "lluminary"
-
+# Analyzes the sentiment of text using LLM.
+# Returns structured sentiment analysis with scores and explanations.
 class SentimentAnalysis < Lluminary::Task
   use_provider :bedrock
 

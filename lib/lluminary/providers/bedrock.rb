@@ -7,6 +7,8 @@ require "pry-byebug"
 
 module Lluminary
   module Providers
+    # Provider for AWS Bedrock models.
+    # Implements the Base provider interface for AWS Bedrock's API.
     class Bedrock < Base
       DEFAULT_MODEL_ID = "anthropic.claude-instant-v1"
 

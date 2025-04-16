@@ -3,13 +3,8 @@ require "active_model"
 require_relative "schema_model"
 
 module Lluminary
-  class JsonValidator < ActiveModel::EachValidator
-    def validate_each(record, _attribute, value)
-      return if value.is_a?(Hash)
-      record.errors.add(:base, "Response must be valid JSON")
-    end
-  end
-
+  # Represents a JSON schema for validating task inputs and outputs.
+  # Provides methods for defining and validating schemas.
   class Schema
     def initialize
       @fields = {}

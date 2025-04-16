@@ -5,6 +5,8 @@ require_relative "../provider_error"
 
 module Lluminary
   module Providers
+    # Provider for OpenAI's GPT models.
+    # Implements the Base provider interface for OpenAI's API.
     class OpenAI < Base
       DEFAULT_MODEL = "gpt-3.5-turbo"
 

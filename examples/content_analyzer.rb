@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 require_relative "config"
 
+# Analyzes content to extract key information and insights.
+# Uses LLM to process and understand content, returning structured analysis.
 class ContentAnalyzer < Lluminary::Task
   use_provider :openai
 

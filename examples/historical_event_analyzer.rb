@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 require_relative "config"
 
+# Analyzes historical events to extract key details and context.
+# Uses LLM to understand and structure information about historical events.
 class HistoricalEventAnalyzer < Lluminary::Task
   use_provider :bedrock, model_id: "anthropic.claude-instant-v1"
 

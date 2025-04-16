@@ -1,6 +1,9 @@
 # frozen_string_literal: true
+
 module Lluminary
   module Providers
+    # Base class for all LLM providers.
+    # Defines the interface that all providers must implement.
     class Base
       attr_reader :config
 

@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 require_relative "config"
 
-# Add the lib directory to the load path
-$LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
-
-require "lluminary"
-
+# Extracts and analyzes quotes from text.
+# Uses LLM to identify quotes and their context from input text.
 class QuoteTask < Lluminary::Task
   use_provider :openai
 

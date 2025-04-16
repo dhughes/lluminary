@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 require_relative "config"
 
-# Add the lib directory to the load path
-$LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
-
-require "lluminary"
-
+# A task that analyzes text using LLM to extract structured information.
+# Takes text input and returns a structured analysis based on a predefined schema.
 class AnalyzeText < Lluminary::Task
   use_provider :openai
 

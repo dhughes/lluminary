@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 require_relative "config"
 
+# Analyzes text to extract and understand pricing information.
+# Uses LLM to identify and structure price-related data from text.
 class PriceAnalyzer < Lluminary::Task
   use_provider :openai
 

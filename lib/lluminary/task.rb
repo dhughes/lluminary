@@ -6,6 +6,15 @@ require_relative "field_description"
 require "json"
 
 module Lluminary
+  # Base class for all Lluminary tasks.
+  # Provides the core functionality for defining and running LLM-powered tasks.
+  #
+  # @example Creating a custom task
+  #   class MyTask < Lluminary::Task
+  #     def run
+  #       # Task implementation
+  #     end
+  #   end
   class Task
     class << self
       def input_schema(&block)

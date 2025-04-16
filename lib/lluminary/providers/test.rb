@@ -1,6 +1,9 @@
 # frozen_string_literal: true
+
 module Lluminary
   module Providers
+    # Test provider for development and testing.
+    # Returns predefined responses for testing purposes.
     class Test < Base
       def call(_prompt, task)
         response = generate_response(task.class.output_fields)

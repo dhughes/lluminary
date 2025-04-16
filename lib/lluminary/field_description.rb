@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 module Lluminary
+  # Represents a field in a schema with its type, description, and validations.
+  # Used to generate human-readable descriptions and validate field values.
   class FieldDescription
     def initialize(name, field)
       @name = name

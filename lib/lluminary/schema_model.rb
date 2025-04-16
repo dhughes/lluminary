@@ -2,6 +2,8 @@
 require "active_model"
 
 module Lluminary
+  # Base class for models that use JSON schema validation.
+  # Provides ActiveModel integration and schema validation.
   class SchemaModel
     include ActiveModel::Validations
 

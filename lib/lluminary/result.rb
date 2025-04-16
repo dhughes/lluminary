@@ -2,6 +2,8 @@
 require "ostruct"
 
 module Lluminary
+  # Represents the result of a task execution.
+  # Contains the output data and any metadata about the execution.
   class Result
     attr_reader :raw_response, :output, :prompt
 
