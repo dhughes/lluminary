@@ -22,7 +22,7 @@ module Lluminary
         response =
           @client.chat(
             parameters: {
-              model: model.name,
+              model: model.class::NAME,
               messages: [{ role: "user", content: prompt }],
               response_format: {
                 type: "json_object"

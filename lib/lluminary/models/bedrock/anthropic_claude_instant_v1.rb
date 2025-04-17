@@ -4,9 +4,7 @@ module Lluminary
   module Models
     module Bedrock
       class AnthropicClaudeInstantV1 < Base
-        def name
-          "anthropic.claude-instant-v1"
-        end
+        NAME = "anthropic.claude-instant-v1"
 
         def compatible_with?(provider_name)
           provider_name == :bedrock

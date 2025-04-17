@@ -3,12 +3,6 @@ require "spec_helper"
 RSpec.describe Lluminary::Models::Bedrock::AnthropicClaudeInstantV1 do
   subject(:model) { described_class.new }
 
-  describe "#name" do
-    it "returns the correct model name" do
-      expect(model.name).to eq("anthropic.claude-instant-v1")
-    end
-  end
-
   describe "#compatible_with?" do
     it "returns true for :bedrock provider" do
       expect(model.compatible_with?(:bedrock)).to be true

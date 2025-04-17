@@ -4,12 +4,6 @@ require "spec_helper"
 RSpec.describe Lluminary::Models::OpenAi::Gpt35Turbo do
   subject(:model) { described_class.new }
 
-  describe "#name" do
-    it "returns the correct model name" do
-      expect(model.name).to eq("gpt-3.5-turbo")
-    end
-  end
-
   describe "#compatible_with?" do
     it "returns true for :openai provider" do
       expect(model.compatible_with?(:openai)).to be true
