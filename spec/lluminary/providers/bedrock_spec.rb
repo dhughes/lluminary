@@ -50,8 +50,10 @@ RSpec.describe Lluminary::Providers::Bedrock do
       )
     end
 
-    it "returns the list of models from the API" do
-      expect(provider.models).to eq(mock_models_response)
+    it "returns an array of model IDs as strings" do
+      expect(provider.models).to eq(
+        %w[anthropic.claude-instant-v1 anthropic.claude-v2]
+      )
     end
   end
 

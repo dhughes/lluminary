@@ -63,7 +63,8 @@ module Lluminary
                 config[:secret_access_key]
               )
           )
-        models_client.list_foundation_models
+        response = models_client.list_foundation_models
+        response.foundation_models.map(&:model_id)
       end
     end
   end

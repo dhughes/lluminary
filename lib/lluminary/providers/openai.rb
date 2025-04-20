@@ -49,7 +49,8 @@ module Lluminary
       end
 
       def models
-        @client.models.list
+        response = @client.models.list
+        response["data"].map { |model| model["id"] }
       end
     end
   end
