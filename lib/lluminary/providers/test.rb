@@ -5,6 +5,8 @@ module Lluminary
     # Test provider for development and testing.
     # Returns predefined responses for testing purposes.
     class Test < Base
+      NAME = :test
+
       def call(_prompt, task)
         response = generate_response(task.class.output_fields)
         raw_response = JSON.pretty_generate(response).gsub(/\n\s*/, "")

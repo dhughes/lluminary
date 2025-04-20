@@ -8,6 +8,7 @@ module Lluminary
     # Provider for AWS Bedrock models.
     # Implements the Base provider interface for AWS Bedrock's API.
     class Bedrock < Base
+      NAME = :bedrock
       DEFAULT_MODEL = Models::Bedrock::AnthropicClaudeInstantV1
 
       attr_reader :client, :config

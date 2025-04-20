@@ -8,6 +8,7 @@ module Lluminary
     # Provider for OpenAI's GPT models.
     # Implements the Base provider interface for OpenAI's API.
     class OpenAI < Base
+      NAME = :openai
       DEFAULT_MODEL = Models::OpenAi::Gpt35Turbo
 
       attr_reader :client, :config
