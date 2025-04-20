@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Run the original Ruby command with bundle exec
+bundle exec irb "$@"

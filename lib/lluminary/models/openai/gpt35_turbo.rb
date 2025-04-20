@@ -10,6 +10,10 @@ module Lluminary
         def compatible_with?(provider_name)
           provider_name == :openai
         end
+
+        def name
+          NAME
+        end
       end
     end
   end

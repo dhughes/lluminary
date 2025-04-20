@@ -5,8 +5,10 @@ require_relative "base"
 module Lluminary
   module Models
     module Bedrock
-      class AnthropicClaudeInstantV1 < Lluminary::Models::Bedrock::Base
-        NAME = "anthropic.claude-instant-v1"
+      class AmazonNovaProV1 < Lluminary::Models::Bedrock::Base
+        NAME = "amazon.nova-pro-v1"
+        VERSIONS = %w[0].freeze
+        CONTEXT_WINDOWS = %w[24k 300k].freeze
 
         def compatible_with?(provider_name)
           provider_name == :bedrock

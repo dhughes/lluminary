@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Run rspec with bundle exec
+bundle exec rspec "$@" 
