@@ -18,6 +18,43 @@ RSpec.describe Lluminary::Providers::Bedrock do
     end
   end
 
+  describe "#models" do
+    let(:mock_models_response) do
+      OpenStruct.new(
+        foundation_models: [
+          OpenStruct.new(
+            model_id: "anthropic.claude-instant-v1",
+            model_name: "Claude Instant",
+            provider_name: "Anthropic",
+            input_modalities: ["TEXT"],
+            output_modalities: ["TEXT"],
+            customizations_supported: []
+          ),
+          OpenStruct.new(
+            model_id: "anthropic.claude-v2",
+            model_name: "Claude V2",
+            provider_name: "Anthropic",
+            input_modalities: ["TEXT"],
+            output_modalities: ["TEXT"],
+            customizations_supported: []
+          )
+        ]
+      )
+    end
+
+    before do
+      models_client = double("BedrockClient")
+      allow(Aws::Bedrock::Client).to receive(:new).and_return(models_client)
+      allow(models_client).to receive(:list_foundation_models).and_return(
+        mock_models_response
+      )
+    end
+
+    it "returns the list of models from the API" do
+      expect(provider.models).to eq(mock_models_response)
+    end
+  end
+
   describe "#call" do
     let(:prompt) { "Test prompt" }
     let(:task) { "Test task" }

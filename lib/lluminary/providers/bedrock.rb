@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require "aws-sdk-bedrockruntime"
+require "aws-sdk-bedrock"
 require "json"
 require_relative "../provider_error"
 
@@ -50,6 +51,19 @@ module Lluminary
 
       def model
         @model ||= config[:model].new
+      end
+
+      def models
+        models_client =
+          Aws::Bedrock::Client.new(
+            region: config[:region],
+            credentials:
+              Aws::Credentials.new(
+                config[:access_key_id],
+                config[:secret_access_key]
+              )
+          )
+        models_client.list_foundation_models
       end
     end
   end
