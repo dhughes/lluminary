@@ -5,6 +5,7 @@ require_relative "lluminary/result"
 require_relative "lluminary/task"
 require_relative "lluminary/providers/base"
 require_relative "lluminary/providers/openai"
+require_relative "lluminary/providers/bedrock"
 require_relative "lluminary/config"
 
 # Lluminary is a framework for building and running LLM-powered tasks.
