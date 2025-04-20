@@ -31,8 +31,8 @@ module Lluminary
 
       def call(prompt, _task)
         response =
-          @client.converse(
-            model_id: model.class::NAME,
+          client.converse(
+            model_id: model.name,
             messages: [{ role: "user", content: [{ text: prompt }] }]
           )
 

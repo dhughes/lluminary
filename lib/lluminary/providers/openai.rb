@@ -16,20 +16,22 @@ module Lluminary
       def initialize(**config_overrides)
         super
         @config = { model: DEFAULT_MODEL }.merge(config)
-        @client = ::OpenAI::Client.new(api_key: config[:api_key])
+        @client = ::OpenAI::Client.new(access_token: config[:api_key])
       end
 
       def call(prompt, _task)
         response =
-          @client.chat.completions.create(
-            model: :"#{model.class::NAME}",
-            messages: [{ role: "user", content: prompt }],
-            response_format: {
-              type: "json_object"
+          client.chat(
+            parameters: {
+              model: model.class::NAME,
+              messages: [{ role: "user", content: prompt }],
+              response_format: {
+                type: "json_object"
+              }
             }
           )
 
-        content = response.choices.first.message.content
+        content = response.dig("choices", 0, "message", "content")
 
         {
           raw: content,

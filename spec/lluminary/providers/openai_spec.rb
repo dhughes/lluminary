@@ -47,25 +47,16 @@ RSpec.describe Lluminary::Providers::OpenAI do
     let(:prompt) { "Test prompt" }
     let(:task) { "Test task" }
     let(:mock_response) do
-      double(
-        "ChatCompletion",
-        choices: [
-          double(
-            "Choice",
-            message: double("Message", content: '{"summary": "Test response"}')
-          )
+      {
+        "choices" => [
+          { "message" => { "content" => '{"summary": "Test response"}' } }
         ]
-      )
+      }
     end
 
     before do
-      chat_client =
-        double(
-          "ChatClient",
-          completions: double("Completions", create: mock_response)
-        )
       allow_any_instance_of(OpenAI::Client).to receive(:chat).and_return(
-        chat_client
+        mock_response
       )
     end
 
@@ -83,15 +74,7 @@ RSpec.describe Lluminary::Providers::OpenAI do
 
     context "when the response is not valid JSON" do
       let(:mock_response) do
-        double(
-          "ChatCompletion",
-          choices: [
-            double(
-              "Choice",
-              message: double("Message", content: "not valid json")
-            )
-          ]
-        )
+        { "choices" => [{ "message" => { "content" => "not valid json" } }] }
       end
 
       it "returns raw response with nil parsed value" do
