@@ -4,9 +4,7 @@ require_relative "lluminary/version"
 require_relative "lluminary/result"
 require_relative "lluminary/task"
 # automatically require all providers
-Dir[File.join(__dir__, "lluminary/providers/**/*.rb")].each do |file|
-  require file
-end
+Dir[File.join(__dir__, "lluminary/providers/*.rb")].each { |file| require file }
 # automatically require all models
 Dir[File.join(__dir__, "lluminary/models/**/*.rb")].each { |file| require file }
 require_relative "lluminary/config"
