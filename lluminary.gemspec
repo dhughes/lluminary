@@ -19,9 +19,8 @@ Gem::Specification.new do |s|
 
   # Runtime dependencies
   s.add_runtime_dependency "activemodel", ">= 5.2"
-  s.add_runtime_dependency "aws-sdk-bedrock", "~> 1.0" # Required for AWS Bedrock model listing
   s.add_runtime_dependency "aws-sdk-bedrockruntime", "~> 1.0" # Required for AWS Bedrock provider
-  s.add_runtime_dependency "openai", ">= 0" # Required for OpenAI provider (gem is not yet published on rubygems)
+  s.add_runtime_dependency "ruby-openai", "~> 6.3" # Required for OpenAI provider
 
   # Development dependencies
   s.add_development_dependency "dotenv", "~> 2.8"
