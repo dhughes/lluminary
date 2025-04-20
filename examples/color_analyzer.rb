@@ -4,7 +4,7 @@ require_relative "config"
 # This example was created to show that output validation works correctly. The prompt is intentionally vague
 # to show that the output validator can handle complex cases.
 class ColorAnalyzer < Lluminary::Task
-  use_provider :bedrock
+  use_provider :bedrock, model: Lluminary::Models::Bedrock::AmazonNovaProV1
 
   # List of valid CSS color names
   CSS_LEVEL1_COLOR_NAMES = %w[
