@@ -8,7 +8,7 @@ RSpec.describe Lluminary::Models::Bedrock::AmazonNovaProV1 do
 
   describe "NAME" do
     it "has the correct model name" do
-      expect(described_class::NAME).to eq("amazon.nova-pro-v1:0")
+      expect(described_class::NAME).to eq("amazon.nova-pro-v1")
     end
   end
 
@@ -19,6 +19,12 @@ RSpec.describe Lluminary::Models::Bedrock::AmazonNovaProV1 do
 
     it "returns false for other providers" do
       expect(model.compatible_with?(:openai)).to be false
+    end
+  end
+
+  describe "#name" do
+    it "returns the model name" do
+      expect(model.name).to eq("amazon.nova-pro-v1:0")
     end
   end
 end

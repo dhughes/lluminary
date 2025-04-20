@@ -9,4 +9,10 @@ RSpec.describe Lluminary::Models::Base do
       )
     end
   end
+
+  describe "#name" do
+    it "raises NotImplementedError" do
+      expect { described_class.new.name }.to raise_error(NotImplementedError)
+    end
+  end
 end

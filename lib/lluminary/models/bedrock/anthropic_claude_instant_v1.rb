@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
+require_relative "base"
+
 module Lluminary
   module Models
     module Bedrock
-      class AnthropicClaudeInstantV1 < Base
+      class AnthropicClaudeInstantV1 < Lluminary::Models::Bedrock::Base
         NAME = "anthropic.claude-instant-v1"
 
         def compatible_with?(provider_name)

@@ -11,6 +11,12 @@ module Lluminary
       def compatible_with?(provider_name)
         raise NotImplementedError, "Subclasses must implement #compatible_with?"
       end
+
+      # Returns the name of the model
+      # @return [String]
+      def name
+        raise NotImplementedError, "Subclasses must implement #name"
+      end
     end
   end
 end
