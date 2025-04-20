@@ -10,6 +10,31 @@ RSpec.describe Lluminary::Providers::Test do
   end
   let(:task) { double("Task", class: task_class) }
 
+  describe "#initialize" do
+    it "accepts configuration options" do
+      config = { api_key: "test_key", model: "test_model" }
+      provider = described_class.new(**config)
+      expect(provider.config).to eq(config)
+    end
+
+    it "merges default provider configuration with instance configuration" do
+      # Set up default provider configuration
+      Lluminary.configure do |config|
+        config.provider(:test, api_key: "global_key", model: "global_model")
+      end
+
+      # Create provider with instance-specific config
+      provider = described_class.new(model: "instance_model", temperature: 0.7)
+
+      # Should merge default and instance config, with instance taking precedence
+      expect(provider.config).to eq(
+        api_key: "global_key",
+        model: "instance_model",
+        temperature: 0.7
+      )
+    end
+  end
+
   describe "#call" do
     it "returns a hash with raw and parsed response" do
       response = provider.call(prompt, task)

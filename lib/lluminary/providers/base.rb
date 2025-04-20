@@ -7,16 +7,21 @@ module Lluminary
     class Base
       # The symbolic name of the provider. Must be overridden by subclasses.
       NAME = :base
-      raise "Provider classes must define NAME constant" if self == Base
 
       attr_reader :config
 
-      def initialize(**config)
-        @config = config
+      def initialize(**config_overrides)
+        @config = default_provider_config.merge(config_overrides)
       end
 
       def call(prompt, task)
         raise NotImplementedError, "Subclasses must implement #call"
+      end
+
+      private
+
+      def default_provider_config
+        Lluminary.config.provider_config(self.class::NAME)
       end
     end
   end

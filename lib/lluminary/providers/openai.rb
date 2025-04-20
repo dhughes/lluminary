@@ -13,7 +13,7 @@ module Lluminary
 
       attr_reader :client, :config
 
-      def initialize(**config)
+      def initialize(**config_overrides)
         super
         @config = { model: DEFAULT_MODEL }.merge(config)
         @client = ::OpenAI::Client.new(access_token: config[:api_key])
