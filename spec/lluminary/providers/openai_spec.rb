@@ -11,6 +11,39 @@ RSpec.describe Lluminary::Providers::OpenAI do
     end
   end
 
+  describe "#models" do
+    let(:mock_models_response) do
+      {
+        "object" => "list",
+        "data" => [
+          {
+            "id" => "gpt-4",
+            "object" => "model",
+            "created" => 1_687_882_411,
+            "owned_by" => "openai"
+          },
+          {
+            "id" => "gpt-3.5-turbo",
+            "object" => "model",
+            "created" => 1_677_610_602,
+            "owned_by" => "openai"
+          }
+        ]
+      }
+    end
+
+    before do
+      models_client = double("ModelsClient", list: mock_models_response)
+      allow_any_instance_of(OpenAI::Client).to receive(:models).and_return(
+        models_client
+      )
+    end
+
+    it "returns the list of models from the API" do
+      expect(provider.models).to eq(mock_models_response)
+    end
+  end
+
   describe "#call" do
     let(:prompt) { "Test prompt" }
     let(:task) { "Test task" }

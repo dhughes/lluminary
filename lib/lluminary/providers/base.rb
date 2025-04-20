@@ -18,6 +18,10 @@ module Lluminary
         raise NotImplementedError, "Subclasses must implement #call"
       end
 
+      def models
+        raise NotImplementedError, "Subclasses must implement #models"
+      end
+
       private
 
       def default_provider_config

@@ -47,6 +47,10 @@ module Lluminary
       def model
         @model ||= config[:model].new
       end
+
+      def models
+        @client.models.list
+      end
     end
   end
 end
