@@ -622,6 +622,149 @@ RSpec.describe Lluminary::Task do
         end
       end
     end
+
+    it "generates a schema example with array of strings" do
+      task_with_array =
+        Class.new(described_class) do
+          input_schema { string :message }
+
+          output_schema do
+            array :suggestions, description: "List of suggestions" do
+              string :element
+            end
+          end
+
+          private
+
+          def task_prompt
+            "Say: #{message}"
+          end
+        end
+
+      task = task_with_array.new(message: "test")
+      expected_output = <<~SCHEMA
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
+
+        suggestions (array of strings): List of suggestions
+        Example: ["first suggestion", "second suggestion", "..."]
+
+        Your response must be ONLY this JSON object:
+        {
+          "suggestions": [
+            "first suggestion",
+            "second suggestion",
+            "..."
+          ]
+        }
+      SCHEMA
+      expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
+    end
+
+    it "generates a schema example with array of integers" do
+      task_with_array =
+        Class.new(described_class) do
+          input_schema { string :message }
+
+          output_schema do
+            array :counts, description: "List of counts" do
+              integer :element
+            end
+          end
+
+          private
+
+          def task_prompt
+            "Say: #{message}"
+          end
+        end
+
+      task = task_with_array.new(message: "test")
+      expected_output = <<~SCHEMA
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
+
+        counts (array of integers): List of counts
+        Example: [1, 2, 3]
+
+        Your response must be ONLY this JSON object:
+        {
+          "counts": [
+            1,
+            2,
+            3
+          ]
+        }
+      SCHEMA
+      expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
+    end
+
+    it "generates a schema example with array of datetimes" do
+      task_with_array =
+        Class.new(described_class) do
+          input_schema { string :message }
+
+          output_schema do
+            array :timestamps, description: "List of timestamps" do
+              datetime :element
+            end
+          end
+
+          private
+
+          def task_prompt
+            "Say: #{message}"
+          end
+        end
+
+      task = task_with_array.new(message: "test")
+      expected_output = <<~SCHEMA
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
+
+        timestamps (array of datetime in ISO8601 format): List of timestamps
+        Example: ["2024-01-01T12:00:00+00:00", "2024-01-02T12:00:00+00:00"]
+
+        Your response must be ONLY this JSON object:
+        {
+          "timestamps": [
+            "2024-01-01T12:00:00+00:00",
+            "2024-01-02T12:00:00+00:00"
+          ]
+        }
+      SCHEMA
+      expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
+    end
+
+    it "generates a schema example with array without element type" do
+      task_with_array =
+        Class.new(described_class) do
+          input_schema { string :message }
+
+          output_schema { array :items, description: "List of items" }
+
+          private
+
+          def task_prompt
+            "Say: #{message}"
+          end
+        end
+
+      task = task_with_array.new(message: "test")
+      expected_output = <<~SCHEMA
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
+
+        items (array): List of items
+        Example: []
+
+        Your response must be ONLY this JSON object:
+        {
+          "items": []
+        }
+      SCHEMA
+      expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
+    end
   end
 
   describe "#validate_input" do
