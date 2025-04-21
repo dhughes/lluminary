@@ -32,6 +32,50 @@ module Lluminary
       parts.join
     end
 
+    def example_value
+      case @type
+      when :string
+        "\"your #{@name} here\""
+      when :integer
+        "0"
+      when :datetime
+        "\"2024-01-01T12:00:00+00:00\""
+      when :boolean
+        "true"
+      when :float
+        "0.0"
+      when :array
+        if @element_type
+          case @element_type[:type]
+          when :string
+            "[\"first #{@name.to_s.singularize}\", \"second #{@name.to_s.singularize}\", \"...\"]"
+          when :integer
+            "[1, 2, 3]"
+          when :float
+            "[1.0, 2.0, 3.0]"
+          when :boolean
+            "[true, false, true]"
+          when :datetime
+            "[\"2024-01-01T12:00:00+00:00\", \"2024-01-02T12:00:00+00:00\"]"
+          when :array
+            if @element_type[:element_type]
+              inner_example =
+                FieldDescription.new(
+                  @name.to_s.singularize,
+                  type: :array,
+                  element_type: @element_type[:element_type]
+                ).example_value
+              "[#{inner_example}, #{inner_example}]"
+            else
+              "[[...], [...]]"
+            end
+          end
+        else
+          "[]"
+        end
+      end
+    end
+
     private
 
     def type_description
@@ -43,6 +87,13 @@ module Lluminary
           case @element_type[:type]
           when :datetime
             "array of datetime in ISO8601 format"
+          when :array
+            if @element_type[:element_type]
+              inner_type = @element_type[:element_type][:type]
+              "array of arrays of #{inner_type}s"
+            else
+              "array of arrays"
+            end
           else
             "array of #{@element_type[:type]}s"
           end
@@ -145,40 +196,6 @@ module Lluminary
       descriptions << "must be odd" if options[:odd]
       descriptions << "must be even" if options[:even]
       descriptions.join(", ")
-    end
-
-    def example_value
-      case @type
-      when :string
-        "\"your #{@name} here\""
-      when :integer
-        "0"
-      when :datetime
-        "\"2024-01-01T12:00:00+00:00\""
-      when :boolean
-        "true"
-      when :float
-        "0.0"
-      when :array
-        if @element_type
-          case @element_type[:type]
-          when :string
-            "[\"first #{@name.to_s.singularize}\", \"second #{@name.to_s.singularize}\", \"...\"]"
-          when :integer
-            "[1, 2, 3]"
-          when :float
-            "[1.0, 2.0, 3.0]"
-          when :boolean
-            "[true, false, true]"
-          when :datetime
-            "[\"2024-01-01T12:00:00+00:00\", \"2024-01-02T12:00:00+00:00\"]"
-          else
-            "[]"
-          end
-        else
-          "[]"
-        end
-      end
     end
   end
 end

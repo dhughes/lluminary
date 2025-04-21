@@ -153,6 +153,60 @@ RSpec.describe Lluminary::FieldDescription do
       expect(description.to_schema_s).to eq(expected)
     end
 
+    it "generates schema description for an array of arrays of strings" do
+      field = {
+        type: :array,
+        description: "Groups of related items",
+        element_type: {
+          type: :array,
+          element_type: {
+            type: :string
+          }
+        }
+      }
+      description = described_class.new("groups", field)
+      expected = <<~DESCRIPTION.chomp
+        groups (array of arrays of strings): Groups of related items
+        Example: [["first group", "second group", "..."], ["first group", "second group", "..."]]
+      DESCRIPTION
+      expect(description.to_schema_s).to eq(expected)
+    end
+
+    it "generates schema description for an array of arrays of booleans" do
+      field = {
+        type: :array,
+        description: "Groups of flags",
+        element_type: {
+          type: :array,
+          element_type: {
+            type: :boolean
+          }
+        }
+      }
+      description = described_class.new("groups", field)
+      expected = <<~DESCRIPTION.chomp
+        groups (array of arrays of booleans): Groups of flags
+        Example: [[true, false, true], [true, false, true]]
+      DESCRIPTION
+      expect(description.to_schema_s).to eq(expected)
+    end
+
+    it "generates schema description for an array of untyped arrays" do
+      field = {
+        type: :array,
+        description: "Groups of items",
+        element_type: {
+          type: :array
+        }
+      }
+      description = described_class.new("groups", field)
+      expected = <<~DESCRIPTION.chomp
+        groups (array of arrays): Groups of items
+        Example: [[...], [...]]
+      DESCRIPTION
+      expect(description.to_schema_s).to eq(expected)
+    end
+
     it "includes validation descriptions for arrays" do
       field = {
         type: :array,
