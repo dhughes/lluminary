@@ -83,6 +83,43 @@ Lluminary supports these field types:
    ```
    Validates that the value is a Ruby DateTime object. When used in output schemas, the LLM will be instructed to return dates in ISO8601 format (e.g., "2024-01-01T12:00:00+00:00"). The library handles the conversion between DateTime objects and ISO8601 strings and back again automatically.
 
+6. **Array**  
+   Arrays can be defined with or without a specific element type. When typed, arrays can contain elements of any of the supported types (string, integer, boolean, float, datetime, etc). The element type is specified in a block.
+   
+   Usage example with strings:  
+   ```ruby
+   class MealSuggester < Lluminary::Task
+     input_schema do
+       array :ingredients do
+         string
+       end
+       validates :ingredients, presence: true, length: { minimum: 1 }
+     end
+   end
+   ```
+
+   Usage example with integers:
+   ```ruby
+   class NumberProcessor < Lluminary::Task
+     output_schema do
+       array :counts, description: "List of counts" do
+         integer
+       end
+     end
+   end
+   ```
+
+   You can also define untyped arrays by omitting the block:
+   ```ruby
+   class GenericTask < Lluminary::Task
+     output_schema do
+       array :items, description: "List of items"
+     end
+   end
+   ```
+
+   When used in output schemas, the LLM will be instructed to return arrays in the appropriate format based on the element type.
+
 All of these field definitions allow nil values by default, ensuring that optional data can be omitted.
 
 ### Validations
