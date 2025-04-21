@@ -224,6 +224,29 @@ module Lluminary
             true
           when :float
             0.0
+          when :array
+            if field[:element_type]
+              case field[:element_type][:type]
+              when :string
+                [
+                  "first #{name.to_s.singularize}",
+                  "second #{name.to_s.singularize}",
+                  "..."
+                ]
+              when :integer
+                [1, 2, 3]
+              when :float
+                [1.0, 2.0, 3.0]
+              when :boolean
+                [true, false, true]
+              when :datetime
+                %w[2024-01-01T12:00:00+00:00 2024-01-02T12:00:00+00:00]
+              else
+                []
+              end
+            else
+              []
+            end
           end
         end
 
