@@ -45,6 +45,58 @@ module Lluminary
 
         # Add type validations
         validate do |record|
+          def validate_array_field(
+            record,
+            name,
+            value,
+            element_type,
+            path = nil
+          )
+            field_name = path || name
+
+            unless value.is_a?(Array)
+              record.errors.add(field_name, "must be an Array")
+              return
+            end
+
+            return unless element_type # untyped array
+
+            value.each_with_index do |element, index|
+              current_path = "#{field_name}[#{index}]"
+
+              case element_type[:type]
+              when :array
+                validate_array_field(
+                  record,
+                  name,
+                  element,
+                  element_type[:element_type],
+                  current_path
+                )
+              when :string
+                unless element.is_a?(String)
+                  record.errors.add(current_path, "must be a String")
+                end
+              when :integer
+                unless element.is_a?(Integer)
+                  record.errors.add(current_path, "must be an Integer")
+                end
+              when :boolean
+                unless [true, false].include?(element)
+                  record.errors.add(current_path, "must be true or false")
+                end
+              when :float
+                unless element.is_a?(Float)
+                  record.errors.add(current_path, "must be a float")
+                end
+              when :datetime
+                unless element.is_a?(DateTime)
+                  record.errors.add(current_path, "must be a DateTime")
+                end
+              end
+            end
+          end
+
           record.attributes.each do |name, value|
             next if name == "raw_response"
             next if value.nil?
@@ -73,6 +125,8 @@ module Lluminary
               unless value.is_a?(DateTime)
                 record.errors.add(name, "must be a DateTime")
               end
+            when :array
+              validate_array_field(record, name, value, field[:element_type])
             end
           end
         end

@@ -31,6 +31,18 @@ module Lluminary
       @fields[name] = { type: :datetime, description: description }
     end
 
+    def array(name, description: nil, &block)
+      field = { type: :array, description: description }
+
+      if block
+        element_schema = Schema.new
+        element_schema.instance_eval(&block)
+        field[:element_type] = element_schema.fields[:element]
+      end
+
+      @fields[name] = field
+    end
+
     attr_reader :fields
 
     def validates(*args, **options)

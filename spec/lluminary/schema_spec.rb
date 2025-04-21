@@ -96,6 +96,76 @@ RSpec.describe Lluminary::Schema do
     end
   end
 
+  describe "#array" do
+    it "adds an untyped array field to the schema" do
+      schema.array(:items)
+      expect(schema.fields).to eq({ items: { type: :array, description: nil } })
+    end
+
+    it "adds an untyped array field with description" do
+      schema.array(:items, description: "A list of items")
+      expect(schema.fields).to eq(
+        { items: { type: :array, description: "A list of items" } }
+      )
+    end
+
+    it "adds a typed array field to the schema" do
+      schema.array(:items) { string :element }
+      expect(schema.fields).to eq(
+        {
+          items: {
+            type: :array,
+            element_type: {
+              type: :string,
+              description: nil
+            },
+            description: nil
+          }
+        }
+      )
+    end
+
+    it "adds a typed array field with description" do
+      schema.array(:items, description: "A list of items") { string :element }
+      expect(schema.fields).to eq(
+        {
+          items: {
+            type: :array,
+            element_type: {
+              type: :string,
+              description: nil
+            },
+            description: "A list of items"
+          }
+        }
+      )
+    end
+
+    it "supports nested array definitions" do
+      schema.array(:matrix) do
+        array :element do
+          integer :element
+        end
+      end
+      expect(schema.fields).to eq(
+        {
+          matrix: {
+            type: :array,
+            element_type: {
+              type: :array,
+              element_type: {
+                type: :integer,
+                description: nil
+              },
+              description: nil
+            },
+            description: nil
+          }
+        }
+      )
+    end
+  end
+
   describe "#fields" do
     it "returns the fields hash" do
       schema.string(:name)
