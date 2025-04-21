@@ -61,7 +61,7 @@ module Lluminary
             if @element_type[:element_type]
               inner_example =
                 FieldDescription.new(
-                  @name.to_s.singularize,
+                  "item",
                   type: :array,
                   element_type: @element_type[:element_type]
                 ).example_value

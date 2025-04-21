@@ -167,7 +167,7 @@ RSpec.describe Lluminary::FieldDescription do
       description = described_class.new("groups", field)
       expected = <<~DESCRIPTION.chomp
         groups (array of arrays of strings): Groups of related items
-        Example: [["first group", "second group", "..."], ["first group", "second group", "..."]]
+        Example: [["first item", "second item", "..."], ["first item", "second item", "..."]]
       DESCRIPTION
       expect(description.to_schema_s).to eq(expected)
     end
