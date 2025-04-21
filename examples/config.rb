@@ -6,6 +6,7 @@ Dotenv.load
 $LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 
 require "lluminary"
+require "awesome_print"
 require "pry-byebug"
 
 Lluminary.configure do |config|

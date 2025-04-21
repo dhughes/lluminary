@@ -30,4 +30,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec", "~> 3.12"
   s.add_development_dependency "rubocop", "~> 1.50"
   s.add_development_dependency "syntax_tree", "~> 6.2"
+  s.add_development_dependency "awesome_print", "~> 1.9"
 end
