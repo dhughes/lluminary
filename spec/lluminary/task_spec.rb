@@ -630,7 +630,7 @@ RSpec.describe Lluminary::Task do
 
           output_schema do
             array :suggestions, description: "List of suggestions" do
-              string :element
+              string
             end
           end
 
@@ -668,7 +668,7 @@ RSpec.describe Lluminary::Task do
 
           output_schema do
             array :counts, description: "List of counts" do
-              integer :element
+              integer
             end
           end
 
@@ -706,7 +706,7 @@ RSpec.describe Lluminary::Task do
 
           output_schema do
             array :timestamps, description: "List of timestamps" do
-              datetime :element
+              datetime
             end
           end
 

@@ -35,9 +35,8 @@ module Lluminary
       field = { type: :array, description: description }
 
       if block
-        element_schema = Schema.new
-        element_schema.instance_eval(&block)
-        field[:element_type] = element_schema.fields[:element]
+        element_schema = ArrayElementSchema.new
+        field[:element_type] = element_schema.instance_eval(&block)
       end
 
       @fields[name] = field
@@ -61,6 +60,55 @@ module Lluminary
     def validate(values)
       instance = schema_model.new(values)
       instance.valid? ? [] : instance.errors.full_messages
+    end
+
+    # Internal class for defining array element types
+    class ArrayElementSchema
+      def string(*args, description: nil)
+        if args.any?
+          raise ArgumentError, "Array element types cannot have names"
+        end
+        { type: :string, description: description }
+      end
+
+      def integer(*args, description: nil)
+        if args.any?
+          raise ArgumentError, "Array element types cannot have names"
+        end
+        { type: :integer, description: description }
+      end
+
+      def boolean(*args, description: nil)
+        if args.any?
+          raise ArgumentError, "Array element types cannot have names"
+        end
+        { type: :boolean, description: description }
+      end
+
+      def float(*args, description: nil)
+        if args.any?
+          raise ArgumentError, "Array element types cannot have names"
+        end
+        { type: :float, description: description }
+      end
+
+      def datetime(*args, description: nil)
+        if args.any?
+          raise ArgumentError, "Array element types cannot have names"
+        end
+        { type: :datetime, description: description }
+      end
+
+      def array(*args, description: nil, &block)
+        if args.any?
+          raise ArgumentError, "Array element types cannot have names"
+        end
+        field = { type: :array, description: description }
+        field[:element_type] = ArrayElementSchema.new.instance_eval(
+          &block
+        ) if block
+        field
+      end
     end
   end
 end

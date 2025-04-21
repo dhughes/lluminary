@@ -8,7 +8,7 @@ class MealSuggester < Lluminary::Task
 
   input_schema do
     array :ingredients do
-      string :element
+      string
     end
     integer :suggestions_count
 
@@ -24,7 +24,7 @@ class MealSuggester < Lluminary::Task
     array :meal_suggestions,
           description:
             "A list of meal suggestions, each describing how to use the available ingredients" do
-      string :element
+      string
     end
 
     validates :meal_suggestions, presence: true

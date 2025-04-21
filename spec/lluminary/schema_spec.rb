@@ -109,52 +109,20 @@ RSpec.describe Lluminary::Schema do
       )
     end
 
-    it "adds a typed array field to the schema" do
-      schema.array(:items) { string :element }
+    it "requires a name for the array field" do
+      expect { schema.array }.to raise_error(ArgumentError)
+    end
+
+    it "accepts array type without a name" do
+      schema.array(:items) { array { string } }
       expect(schema.fields).to eq(
         {
           items: {
-            type: :array,
-            element_type: {
-              type: :string,
-              description: nil
-            },
-            description: nil
-          }
-        }
-      )
-    end
-
-    it "adds a typed array field with description" do
-      schema.array(:items, description: "A list of items") { string :element }
-      expect(schema.fields).to eq(
-        {
-          items: {
-            type: :array,
-            element_type: {
-              type: :string,
-              description: nil
-            },
-            description: "A list of items"
-          }
-        }
-      )
-    end
-
-    it "supports nested array definitions" do
-      schema.array(:matrix) do
-        array :element do
-          integer :element
-        end
-      end
-      expect(schema.fields).to eq(
-        {
-          matrix: {
             type: :array,
             element_type: {
               type: :array,
               element_type: {
-                type: :integer,
+                type: :string,
                 description: nil
               },
               description: nil
@@ -163,6 +131,121 @@ RSpec.describe Lluminary::Schema do
           }
         }
       )
+    end
+
+    it "accepts string type without a name" do
+      schema.array(:items) { string }
+      expect(schema.fields).to eq(
+        {
+          items: {
+            type: :array,
+            element_type: {
+              type: :string,
+              description: nil
+            },
+            description: nil
+          }
+        }
+      )
+    end
+
+    it "accepts integer type without a name" do
+      schema.array(:items) { integer }
+      expect(schema.fields).to eq(
+        {
+          items: {
+            type: :array,
+            element_type: {
+              type: :integer,
+              description: nil
+            },
+            description: nil
+          }
+        }
+      )
+    end
+
+    it "accepts boolean type without a name" do
+      schema.array(:items) { boolean }
+      expect(schema.fields).to eq(
+        {
+          items: {
+            type: :array,
+            element_type: {
+              type: :boolean,
+              description: nil
+            },
+            description: nil
+          }
+        }
+      )
+    end
+
+    it "accepts float type without a name" do
+      schema.array(:items) { float }
+      expect(schema.fields).to eq(
+        {
+          items: {
+            type: :array,
+            element_type: {
+              type: :float,
+              description: nil
+            },
+            description: nil
+          }
+        }
+      )
+    end
+
+    it "accepts datetime type without a name" do
+      schema.array(:items) { datetime }
+      expect(schema.fields).to eq(
+        {
+          items: {
+            type: :array,
+            element_type: {
+              type: :datetime,
+              description: nil
+            },
+            description: nil
+          }
+        }
+      )
+    end
+
+    it "does not accept types with names in array blocks" do
+      expect { schema.array(:items) { string :element } }.to raise_error(
+        ArgumentError,
+        "Array element types cannot have names"
+      )
+    end
+
+    it "validates array elements" do
+      schema.array(:numbers) { integer }
+      errors = schema.validate(numbers: [1, "2", 3])
+      expect(errors).to contain_exactly("Numbers[1] must be an Integer")
+    end
+  end
+
+  describe "primitive types" do
+    it "requires a name for string fields" do
+      expect { schema.string }.to raise_error(ArgumentError)
+    end
+
+    it "requires a name for integer fields" do
+      expect { schema.integer }.to raise_error(ArgumentError)
+    end
+
+    it "requires a name for boolean fields" do
+      expect { schema.boolean }.to raise_error(ArgumentError)
+    end
+
+    it "requires a name for float fields" do
+      expect { schema.float }.to raise_error(ArgumentError)
+    end
+
+    it "requires a name for datetime fields" do
+      expect { schema.datetime }.to raise_error(ArgumentError)
     end
   end
 
