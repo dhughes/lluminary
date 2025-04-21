@@ -12,8 +12,12 @@ class MealSuggester < Lluminary::Task
     end
     integer :suggestions_count
 
-    validates :ingredients, presence: true
-    validates :suggestions_count, presence: true
+    validates :ingredients, presence: true, length: { minimum: 1 }
+    validates :suggestions_count,
+              presence: true,
+              numericality: {
+                greater_than: 0
+              }
   end
 
   output_schema do

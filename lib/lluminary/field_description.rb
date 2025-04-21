@@ -8,6 +8,7 @@ module Lluminary
       @type = field[:type]
       @description = field[:description]
       @validations = field[:validations] || []
+      @element_type = field[:element_type]
     end
 
     def to_s
@@ -37,6 +38,17 @@ module Lluminary
       case @type
       when :datetime
         "datetime in ISO8601 format"
+      when :array
+        if @element_type
+          case @element_type[:type]
+          when :datetime
+            "array of datetime in ISO8601 format"
+          else
+            "array of #{@element_type[:type]}s"
+          end
+        else
+          "array"
+        end
       else
         @type.to_s
       end
@@ -147,6 +159,25 @@ module Lluminary
         "true"
       when :float
         "0.0"
+      when :array
+        if @element_type
+          case @element_type[:type]
+          when :string
+            "[\"first #{@name.to_s.singularize}\", \"second #{@name.to_s.singularize}\", \"...\"]"
+          when :integer
+            "[1, 2, 3]"
+          when :float
+            "[1.0, 2.0, 3.0]"
+          when :boolean
+            "[true, false, true]"
+          when :datetime
+            "[\"2024-01-01T12:00:00+00:00\", \"2024-01-02T12:00:00+00:00\"]"
+          else
+            "[]"
+          end
+        else
+          "[]"
+        end
       end
     end
   end
