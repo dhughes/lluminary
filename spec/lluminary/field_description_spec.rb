@@ -31,6 +31,120 @@ RSpec.describe Lluminary::FieldDescription do
       expect(description.to_s).to eq(expected)
     end
 
+    context "with individual validations" do
+      it "formats presence validation" do
+        field = {
+          type: :string,
+          description: "A required field",
+          validations: [[{}, { presence: true }]]
+        }
+        description = described_class.new("required_field", field)
+        expect(description.to_s).to eq(
+          "required_field (string): A required field (must be present)"
+        )
+      end
+
+      it "formats inclusion validation" do
+        field = {
+          type: :string,
+          description: "A status field",
+          validations: [[{}, { inclusion: { in: %w[active inactive] } }]]
+        }
+        description = described_class.new("status", field)
+        expect(description.to_s).to eq(
+          "status (string): A status field (must be one of: active, inactive)"
+        )
+      end
+
+      it "formats exclusion validation" do
+        field = {
+          type: :string,
+          description: "A username field",
+          validations: [[{}, { exclusion: { in: %w[admin root] } }]]
+        }
+        description = described_class.new("username", field)
+        expect(description.to_s).to eq(
+          "username (string): A username field (must not be one of: admin, root)"
+        )
+      end
+
+      it "formats numericality validation" do
+        field = {
+          type: :integer,
+          description: "An age field",
+          validations: [
+            [{}, { numericality: { greater_than: 0, less_than: 120 } }]
+          ]
+        }
+        description = described_class.new("age", field)
+        expect(description.to_s).to eq(
+          "age (integer): An age field (must be greater than 0, must be less than 120)"
+        )
+      end
+
+      it "formats comparison validation" do
+        field = {
+          type: :integer,
+          description: "A quantity field",
+          validations: [
+            [
+              {},
+              { comparison: { greater_than: 10, less_than_or_equal_to: 100 } }
+            ]
+          ]
+        }
+        description = described_class.new("quantity", field)
+        expect(description.to_s).to eq(
+          "quantity (integer): A quantity field (must be greater than 10, must be less than or equal to 100)"
+        )
+      end
+
+      it "formats absence validation" do
+        field = {
+          type: :string,
+          description: "A restricted field",
+          validations: [[{}, { absence: true }]]
+        }
+        description = described_class.new("restricted_field", field)
+        expect(description.to_s).to eq(
+          "restricted_field (string): A restricted field (must be absent)"
+        )
+      end
+    end
+
+    context "with complex validation combinations" do
+      it "formats length with format and presence validations" do
+        field = {
+          type: :string,
+          description: "A username field",
+          validations: [
+            [{}, { presence: true }],
+            [{}, { length: { in: 3..20 } }],
+            [{}, { format: { with: "/^[a-z0-9_]+$/" } }]
+          ]
+        }
+        description = described_class.new("username", field)
+        expect(description.to_s).to eq(
+          "username (string): A username field (must be present, must be between 3 and 20 characters, must match format: /^[a-z0-9_]+$/)"
+        )
+      end
+
+      it "formats numericality with inclusion validations" do
+        field = {
+          type: :integer,
+          description: "A rating field",
+          validations: [
+            [{}, { numericality: { greater_than_or_equal_to: 1 } }],
+            [{}, { inclusion: { in: [1, 2, 3, 4, 5] } }]
+          ]
+        }
+        description = described_class.new("rating", field)
+        expect(description.to_s).to eq(
+          "rating (integer): A rating field (must be greater than or equal to 1, must be one of: 1, 2, 3, 4, 5)"
+        )
+      end
+    end
+
     it "generates a description for an array field with element type" do
       field = {
         type: :array,

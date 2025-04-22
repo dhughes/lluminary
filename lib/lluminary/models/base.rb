@@ -47,20 +47,29 @@ module Lluminary
       end
 
       def format_field_descriptions(fields)
-        fields.map { |name, field| <<~DESC.chomp }.join("\n\n")
+        fields
+          .map do |name, field|
+            desc = <<~DESC.chomp
             # #{name} 
             Type: #{format_type(field)}
             Description: #{field[:description].chomp}
-            Validations: #{describe_validations(field[:validations])}
-            Example: #{generate_example_value(name, field)}
           DESC
+
+            if (validations = describe_validations(field[:validations]))
+              desc += "\nValidations: #{validations}"
+            end
+
+            desc += "\nExample: #{generate_example_value(name, field)}"
+            desc
+          end
+          .join("\n\n")
       end
 
       def describe_validations(validations)
         return unless validations&.any?
 
         validations
-          .map do |args, options|
+          .map do |options|
             case options.keys.first
             when :presence
               "must be present"
@@ -154,8 +163,8 @@ module Lluminary
 
       def format_json_example(fields)
         example =
-          fields.transform_values do |field|
-            generate_example_value(field[:name], field)
+          fields.each_with_object({}) do |(name, field), hash|
+            hash[name] = generate_example_value(name, field)
           end
         JSON.pretty_generate(example)
       end

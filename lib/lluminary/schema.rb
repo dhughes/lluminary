@@ -52,7 +52,8 @@ module Lluminary
         next unless field # Skip if field doesn't exist yet
 
         field[:validations] ||= []
-        field[:validations] << [args, options]
+        # Store each validation option separately
+        options.each { |key, value| field[:validations] << { key => value } }
       end
     end
 
