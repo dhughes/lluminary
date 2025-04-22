@@ -40,9 +40,7 @@ RSpec.describe Lluminary::FieldDescription do
         }
       }
       description = described_class.new("items", field)
-      expect(description.to_s).to eq(
-        "items (array of strings): A list of items"
-      )
+      expect(description.to_s).to eq("items (array of string): A list of items")
     end
 
     it "generates a description for an array field without element type" do
@@ -83,7 +81,7 @@ RSpec.describe Lluminary::FieldDescription do
       }
       description = described_class.new("items", field)
       expected = <<~DESCRIPTION.chomp
-        items (array of strings): A list of items
+        items (array of string): A list of items
         Example: ["first item", "second item", "..."]
       DESCRIPTION
       expect(description.to_schema_s).to eq(expected)
@@ -99,7 +97,7 @@ RSpec.describe Lluminary::FieldDescription do
       }
       description = described_class.new("numbers", field)
       expected = <<~DESCRIPTION.chomp
-        numbers (array of integers): A list of numbers
+        numbers (array of integer): A list of numbers
         Example: [1, 2, 3]
       DESCRIPTION
       expect(description.to_schema_s).to eq(expected)
@@ -115,7 +113,7 @@ RSpec.describe Lluminary::FieldDescription do
       }
       description = described_class.new("decimals", field)
       expected = <<~DESCRIPTION.chomp
-        decimals (array of floats): A list of decimals
+        decimals (array of float): A list of decimals
         Example: [1.0, 2.0, 3.0]
       DESCRIPTION
       expect(description.to_schema_s).to eq(expected)
@@ -131,7 +129,7 @@ RSpec.describe Lluminary::FieldDescription do
       }
       description = described_class.new("flags", field)
       expected = <<~DESCRIPTION.chomp
-        flags (array of booleans): A list of flags
+        flags (array of boolean): A list of flags
         Example: [true, false, true]
       DESCRIPTION
       expect(description.to_schema_s).to eq(expected)
@@ -166,7 +164,7 @@ RSpec.describe Lluminary::FieldDescription do
       }
       description = described_class.new("groups", field)
       expected = <<~DESCRIPTION.chomp
-        groups (array of arrays of strings): Groups of related items
+        groups (array of array of string): Groups of related items
         Example: [["first item", "second item", "..."], ["first item", "second item", "..."]]
       DESCRIPTION
       expect(description.to_schema_s).to eq(expected)
@@ -185,7 +183,7 @@ RSpec.describe Lluminary::FieldDescription do
       }
       description = described_class.new("groups", field)
       expected = <<~DESCRIPTION.chomp
-        groups (array of arrays of booleans): Groups of flags
+        groups (array of array of boolean): Groups of flags
         Example: [[true, false, true], [true, false, true]]
       DESCRIPTION
       expect(description.to_schema_s).to eq(expected)
@@ -201,7 +199,7 @@ RSpec.describe Lluminary::FieldDescription do
       }
       description = described_class.new("groups", field)
       expected = <<~DESCRIPTION.chomp
-        groups (array of arrays): Groups of items
+        groups (array of array): Groups of items
         Example: [[...], [...]]
       DESCRIPTION
       expect(description.to_schema_s).to eq(expected)
@@ -218,7 +216,7 @@ RSpec.describe Lluminary::FieldDescription do
       }
       description = described_class.new("items", field)
       expected = <<~DESCRIPTION.chomp
-        items (array of strings): A list of items
+        items (array of string): A list of items
         Validation: must be present
         Example: ["first item", "second item", "..."]
       DESCRIPTION

@@ -213,44 +213,59 @@ module Lluminary
     def example_json
       json =
         fields.each_with_object({}) do |(name, field), hash|
-          hash[name] = case field[:type]
-          when :string
-            "your #{name} here"
-          when :integer
-            0
-          when :datetime
-            "2024-01-01T12:00:00+00:00"
-          when :boolean
-            true
-          when :float
-            0.0
-          when :array
-            if field[:element_type]
-              case field[:element_type][:type]
-              when :string
-                [
-                  "first #{name.to_s.singularize}",
-                  "second #{name.to_s.singularize}",
-                  "..."
-                ]
-              when :integer
-                [1, 2, 3]
-              when :float
-                [1.0, 2.0, 3.0]
-              when :boolean
-                [true, false, true]
-              when :datetime
-                %w[2024-01-01T12:00:00+00:00 2024-01-02T12:00:00+00:00]
-              else
-                []
-              end
-            else
-              []
-            end
-          end
+          hash[name] = generate_example_value(name, field)
         end
 
       JSON.pretty_generate(json)
+    end
+
+    def generate_example_value(name, field)
+      case field[:type]
+      when :string
+        "your #{name} here"
+      when :integer
+        0
+      when :datetime
+        "2024-01-01T12:00:00+00:00"
+      when :boolean
+        true
+      when :float
+        0.0
+      when :array
+        if field[:element_type]
+          generate_array_example(name, field[:element_type])
+        else
+          []
+        end
+      end
+    end
+
+    def generate_array_example(name, element_type)
+      case element_type[:type]
+      when :string
+        [
+          "first #{name.to_s.singularize}",
+          "second #{name.to_s.singularize}",
+          "..."
+        ]
+      when :integer
+        [1, 2, 3]
+      when :float
+        [1.0, 2.0, 3.0]
+      when :boolean
+        [true, false, true]
+      when :datetime
+        %w[2024-01-01T12:00:00+00:00 2024-01-02T12:00:00+00:00]
+      when :array
+        if element_type[:element_type]
+          # For nested arrays, generate two examples of the inner array
+          inner_example =
+            generate_array_example("item", element_type[:element_type])
+          [inner_example, inner_example]
+        else
+          [["..."], ["..."]]
+        end
+      end
     end
 
     def to_result

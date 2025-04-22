@@ -62,8 +62,11 @@ module Lluminary
               inner_example =
                 FieldDescription.new(
                   "item",
-                  type: :array,
-                  element_type: @element_type[:element_type]
+                  {
+                    type: :array,
+                    element_type: @element_type[:element_type],
+                    description: nil
+                  }
                 ).example_value
               "[#{inner_example}, #{inner_example}]"
             else
@@ -76,8 +79,6 @@ module Lluminary
       end
     end
 
-    private
-
     def type_description
       case @type
       when :datetime
@@ -89,13 +90,21 @@ module Lluminary
             "array of datetime in ISO8601 format"
           when :array
             if @element_type[:element_type]
-              inner_type = @element_type[:element_type][:type]
-              "array of arrays of #{inner_type}s"
+              inner_description =
+                FieldDescription.new(
+                  "item",
+                  {
+                    type: :array,
+                    element_type: @element_type[:element_type],
+                    description: nil
+                  }
+                ).type_description
+              "array of #{inner_description}"
             else
-              "array of arrays"
+              "array of array"
             end
           else
-            "array of #{@element_type[:type]}s"
+            "array of #{@element_type[:type]}"
           end
         else
           "array"
@@ -104,6 +113,8 @@ module Lluminary
         @type.to_s
       end
     end
+
+    private
 
     def validation_descriptions
       @validations

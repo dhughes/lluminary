@@ -646,7 +646,7 @@ RSpec.describe Lluminary::Task do
         You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
         The JSON object must contain the following fields:
 
-        suggestions (array of strings): List of suggestions
+        suggestions (array of string): List of suggestions
         Example: ["first suggestion", "second suggestion", "..."]
 
         Your response must be ONLY this JSON object:
@@ -684,7 +684,7 @@ RSpec.describe Lluminary::Task do
         You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
         The JSON object must contain the following fields:
 
-        counts (array of integers): List of counts
+        counts (array of integer): List of counts
         Example: [1, 2, 3]
 
         Your response must be ONLY this JSON object:
@@ -761,6 +761,170 @@ RSpec.describe Lluminary::Task do
         Your response must be ONLY this JSON object:
         {
           "items": []
+        }
+      SCHEMA
+      expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
+    end
+
+    it "generates a schema example with array of arrays of strings" do
+      task_with_nested_array =
+        Class.new(described_class) do
+          input_schema { string :message }
+
+          output_schema do
+            array :groups, description: "Groups of related items" do
+              array { string }
+            end
+          end
+
+          private
+
+          def task_prompt
+            "Say: #{message}"
+          end
+        end
+
+      task = task_with_nested_array.new(message: "test")
+      expected_output = <<~SCHEMA
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
+
+        groups (array of array of string): Groups of related items
+        Example: [["first item", "second item", "..."], ["first item", "second item", "..."]]
+
+        Your response must be ONLY this JSON object:
+        {
+          "groups": [
+            [
+              "first item",
+              "second item",
+              "..."
+            ],
+            [
+              "first item",
+              "second item",
+              "..."
+            ]
+          ]
+        }
+      SCHEMA
+      expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
+    end
+
+    it "generates a schema example with three-dimensional array of strings" do
+      task_with_3d_array =
+        Class.new(described_class) do
+          input_schema { string :message }
+
+          output_schema do
+            array :super_groups,
+                  description: "Super groups of groups of items" do
+              array { array { string } }
+            end
+          end
+
+          private
+
+          def task_prompt
+            "Say: #{message}"
+          end
+        end
+
+      task = task_with_3d_array.new(message: "test")
+      expected_output = <<~SCHEMA
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
+
+        super_groups (array of array of array of string): Super groups of groups of items
+        Example: [[["first item", "second item", "..."], ["first item", "second item", "..."]], [["first item", "second item", "..."], ["first item", "second item", "..."]]]
+
+        Your response must be ONLY this JSON object:
+        {
+          "super_groups": [
+            [
+              [
+                "first item",
+                "second item",
+                "..."
+              ],
+              [
+                "first item",
+                "second item",
+                "..."
+              ]
+            ],
+            [
+              [
+                "first item",
+                "second item",
+                "..."
+              ],
+              [
+                "first item",
+                "second item",
+                "..."
+              ]
+            ]
+          ]
+        }
+      SCHEMA
+      expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
+    end
+
+    it "generates a schema example with three-dimensional array of integers" do
+      task_with_3d_array =
+        Class.new(described_class) do
+          input_schema { string :message }
+
+          output_schema do
+            array :matrices, description: "Collection of matrices" do
+              array { array { integer } }
+            end
+          end
+
+          private
+
+          def task_prompt
+            "Say: #{message}"
+          end
+        end
+
+      task = task_with_3d_array.new(message: "test")
+      expected_output = <<~SCHEMA
+        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
+        The JSON object must contain the following fields:
+
+        matrices (array of array of array of integer): Collection of matrices
+        Example: [[[1, 2, 3], [1, 2, 3]], [[1, 2, 3], [1, 2, 3]]]
+
+        Your response must be ONLY this JSON object:
+        {
+          "matrices": [
+            [
+              [
+                1,
+                2,
+                3
+              ],
+              [
+                1,
+                2,
+                3
+              ]
+            ],
+            [
+              [
+                1,
+                2,
+                3
+              ],
+              [
+                1,
+                2,
+                3
+              ]
+            ]
+          ]
         }
       SCHEMA
       expect(task.send(:json_schema_example)).to eq(expected_output.chomp)
