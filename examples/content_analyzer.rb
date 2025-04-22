@@ -23,8 +23,6 @@ class ContentAnalyzer < Lluminary::Task
     # validates :contains_type, presence: true
   end
 
-  private
-
   def task_prompt
     <<~PROMPT
       Analyze the following text and determine if it contains #{content_type} content. Consider the language, tone, and style used in the text.

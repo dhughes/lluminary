@@ -20,8 +20,6 @@ class GroupSimilarItems < Lluminary::Task
     validates :groups, presence: true
   end
 
-  private
-
   def task_prompt
     <<~PROMPT
       Group these items into categories based on their semantic relationships:

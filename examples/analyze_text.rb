@@ -10,8 +10,6 @@ class AnalyzeText < Lluminary::Task
 
   output_schema { string :analysis }
 
-  private
-
   def task_prompt
     "Analyze the following text and provide a brief thematic analysis:\n\n#{text}"
   end

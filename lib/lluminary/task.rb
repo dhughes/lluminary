@@ -114,11 +114,11 @@ module Lluminary
     end
 
     def prompt
-      <<~PROMPT
-        #{task_prompt}
+      self.class.provider.model.format_prompt(self)
+    end
 
-        #{json_schema_example}
-      PROMPT
+    def task_prompt
+      raise NotImplementedError, "Subclasses must implement task_prompt"
     end
 
     private
@@ -170,101 +170,6 @@ module Lluminary
     def define_input_methods
       self.class.input_fields.each_key do |name|
         define_singleton_method(name) { @input.attributes[name.to_s] }
-      end
-    end
-
-    def task_prompt
-      raise NotImplementedError, "Subclasses must implement task_prompt"
-    end
-
-    def json_schema_example
-      return "{}" if fields.empty?
-
-      <<~SCHEMA.chomp
-        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
-        The JSON object must contain the following fields:
-
-        #{generate_field_descriptions}
-
-        Your response must be ONLY this JSON object:
-        #{example_json}
-      SCHEMA
-    end
-
-    def fields
-      @fields ||= self.class.output_fields
-    end
-
-    def generate_field_descriptions
-      fields
-        .map do |name, field|
-          # Get validations for this field
-          validations =
-            self
-              .class
-              .instance_variable_get(:@output_schema)
-              &.validations_for(name) || []
-          field_with_validations = field.merge(validations: validations)
-          FieldDescription.new(name, field_with_validations).to_schema_s
-        end
-        .join("\n\n")
-    end
-
-    def example_json
-      json =
-        fields.each_with_object({}) do |(name, field), hash|
-          hash[name] = generate_example_value(name, field)
-        end
-
-      JSON.pretty_generate(json)
-    end
-
-    def generate_example_value(name, field)
-      case field[:type]
-      when :string
-        "your #{name} here"
-      when :integer
-        0
-      when :datetime
-        "2024-01-01T12:00:00+00:00"
-      when :boolean
-        true
-      when :float
-        0.0
-      when :array
-        if field[:element_type]
-          generate_array_example(name, field[:element_type])
-        else
-          []
-        end
-      end
-    end
-
-    def generate_array_example(name, element_type)
-      case element_type[:type]
-      when :string
-        [
-          "first #{name.to_s.singularize}",
-          "second #{name.to_s.singularize}",
-          "..."
-        ]
-      when :integer
-        [1, 2, 3]
-      when :float
-        [1.0, 2.0, 3.0]
-      when :boolean
-        [true, false, true]
-      when :datetime
-        %w[2024-01-01T12:00:00+00:00 2024-01-02T12:00:00+00:00]
-      when :array
-        if element_type[:element_type]
-          # For nested arrays, generate two examples of the inner array
-          inner_example =
-            generate_array_example("item", element_type[:element_type])
-          [inner_example, inner_example]
-        else
-          [["..."], ["..."]]
-        end
       end
     end
 

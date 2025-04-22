@@ -10,8 +10,6 @@ class SummarizeText < Lluminary::Task
 
   output_schema { string :summary }
 
-  private
-
   def task_prompt
     "Summarize the following text in one short sentence:\n\n#{text}"
   end

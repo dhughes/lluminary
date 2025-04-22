@@ -1,3 +1,5 @@
+# TODO: delete me and the associated tests
+
 # frozen_string_literal: true
 module Lluminary
   # Represents a field in a schema with its type, description, and validations.

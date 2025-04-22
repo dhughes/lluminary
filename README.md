@@ -321,8 +321,6 @@ class SummarizeText < Lluminary::Task
     string :summary, description: "A concise one-sentence summary of the input text"
   end
 
-  private
-
   def task_prompt
     "Summarize the following text in one short sentence:\n\n#{text}"
   end

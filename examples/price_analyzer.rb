@@ -22,8 +22,6 @@ class PriceAnalyzer < Lluminary::Task
     validates :competitiveness_score, presence: true
   end
 
-  private
-
   def task_prompt
     <<~PROMPT
       Analyze the price competitiveness of the following product. Consider factors like:

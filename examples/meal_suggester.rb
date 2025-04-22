@@ -30,8 +30,6 @@ class MealSuggester < Lluminary::Task
     validates :meal_suggestions, presence: true
   end
 
-  private
-
   def task_prompt
     <<~PROMPT
       Given these ingredients, suggest exactly #{suggestions_count} meal ideas that use them:

@@ -52,8 +52,6 @@ class ColorAnalyzer < Lluminary::Task
               }
   end
 
-  private
-
   def task_prompt
     <<~PROMPT
       Analyze the following image description and determine the CSS level 1 color name that best matches the dominant or most significant color in the scene.

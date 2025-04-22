@@ -25,8 +25,6 @@ class HistoricalEventAnalyzer < Lluminary::Task
     validates :exact_time_is_known, inclusion: { in: [true, false] }
   end
 
-  private
-
   def task_prompt
     <<~PROMPT
       Analyze the following historical event and determine the date and time it occurred.

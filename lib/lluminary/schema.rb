@@ -46,6 +46,14 @@ module Lluminary
 
     def validates(*args, **options)
       @validations << [args, options]
+      # Attach the validation to each field it applies to
+      args.each do |field_name|
+        field = @fields[field_name]
+        next unless field # Skip if field doesn't exist yet
+
+        field[:validations] ||= []
+        field[:validations] << [args, options]
+      end
     end
 
     def validations_for(field_name)

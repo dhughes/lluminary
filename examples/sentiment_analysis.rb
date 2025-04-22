@@ -19,8 +19,6 @@ class SentimentAnalysis < Lluminary::Task
     integer :confidence, description: "Confidence score from 0-100"
   end
 
-  private
-
   def task_prompt
     <<~PROMPT
       Analyze the sentiment of the following text:

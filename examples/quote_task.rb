@@ -11,8 +11,6 @@ class QuoteTask < Lluminary::Task
     string :author, description: "The person who said or wrote the quote"
   end
 
-  private
-
   def task_prompt
     <<~PROMPT
       Generate an inspirational quote and its author. The quote should be:
