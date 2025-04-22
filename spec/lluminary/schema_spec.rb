@@ -213,13 +213,6 @@ RSpec.describe Lluminary::Schema do
       )
     end
 
-    it "does not accept types with names in array blocks" do
-      expect { schema.array(:items) { string :element } }.to raise_error(
-        ArgumentError,
-        "Array element types cannot have names"
-      )
-    end
-
     it "validates array elements" do
       schema.array(:numbers) { integer }
       errors = schema.validate(numbers: [1, "2", 3])

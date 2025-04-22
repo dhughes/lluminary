@@ -64,45 +64,27 @@ module Lluminary
 
     # Internal class for defining array element types
     class ArrayElementSchema
-      def string(*args, description: nil)
-        if args.any?
-          raise ArgumentError, "Array element types cannot have names"
-        end
+      def string(description: nil)
         { type: :string, description: description }
       end
 
-      def integer(*args, description: nil)
-        if args.any?
-          raise ArgumentError, "Array element types cannot have names"
-        end
+      def integer(description: nil)
         { type: :integer, description: description }
       end
 
-      def boolean(*args, description: nil)
-        if args.any?
-          raise ArgumentError, "Array element types cannot have names"
-        end
+      def boolean(description: nil)
         { type: :boolean, description: description }
       end
 
-      def float(*args, description: nil)
-        if args.any?
-          raise ArgumentError, "Array element types cannot have names"
-        end
+      def float(description: nil)
         { type: :float, description: description }
       end
 
-      def datetime(*args, description: nil)
-        if args.any?
-          raise ArgumentError, "Array element types cannot have names"
-        end
+      def datetime(description: nil)
         { type: :datetime, description: description }
       end
 
-      def array(*args, description: nil, &block)
-        if args.any?
-          raise ArgumentError, "Array element types cannot have names"
-        end
+      def array(description: nil, &block)
         field = { type: :array, description: description }
         field[:element_type] = ArrayElementSchema.new.instance_eval(
           &block
