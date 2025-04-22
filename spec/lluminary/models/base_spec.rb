@@ -358,5 +358,224 @@ RSpec.describe Lluminary::Models::Base do
         end
       end
     end
+
+    context "JSON example generation" do
+      context "with simple field types" do
+        it "generates correct JSON example for string field" do
+          task_class.output_schema do
+            string :name, description: "The person's name"
+          end
+
+          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+            {
+              "name": "your name here"
+            }
+          JSON
+        end
+
+        it "generates correct JSON example for integer field" do
+          task_class.output_schema do
+            integer :age, description: "The person's age"
+          end
+
+          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+            {
+              "age": 0
+            }
+          JSON
+        end
+
+        it "generates correct JSON example for boolean field" do
+          task_class.output_schema do
+            boolean :is_active, description: "Whether the person is active"
+          end
+
+          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+            {
+              "is_active": true
+            }
+          JSON
+        end
+
+        it "generates correct JSON example for float field" do
+          task_class.output_schema { float :score, description: "The score" }
+
+          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+            {
+              "score": 0.0
+            }
+          JSON
+        end
+
+        it "generates correct JSON example for datetime field" do
+          task_class.output_schema do
+            datetime :created_at, description: "When it was created"
+          end
+
+          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+            {
+              "created_at": "2024-01-01T12:00:00+00:00"
+            }
+          JSON
+        end
+      end
+
+      context "with array fields" do
+        it "generates correct JSON example for array of strings" do
+          task_class.output_schema do
+            array :tags, description: "List of tags" do
+              string
+            end
+          end
+
+          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+            {
+              "tags": [
+                "first tag",
+                "second tag",
+                "..."
+              ]
+            }
+          JSON
+        end
+
+        it "generates correct JSON example for array of integers" do
+          task_class.output_schema do
+            array :counts, description: "List of counts" do
+              integer
+            end
+          end
+
+          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+            {
+              "counts": [
+                1,
+                2,
+                3
+              ]
+            }
+          JSON
+        end
+
+        it "generates correct JSON example for array of datetimes" do
+          task_class.output_schema do
+            array :timestamps, description: "List of timestamps" do
+              datetime
+            end
+          end
+
+          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+            {
+              "timestamps": [
+                "2024-01-01T12:00:00+00:00",
+                "2024-01-02T12:00:00+00:00"
+              ]
+            }
+          JSON
+        end
+
+        it "generates correct JSON example for array without element type" do
+          task_class.output_schema do
+            array :items, description: "List of items"
+          end
+
+          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+            {
+              "items": []
+            }
+          JSON
+        end
+
+        it "generates correct JSON example for nested array of strings" do
+          task_class.output_schema do
+            array :groups, description: "Groups of items" do
+              array { string }
+            end
+          end
+
+          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+            {
+              "groups": [
+                [
+                  "first item",
+                  "second item",
+                  "..."
+                ],
+                [
+                  "first item",
+                  "second item",
+                  "..."
+                ]
+              ]
+            }
+          JSON
+        end
+
+        it "generates correct JSON example for three-dimensional array of integers" do
+          task_class.output_schema do
+            array :matrices, description: "Collection of matrices" do
+              array { array { integer } }
+            end
+          end
+
+          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+            {
+              "matrices": [
+                [
+                  [
+                    1,
+                    2,
+                    3
+                  ],
+                  [
+                    1,
+                    2,
+                    3
+                  ]
+                ],
+                [
+                  [
+                    1,
+                    2,
+                    3
+                  ],
+                  [
+                    1,
+                    2,
+                    3
+                  ]
+                ]
+              ]
+            }
+          JSON
+        end
+      end
+
+      context "with multiple fields" do
+        it "generates correct JSON example for mixed field types" do
+          task_class.output_schema do
+            string :name, description: "The person's name"
+            integer :age, description: "The person's age"
+            array :hobbies, description: "List of hobbies" do
+              string
+            end
+            datetime :joined_at, description: "When they joined"
+          end
+
+          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+            {
+              "name": "your name here",
+              "age": 0,
+              "hobbies": [
+                "first hobby",
+                "second hobby",
+                "..."
+              ],
+              "joined_at": "2024-01-01T12:00:00+00:00"
+            }
+          JSON
+        end
+      end
+    end
   end
 end
