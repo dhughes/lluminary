@@ -706,7 +706,7 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # config
-            Type: hash with fields:
+            Type: object with fields:
               host: string
               port: integer
             Example: {
@@ -733,9 +733,9 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # config
-            Type: hash with fields:
+            Type: object with fields:
               name: string
-              database: hash with fields:
+              database: object with fields:
                 host: string
                 port: integer
             Example: {
@@ -764,7 +764,7 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # config
-            Type: hash with fields:
+            Type: object with fields:
               name: string
               tags: array of string
             Example: {
@@ -780,7 +780,7 @@ RSpec.describe Lluminary::Models::Base do
           expect(prompt).to include(expected_description)
         end
 
-        it "generates correct JSON example for array of hashes" do
+        it "generates correct JSON example for array of objects" do
           task_class.output_schema do
             array :users do
               hash do
@@ -794,7 +794,7 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # users
-            Type: array of hash with fields:
+            Type: array of object with fields:
               name: string
               age: integer
             Example: {

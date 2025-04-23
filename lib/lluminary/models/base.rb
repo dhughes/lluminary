@@ -199,14 +199,14 @@ module Lluminary
         when :hash
           if field[:fields]
             nested_indent = "  " * (indent_level + 1)
-            "hash with fields:\n" +
+            "object with fields:\n" +
               field[:fields]
                 .map do |name, subfield|
                   "#{nested_indent}#{name}: #{format_type(subfield, indent_level + 1)}"
                 end
                 .join("\n")
           else
-            "hash"
+            "object"
           end
         else
           type.to_s
