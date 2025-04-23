@@ -38,12 +38,16 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "formats string field description correctly" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-          # name
-          Type: string
-          Description: The person's name
-          Example: your name here
-        DESCRIPTION
+          prompt = model.format_prompt(task)
+
+          example_description = <<~DESCRIPTION.chomp
+            # name
+            Type: string
+            Description: The person's name
+            Example: "your name here"
+          DESCRIPTION
+
+          expect(prompt).to include(example_description)
         end
       end
 
@@ -73,11 +77,11 @@ RSpec.describe Lluminary::Models::Base do
 
         it "formats boolean field description correctly" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-          # active
-          Type: boolean
-          Description: Whether the person is active
-          Example: true
-        DESCRIPTION
+            # active
+            Type: boolean
+            Description: Whether the person is active
+            Example: true
+          DESCRIPTION
         end
       end
 
@@ -90,11 +94,11 @@ RSpec.describe Lluminary::Models::Base do
 
         it "formats float field description correctly" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-          # score
-          Type: float
-          Description: The person's score
-          Example: 0.0
-        DESCRIPTION
+            # score
+            Type: float
+            Description: The person's score
+            Example: 0.0
+          DESCRIPTION
         end
       end
 
@@ -107,11 +111,11 @@ RSpec.describe Lluminary::Models::Base do
 
         it "formats datetime field description correctly" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-          # created_at
-          Type: datetime in ISO8601 format
-          Description: When the person was created
-          Example: 2024-01-01T12:00:00+00:00
-        DESCRIPTION
+            # created_at
+            Type: datetime in ISO8601 format
+            Description: When the person was created
+            Example: "2024-01-01T12:00:00+00:00"
+          DESCRIPTION
         end
       end
     end
@@ -127,12 +131,16 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "formats array of strings field description correctly" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          example_description = <<~DESCRIPTION.chomp
             # tags
             Type: array of string
             Description: List of tags
             Example: ["first tag", "second tag", "..."]
           DESCRIPTION
+
+          expect(prompt).to include(example_description)
         end
       end
 
@@ -228,7 +236,7 @@ RSpec.describe Lluminary::Models::Base do
             Type: string
             Description: The person's name
             Validations: must be present
-            Example: your name here
+            Example: "your name here"
           DESCRIPTION
         end
       end
@@ -247,7 +255,7 @@ RSpec.describe Lluminary::Models::Base do
             Type: string
             Description: The status
             Validations: must be one of: active, inactive
-            Example: your status here
+            Example: "your status here"
           DESCRIPTION
         end
       end
@@ -266,7 +274,7 @@ RSpec.describe Lluminary::Models::Base do
             Type: string
             Description: The status
             Validations: must not be one of: banned, blocked
-            Example: your status here
+            Example: "your status here"
           DESCRIPTION
         end
       end
@@ -285,7 +293,7 @@ RSpec.describe Lluminary::Models::Base do
             Type: string
             Description: Email address
             Validations: must match format: (?-mix:\\A[^@\\s]+@[^@\\s]+\\z)
-            Example: your email here
+            Example: "your email here"
           DESCRIPTION
         end
       end
@@ -304,7 +312,7 @@ RSpec.describe Lluminary::Models::Base do
             Type: string
             Description: The password
             Validations: must be at least 8 characters, must be at most 20 characters
-            Example: your password here
+            Example: "your password here"
           DESCRIPTION
         end
       end
@@ -353,7 +361,7 @@ RSpec.describe Lluminary::Models::Base do
             Type: string
             Description: The username
             Validations: must be present, must be between 3 and 20 characters, must match format: (?-mix:\\A[a-z0-9_]+\\z)
-            Example: your username here
+            Example: "your username here"
           DESCRIPTION
         end
       end
@@ -574,6 +582,128 @@ RSpec.describe Lluminary::Models::Base do
               "joined_at": "2024-01-01T12:00:00+00:00"
             }
           JSON
+        end
+      end
+
+      context "with hash fields" do
+        it "generates correct JSON example for simple hash" do
+          task_class.output_schema do
+            hash :config do
+              string :host
+              integer :port
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          example_description = <<~DESCRIPTION.chomp
+            # config
+            Type: hash with fields:
+              host: string
+              port: integer
+            Example: {
+              "host": "your host here",
+              "port": 0
+            }
+          DESCRIPTION
+
+          expect(prompt).to include(example_description)
+        end
+
+        it "generates correct JSON example for nested hash" do
+          task_class.output_schema do
+            hash :config do
+              string :name
+              hash :database do
+                string :host
+                integer :port
+              end
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          example_description = <<~DESCRIPTION.chomp
+            # config
+            Type: hash with fields:
+              name: string
+              database: hash with fields:
+                host: string
+                port: integer
+            Example: {
+              "name": "your name here",
+              "database": {
+                "host": "your host here",
+                "port": 0
+              }
+            }
+          DESCRIPTION
+
+          expect(prompt).to include(example_description)
+        end
+
+        it "generates correct JSON example for hash with array" do
+          task_class.output_schema do
+            hash :config do
+              string :name
+              array :tags do
+                string
+              end
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          example_description = <<~DESCRIPTION.chomp
+            # config
+            Type: hash with fields:
+              name: string
+              tags: array of string
+            Example: {
+              "name": "your name here",
+              "tags": [
+                "first tag",
+                "second tag",
+                "..."
+              ]
+            }
+          DESCRIPTION
+
+          expect(prompt).to include(example_description)
+        end
+
+        it "generates correct JSON example for array of hashes" do
+          task_class.output_schema do
+            array :users do
+              hash do
+                string :name
+                integer :age
+              end
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          example_description = <<~DESCRIPTION.chomp
+            # users
+            Type: array of hash with fields:
+              name: string
+              age: integer
+            Example: {
+              "users": [
+                {
+                  "name": "your name here",
+                  "age": 0
+                },
+                {
+                  "name": "your name here",
+                  "age": 0
+                }
+              ]
+            }
+          DESCRIPTION
+
+          expect(prompt).to include(example_description)
         end
       end
     end

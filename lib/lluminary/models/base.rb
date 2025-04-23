@@ -60,7 +60,21 @@ module Lluminary
               desc += "\nValidations: #{validations}"
             end
 
-            desc += "\nExample: #{generate_example_value(name, field)}"
+            example_value = generate_example_value(name, field)
+            example_str =
+              case field[:type]
+              when :hash
+                JSON.pretty_generate(example_value)
+              when :array
+                if field[:element_type]&.[](:type) == :hash
+                  JSON.pretty_generate({ name => example_value })
+                else
+                  example_value.inspect
+                end
+              else
+                example_value.inspect
+              end
+            desc += "\nExample: #{example_str}"
             desc
           end
           .join("\n\n")
@@ -170,16 +184,29 @@ module Lluminary
         JSON.pretty_generate(example)
       end
 
-      def format_type(field)
+      def format_type(field, indent_level = 0)
         type = field[:type]
+        base_indent = "  " * indent_level
         case type
         when :datetime
           "datetime in ISO8601 format"
         when :array
           if field[:element_type]
-            "array of #{format_type(field[:element_type])}"
+            "array of #{format_type(field[:element_type], indent_level)}"
           else
             "array"
+          end
+        when :hash
+          if field[:fields]
+            nested_indent = "  " * (indent_level + 1)
+            "hash with fields:\n" +
+              field[:fields]
+                .map do |name, subfield|
+                  "#{nested_indent}#{name}: #{format_type(subfield, indent_level + 1)}"
+                end
+                .join("\n")
+          else
+            "hash"
           end
         else
           type.to_s
@@ -200,6 +227,8 @@ module Lluminary
           0.0
         when :array
           generate_array_example(name, field)
+        when :hash
+          generate_hash_example(name, field)
         end
       end
 
@@ -228,6 +257,18 @@ module Lluminary
           else
             [["..."], ["..."]]
           end
+        when :hash
+          example =
+            generate_hash_example(name.to_s.singularize, field[:element_type])
+          [example, example]
+        end
+      end
+
+      def generate_hash_example(name, field)
+        return {} unless field[:fields]
+
+        field[:fields].each_with_object({}) do |(subname, subfield), hash|
+          hash[subname] = generate_example_value(subname, subfield)
         end
       end
     end
