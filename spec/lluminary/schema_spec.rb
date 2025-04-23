@@ -218,6 +218,261 @@ RSpec.describe Lluminary::Schema do
       errors = schema.validate(numbers: [1, "2", 3])
       expect(errors).to contain_exactly("Numbers[1] must be an Integer")
     end
+
+    it "supports hashes inside arrays" do
+      schema.array(:users) do
+        hash do
+          string :name
+          integer :age
+        end
+      end
+
+      expect(schema.fields[:users]).to eq(
+        {
+          type: :array,
+          description: nil,
+          element_type: {
+            type: :hash,
+            description: nil,
+            fields: {
+              name: {
+                type: :string,
+                description: nil
+              },
+              age: {
+                type: :integer,
+                description: nil
+              }
+            }
+          }
+        }
+      )
+    end
+
+    it "validates hashes inside arrays" do
+      schema.array(:users) do
+        hash do
+          string :name
+          integer :age
+        end
+      end
+
+      errors =
+        schema.validate(
+          users: [
+            { name: "Alice", age: 30 },
+            { name: 123, age: "invalid" }, # name should be string, age should be integer
+            { name: "Bob", age: 25 }
+          ]
+        )
+
+      expect(errors).to contain_exactly(
+        "Users[1][name] must be a String",
+        "Users[1][age] must be an Integer"
+      )
+    end
+  end
+
+  describe "#hash" do
+    it "requires a block for hash fields" do
+      expect { schema.hash(:config) }.to raise_error(
+        ArgumentError,
+        "Hash fields must be defined with a block"
+      )
+    end
+
+    it "adds a hash field with nested fields to the schema" do
+      schema.hash(:config, description: "Configuration") do
+        string :host, description: "The server hostname"
+        integer :port
+      end
+
+      expect(schema.fields).to eq(
+        {
+          config: {
+            type: :hash,
+            description: "Configuration",
+            fields: {
+              host: {
+                type: :string,
+                description: "The server hostname"
+              },
+              port: {
+                type: :integer,
+                description: nil
+              }
+            }
+          }
+        }
+      )
+    end
+
+    it "validates hash values" do
+      schema.hash(:config) do
+        string :host
+        integer :port
+      end
+
+      errors =
+        schema.validate(
+          config: {
+            host: 123, # should be string
+            port: "80" # should be integer
+          }
+        )
+
+      expect(errors).to contain_exactly(
+        "Config[host] must be a String",
+        "Config[port] must be an Integer"
+      )
+    end
+
+    it "validates that value is a hash" do
+      schema.hash(:config) { string :host }
+
+      errors = schema.validate(config: "not a hash")
+      expect(errors).to contain_exactly("Config must be a Hash")
+    end
+
+    it "supports nested hashes" do
+      schema.hash(:config) do
+        string :name
+        hash :database do
+          string :host
+          integer :port
+          hash :credentials do
+            string :username
+            string :password
+          end
+        end
+      end
+
+      expect(schema.fields[:config]).to eq(
+        {
+          type: :hash,
+          description: nil,
+          fields: {
+            name: {
+              type: :string,
+              description: nil
+            },
+            database: {
+              type: :hash,
+              description: nil,
+              fields: {
+                host: {
+                  type: :string,
+                  description: nil
+                },
+                port: {
+                  type: :integer,
+                  description: nil
+                },
+                credentials: {
+                  type: :hash,
+                  description: nil,
+                  fields: {
+                    username: {
+                      type: :string,
+                      description: nil
+                    },
+                    password: {
+                      type: :string,
+                      description: nil
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      )
+    end
+
+    it "validates nested hashes" do
+      schema.hash(:config) do
+        string :name
+        hash :database do
+          string :host
+          integer :port
+          hash :credentials do
+            string :username
+            string :password
+          end
+        end
+      end
+
+      errors =
+        schema.validate(
+          config: {
+            name: "test",
+            database: {
+              host: 123, # should be string
+              port: "80", # should be integer
+              credentials: {
+                username: 456, # should be string
+                password: 789 # should be string
+              }
+            }
+          }
+        )
+
+      expect(errors).to contain_exactly(
+        "Config[database][host] must be a String",
+        "Config[database][port] must be an Integer",
+        "Config[database][credentials][username] must be a String",
+        "Config[database][credentials][password] must be a String"
+      )
+    end
+
+    it "supports arrays inside hashes" do
+      schema.hash(:config) do
+        string :name
+        array :tags do
+          string
+        end
+      end
+
+      expect(schema.fields[:config]).to eq(
+        {
+          type: :hash,
+          description: nil,
+          fields: {
+            name: {
+              type: :string,
+              description: nil
+            },
+            tags: {
+              type: :array,
+              description: nil,
+              element_type: {
+                type: :string,
+                description: nil
+              }
+            }
+          }
+        }
+      )
+    end
+
+    it "validates arrays inside hashes" do
+      schema.hash(:config) do
+        string :name
+        array :tags do
+          string
+        end
+      end
+
+      errors =
+        schema.validate(
+          config: {
+            name: "test",
+            tags: ["valid", 123, "also valid"] # second element should be string
+          }
+        )
+
+      expect(errors).to contain_exactly("Config[tags][1] must be a String")
+    end
   end
 
   describe "primitive types" do
