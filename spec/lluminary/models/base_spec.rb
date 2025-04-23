@@ -39,7 +39,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "formats string field description correctly" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-          # name 
+          # name
           Type: string
           Description: The person's name
           Example: your name here
@@ -56,7 +56,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "formats integer field description correctly" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-          # age 
+          # age
           Type: integer
           Description: The person's age
           Example: 0
@@ -73,7 +73,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "formats boolean field description correctly" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-          # active 
+          # active
           Type: boolean
           Description: Whether the person is active
           Example: true
@@ -90,7 +90,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "formats float field description correctly" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-          # score 
+          # score
           Type: float
           Description: The person's score
           Example: 0.0
@@ -107,7 +107,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "formats datetime field description correctly" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-          # created_at 
+          # created_at
           Type: datetime in ISO8601 format
           Description: When the person was created
           Example: 2024-01-01T12:00:00+00:00
@@ -128,7 +128,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "formats array of strings field description correctly" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-            # tags 
+            # tags
             Type: array of string
             Description: List of tags
             Example: ["first tag", "second tag", "..."]
@@ -147,7 +147,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "formats array of floats field description correctly" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-            # scores 
+            # scores
             Type: array of float
             Description: List of scores
             Example: [1.0, 2.0, 3.0]
@@ -166,7 +166,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "formats array of datetimes field description correctly" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-            # dates 
+            # dates
             Type: array of datetime in ISO8601 format
             Description: List of important dates
             Example: ["2024-01-01T12:00:00+00:00", "2024-01-02T12:00:00+00:00"]
@@ -185,7 +185,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "formats 2D array field description correctly" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-            # matrix 
+            # matrix
             Type: array of array of integer
             Description: 2D array of numbers
             Example: [[1, 2, 3], [1, 2, 3]]
@@ -204,7 +204,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "formats 3D array field description correctly" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-            # cube 
+            # cube
             Type: array of array of array of string
             Description: 3D array of strings
             Example: [[["first item", "second item", "..."], ["first item", "second item", "..."]], [["first item", "second item", "..."], ["first item", "second item", "..."]]]
@@ -224,7 +224,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "includes presence validation in field description" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-            # name 
+            # name
             Type: string
             Description: The person's name
             Validations: must be present
@@ -243,7 +243,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "includes inclusion validation in field description" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-            # status 
+            # status
             Type: string
             Description: The status
             Validations: must be one of: active, inactive
@@ -262,7 +262,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "includes exclusion validation in field description" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-            # status 
+            # status
             Type: string
             Description: The status
             Validations: must not be one of: banned, blocked
@@ -281,7 +281,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "includes format validation in field description" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-            # email 
+            # email
             Type: string
             Description: Email address
             Validations: must match format: (?-mix:\\A[^@\\s]+@[^@\\s]+\\z)
@@ -300,7 +300,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "includes length validation in field description" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-            # password 
+            # password
             Type: string
             Description: The password
             Validations: must be at least 8 characters, must be at most 20 characters
@@ -323,7 +323,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "includes numericality validation in field description" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-            # age 
+            # age
             Type: integer
             Description: The age
             Validations: must be greater than 0, must be less than or equal to 120
@@ -349,7 +349,7 @@ RSpec.describe Lluminary::Models::Base do
 
         it "includes all validations in field description" do
           expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-            # username 
+            # username
             Type: string
             Description: The username
             Validations: must be present, must be between 3 and 20 characters, must match format: (?-mix:\\A[a-z0-9_]+\\z)

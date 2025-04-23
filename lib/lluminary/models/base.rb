@@ -49,11 +49,12 @@ module Lluminary
       def format_field_descriptions(fields)
         fields
           .map do |name, field|
-            desc = <<~DESC.chomp
-            # #{name} 
-            Type: #{format_type(field)}
-            Description: #{field[:description].chomp}
-          DESC
+            desc = "# #{name}"
+            desc += "\nType: #{format_type(field)}"
+
+            desc += "\nDescription: #{field[:description].chomp}" if field[
+              :description
+            ]
 
             if (validations = describe_validations(field[:validations]))
               desc += "\nValidations: #{validations}"
