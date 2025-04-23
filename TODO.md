@@ -25,6 +25,7 @@
     - [ ] Consider adding examples from the schema to the prompt
 
 ## Future Tasks
+- [ ] Test this for support of older versions of Rails. (I think it might not work below Rails 8)
 - [x] Add support for additional LLM providers (Anthropic, Google, etc.)
   - [x] Add support for Amazon Bedrock
 - [ ] Add support for local LLM providers
