@@ -50,8 +50,20 @@ module Lluminary
         fields
           .map do |name, field|
             desc = "# #{name}"
-            desc += "\nType: #{format_type(field)}"
+            type_desc = format_type(field)
 
+            # For hash fields with field descriptions, append them in parentheses
+            if field[:type] == :hash && field[:fields]
+              type_desc =
+                type_desc.gsub(/^(\s+\w+: \w+)(?=\n|\z)/) do |match|
+                  field_name = match.strip.split(":").first
+                  field_desc =
+                    field[:fields][field_name.to_sym]&.[](:description)
+                  field_desc ? "#{match} (#{field_desc.chomp})" : match
+                end
+            end
+
+            desc += "\nType: #{type_desc}"
             desc += "\nDescription: #{field[:description].chomp}" if field[
               :description
             ]

@@ -718,6 +718,31 @@ RSpec.describe Lluminary::Models::Base do
           expect(prompt).to include(expected_description)
         end
 
+        it "generates correct JSON example for simple hash with descriptions" do
+          task_class.output_schema do
+            hash :config, description: "The configuration" do
+              string :host, description: "The host"
+              integer :port
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
+            # config
+            Type: object with fields:
+              host: string (The host)
+              port: integer
+            Description: The configuration
+            Example: {
+              "host": "your host here",
+              "port": 0
+            }
+          DESCRIPTION
+
+          expect(prompt).to include(expected_description)
+        end
+
         it "generates correct JSON example for nested hash" do
           task_class.output_schema do
             hash :config do
