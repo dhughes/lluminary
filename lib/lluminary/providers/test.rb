@@ -13,6 +13,10 @@ module Lluminary
         { raw: raw_response, parsed: JSON.parse(raw_response) }
       end
 
+      def model
+        @model ||= Lluminary::Models::Base.new
+      end
+
       private
 
       def generate_response(fields)

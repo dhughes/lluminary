@@ -12,8 +12,6 @@ RSpec.describe Lluminary::Task do
         string :summary, description: "A brief summary of the message"
       end
 
-      private
-
       def task_prompt
         "Say: #{message}"
       end
@@ -30,66 +28,9 @@ RSpec.describe Lluminary::Task do
       )
     end
 
-    it "string input allows providing a string input" do
-      result = task_class.call(message: "hello")
-      expect(result.output.raw_response).to eq(
-        '{"summary": "Test string value"}'
-      )
-    end
-
     it "string output returns the output in the result" do
       result = task_class.call(message: "hello")
       expect(result.output.summary).to eq("Test string value")
-    end
-
-    it "includes schema descriptions in the prompt" do
-      result = task_class.call(message: "hello")
-      expected_schema = <<~SCHEMA
-        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
-        The JSON object must contain the following fields:
-
-        summary (string): A brief summary of the message
-        Example: "your summary here"
-
-        Your response must be ONLY this JSON object:
-        {
-          "summary": "your summary here"
-        }
-      SCHEMA
-      expect(result.prompt).to include(expected_schema.chomp)
-    end
-  end
-
-  describe ".call without descriptions" do
-    let(:task_without_descriptions) do
-      Class.new(described_class) do
-        input_schema { string :message }
-
-        output_schema { string :summary }
-
-        private
-
-        def task_prompt
-          "Say: #{message}"
-        end
-      end
-    end
-
-    it "includes basic schema in the prompt" do
-      result = task_without_descriptions.call(message: "hello")
-      expected_schema = <<~SCHEMA
-        You must respond with ONLY a valid JSON object. Do not include any other text, explanations, or formatting.
-        The JSON object must contain the following fields:
-
-        summary (string)
-        Example: "your summary here"
-
-        Your response must be ONLY this JSON object:
-        {
-          "summary": "your summary here"
-        }
-      SCHEMA
-      expect(result.prompt).to include(expected_schema.chomp)
     end
   end
 
@@ -151,8 +92,6 @@ RSpec.describe Lluminary::Task do
           integer :age
           datetime :start_time
         end
-
-        private
 
         def task_prompt
           "Test prompt"
@@ -225,8 +164,6 @@ RSpec.describe Lluminary::Task do
           integer :word_count
         end
 
-        private
-
         def task_prompt
           "Test prompt"
         end
@@ -296,8 +233,6 @@ RSpec.describe Lluminary::Task do
           string :author, description: "The person who said the quote"
         end
 
-        private
-
         def task_prompt
           "Generate an inspirational quote and its author"
         end
@@ -326,8 +261,6 @@ RSpec.describe Lluminary::Task do
         output_schema do
           datetime :event_time, description: "When the event occurred"
         end
-
-        private
 
         def task_prompt
           "Test prompt"

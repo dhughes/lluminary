@@ -113,7 +113,7 @@ module Lluminary
     end
 
     def prompt
-      self.class.provider.model.format_prompt(self)
+      @prompt ||= self.class.provider.model.format_prompt(self)
     end
 
     def task_prompt
@@ -163,7 +163,7 @@ module Lluminary
       # Validate after merging
       @output.valid?
 
-      @prompt = prompt
+      prompt
     end
 
     def define_input_methods
@@ -176,7 +176,7 @@ module Lluminary
       Result.new(
         raw_response: @output&.raw_response,
         output: @parsed_response,
-        prompt: @prompt
+        prompt: prompt
       )
     end
   end
