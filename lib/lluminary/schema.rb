@@ -42,6 +42,21 @@ module Lluminary
       @fields[name] = field
     end
 
+    def hash(name, description: nil, &block)
+      unless block
+        raise ArgumentError, "Hash fields must be defined with a block"
+      end
+
+      nested_schema = Schema.new
+      nested_schema.instance_eval(&block)
+
+      @fields[name] = {
+        type: :hash,
+        description: description,
+        fields: nested_schema.fields
+      }
+    end
+
     attr_reader :fields
 
     def validates(*args, **options)
@@ -99,6 +114,17 @@ module Lluminary
           &block
         ) if block
         field
+      end
+
+      def hash(description: nil, &block)
+        unless block
+          raise ArgumentError, "Hash fields must be defined with a block"
+        end
+
+        nested_schema = Schema.new
+        nested_schema.instance_eval(&block)
+
+        { type: :hash, description: description, fields: nested_schema.fields }
       end
     end
   end
