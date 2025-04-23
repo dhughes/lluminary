@@ -40,14 +40,14 @@ RSpec.describe Lluminary::Models::Base do
         it "formats string field description correctly" do
           prompt = model.format_prompt(task)
 
-          example_description = <<~DESCRIPTION.chomp
+          expected_description = <<~DESCRIPTION.chomp
             # name
             Type: string
             Description: The person's name
             Example: "your name here"
           DESCRIPTION
 
-          expect(prompt).to include(example_description)
+          expect(prompt).to include(expected_description)
         end
       end
 
@@ -59,12 +59,16 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "formats integer field description correctly" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
-          # age
-          Type: integer
-          Description: The person's age
-          Example: 0
-        DESCRIPTION
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
+            # age
+            Type: integer
+            Description: The person's age
+            Example: 0
+          DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
 
@@ -76,12 +80,16 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "formats boolean field description correctly" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
             # active
             Type: boolean
             Description: Whether the person is active
             Example: true
           DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
 
@@ -93,12 +101,16 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "formats float field description correctly" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
             # score
             Type: float
             Description: The person's score
             Example: 0.0
           DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
 
@@ -110,12 +122,16 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "formats datetime field description correctly" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
             # created_at
             Type: datetime in ISO8601 format
             Description: When the person was created
             Example: "2024-01-01T12:00:00+00:00"
           DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
     end
@@ -133,14 +149,14 @@ RSpec.describe Lluminary::Models::Base do
         it "formats array of strings field description correctly" do
           prompt = model.format_prompt(task)
 
-          example_description = <<~DESCRIPTION.chomp
+          expected_description = <<~DESCRIPTION.chomp
             # tags
             Type: array of string
             Description: List of tags
             Example: ["first tag", "second tag", "..."]
           DESCRIPTION
 
-          expect(prompt).to include(example_description)
+          expect(prompt).to include(expected_description)
         end
       end
 
@@ -154,12 +170,16 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "formats array of floats field description correctly" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
             # scores
             Type: array of float
             Description: List of scores
             Example: [1.0, 2.0, 3.0]
           DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
 
@@ -173,12 +193,16 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "formats array of datetimes field description correctly" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
             # dates
             Type: array of datetime in ISO8601 format
             Description: List of important dates
             Example: ["2024-01-01T12:00:00+00:00", "2024-01-02T12:00:00+00:00"]
           DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
 
@@ -192,12 +216,16 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "formats 2D array field description correctly" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
             # matrix
             Type: array of array of integer
             Description: 2D array of numbers
             Example: [[1, 2, 3], [1, 2, 3]]
           DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
 
@@ -211,12 +239,16 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "formats 3D array field description correctly" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
             # cube
             Type: array of array of array of string
             Description: 3D array of strings
             Example: [[["first item", "second item", "..."], ["first item", "second item", "..."]], [["first item", "second item", "..."], ["first item", "second item", "..."]]]
           DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
     end
@@ -231,13 +263,17 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "includes presence validation in field description" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
             # name
             Type: string
             Description: The person's name
             Validations: must be present
             Example: "your name here"
           DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
 
@@ -250,13 +286,17 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "includes inclusion validation in field description" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
             # status
             Type: string
             Description: The status
             Validations: must be one of: active, inactive
             Example: "your status here"
           DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
 
@@ -269,13 +309,17 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "includes exclusion validation in field description" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
             # status
             Type: string
             Description: The status
             Validations: must not be one of: banned, blocked
             Example: "your status here"
           DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
 
@@ -288,13 +332,17 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "includes format validation in field description" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
             # email
             Type: string
             Description: Email address
             Validations: must match format: (?-mix:\\A[^@\\s]+@[^@\\s]+\\z)
             Example: "your email here"
           DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
 
@@ -307,13 +355,17 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "includes length validation in field description" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
             # password
             Type: string
             Description: The password
             Validations: must be at least 8 characters, must be at most 20 characters
             Example: "your password here"
           DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
 
@@ -330,13 +382,17 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "includes numericality validation in field description" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
             # age
             Type: integer
             Description: The age
             Validations: must be greater than 0, must be less than or equal to 120
             Example: 0
           DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
 
@@ -356,13 +412,17 @@ RSpec.describe Lluminary::Models::Base do
         end
 
         it "includes all validations in field description" do
-          expect(model.format_prompt(task)).to include(<<~DESCRIPTION.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
             # username
             Type: string
             Description: The username
             Validations: must be present, must be between 3 and 20 characters, must match format: (?-mix:\\A[a-z0-9_]+\\z)
             Example: "your username here"
           DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
     end
@@ -374,11 +434,15 @@ RSpec.describe Lluminary::Models::Base do
             string :name, description: "The person's name"
           end
 
-          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
             {
               "name": "your name here"
             }
           JSON
+
+          expect(prompt).to include(expected_json)
         end
 
         it "generates correct JSON example for integer field" do
@@ -386,11 +450,15 @@ RSpec.describe Lluminary::Models::Base do
             integer :age, description: "The person's age"
           end
 
-          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
             {
               "age": 0
             }
           JSON
+
+          expect(prompt).to include(expected_json)
         end
 
         it "generates correct JSON example for boolean field" do
@@ -398,21 +466,29 @@ RSpec.describe Lluminary::Models::Base do
             boolean :is_active, description: "Whether the person is active"
           end
 
-          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
             {
               "is_active": true
             }
           JSON
+
+          expect(prompt).to include(expected_json)
         end
 
         it "generates correct JSON example for float field" do
           task_class.output_schema { float :score, description: "The score" }
 
-          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
             {
               "score": 0.0
             }
           JSON
+
+          expect(prompt).to include(expected_json)
         end
 
         it "generates correct JSON example for datetime field" do
@@ -420,11 +496,15 @@ RSpec.describe Lluminary::Models::Base do
             datetime :created_at, description: "When it was created"
           end
 
-          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
             {
               "created_at": "2024-01-01T12:00:00+00:00"
             }
           JSON
+
+          expect(prompt).to include(expected_json)
         end
       end
 
@@ -436,7 +516,9 @@ RSpec.describe Lluminary::Models::Base do
             end
           end
 
-          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
             {
               "tags": [
                 "first tag",
@@ -445,6 +527,8 @@ RSpec.describe Lluminary::Models::Base do
               ]
             }
           JSON
+
+          expect(prompt).to include(expected_json)
         end
 
         it "generates correct JSON example for array of integers" do
@@ -454,7 +538,9 @@ RSpec.describe Lluminary::Models::Base do
             end
           end
 
-          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
             {
               "counts": [
                 1,
@@ -463,6 +549,8 @@ RSpec.describe Lluminary::Models::Base do
               ]
             }
           JSON
+
+          expect(prompt).to include(expected_json)
         end
 
         it "generates correct JSON example for array of datetimes" do
@@ -472,7 +560,9 @@ RSpec.describe Lluminary::Models::Base do
             end
           end
 
-          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
             {
               "timestamps": [
                 "2024-01-01T12:00:00+00:00",
@@ -480,6 +570,8 @@ RSpec.describe Lluminary::Models::Base do
               ]
             }
           JSON
+
+          expect(prompt).to include(expected_json)
         end
 
         it "generates correct JSON example for array without element type" do
@@ -487,11 +579,15 @@ RSpec.describe Lluminary::Models::Base do
             array :items, description: "List of items"
           end
 
-          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
             {
               "items": []
             }
           JSON
+
+          expect(prompt).to include(expected_json)
         end
 
         it "generates correct JSON example for nested array of strings" do
@@ -501,7 +597,9 @@ RSpec.describe Lluminary::Models::Base do
             end
           end
 
-          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
             {
               "groups": [
                 [
@@ -517,6 +615,8 @@ RSpec.describe Lluminary::Models::Base do
               ]
             }
           JSON
+
+          expect(prompt).to include(expected_json)
         end
 
         it "generates correct JSON example for three-dimensional array of integers" do
@@ -526,7 +626,9 @@ RSpec.describe Lluminary::Models::Base do
             end
           end
 
-          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
             {
               "matrices": [
                 [
@@ -556,6 +658,8 @@ RSpec.describe Lluminary::Models::Base do
               ]
             }
           JSON
+
+          expect(prompt).to include(expected_json)
         end
       end
 
@@ -570,7 +674,9 @@ RSpec.describe Lluminary::Models::Base do
             datetime :joined_at, description: "When they joined"
           end
 
-          expect(model.format_prompt(task)).to include(<<~JSON.chomp)
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
             {
               "name": "your name here",
               "age": 0,
@@ -582,6 +688,8 @@ RSpec.describe Lluminary::Models::Base do
               "joined_at": "2024-01-01T12:00:00+00:00"
             }
           JSON
+
+          expect(prompt).to include(expected_json)
         end
       end
 
@@ -596,7 +704,7 @@ RSpec.describe Lluminary::Models::Base do
 
           prompt = model.format_prompt(task)
 
-          example_description = <<~DESCRIPTION.chomp
+          expected_description = <<~DESCRIPTION.chomp
             # config
             Type: hash with fields:
               host: string
@@ -607,7 +715,7 @@ RSpec.describe Lluminary::Models::Base do
             }
           DESCRIPTION
 
-          expect(prompt).to include(example_description)
+          expect(prompt).to include(expected_description)
         end
 
         it "generates correct JSON example for nested hash" do
@@ -623,7 +731,7 @@ RSpec.describe Lluminary::Models::Base do
 
           prompt = model.format_prompt(task)
 
-          example_description = <<~DESCRIPTION.chomp
+          expected_description = <<~DESCRIPTION.chomp
             # config
             Type: hash with fields:
               name: string
@@ -639,7 +747,7 @@ RSpec.describe Lluminary::Models::Base do
             }
           DESCRIPTION
 
-          expect(prompt).to include(example_description)
+          expect(prompt).to include(expected_description)
         end
 
         it "generates correct JSON example for hash with array" do
@@ -654,7 +762,7 @@ RSpec.describe Lluminary::Models::Base do
 
           prompt = model.format_prompt(task)
 
-          example_description = <<~DESCRIPTION.chomp
+          expected_description = <<~DESCRIPTION.chomp
             # config
             Type: hash with fields:
               name: string
@@ -669,7 +777,7 @@ RSpec.describe Lluminary::Models::Base do
             }
           DESCRIPTION
 
-          expect(prompt).to include(example_description)
+          expect(prompt).to include(expected_description)
         end
 
         it "generates correct JSON example for array of hashes" do
@@ -684,7 +792,7 @@ RSpec.describe Lluminary::Models::Base do
 
           prompt = model.format_prompt(task)
 
-          example_description = <<~DESCRIPTION.chomp
+          expected_description = <<~DESCRIPTION.chomp
             # users
             Type: array of hash with fields:
               name: string
@@ -703,7 +811,7 @@ RSpec.describe Lluminary::Models::Base do
             }
           DESCRIPTION
 
-          expect(prompt).to include(example_description)
+          expect(prompt).to include(expected_description)
         end
       end
     end
