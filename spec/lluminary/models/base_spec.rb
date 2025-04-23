@@ -1,6 +1,133 @@
 # frozen_string_literal: true
 require "spec_helper"
 
+# The following is an example of our goals for the output when describing fields in the schema:
+#
+# # user_profile
+# Description: A user's complete profile
+# Type: object
+# Example: {
+#   "name": "your name here",
+#   "age": 0,
+#   "preferences": {
+#     "theme": "your theme here",
+#     "notifications_enabled": true
+#   }
+# }
+#
+# # name
+# Description: A person's full name
+# Type: string
+# Example: "your name here"
+#
+# # age
+# Type: integer
+# Example: 0
+#
+# # preferences
+# Description: User's system preferences
+# Type: object
+# Example: {
+#   "theme": "your theme here",
+#   "notifications_enabled": true
+# }
+#
+# # preferences.theme
+# Description: The UI color theme
+# Type: string
+# Example: "your theme here"
+#
+# # preferences.notifications_enabled
+# Type: boolean
+# Example: true
+#
+# # security
+# Description: Security and authentication settings
+# Type: object
+# Example: {
+#   "credentials": {
+#     "last_login": "2024-01-01T12:00:00+00:00"
+#   }
+# }
+#
+# # security.credentials
+# Type: object
+# Example: {
+#   "last_login": "2024-01-01T12:00:00+00:00"
+# }
+#
+# # security.credentials.last_login
+# Type: datetime in ISO8601 format
+# Description: Most recent successful login
+# Example: "2024-01-01T12:00:00+00:00"
+#
+# # tags
+# Description: User's associated tags
+# Type: array of string
+# Example: ["first tag", "second tag", "..."]
+#
+# # roles
+# Description: User's system roles
+# Type: array of objects
+# Example: [
+#   {
+#     "name": "your name here",
+#     "permissions": ["first permission", "second permission", "..."]
+#   },
+#   {
+#     "name": "your name here",
+#     "permissions": ["first permission", "second permission", "..."]
+#   }
+# ]
+#
+# # roles[].name
+# Description: Name of the role
+# Type: string
+# Example: "your name here"
+#
+# # roles[].permissions
+# Description: Permissions granted by this role
+# Type: array of strings
+# Example: ["first permission", "second permission", "..."]
+#
+# # matrix
+# Description: A 2D grid of numbers
+# Type: array of arrays
+# Example: [
+#   [1, 2, 3],
+#   [4, 5, 6]
+# ]
+#
+# # settings
+# Description: User configuration settings
+# Type: object
+# Example: {
+#   "theme": "your theme here",
+#   "favorites": ["first favorite", "second favorite", "..."],
+#   "notifications": {
+#     "email": true,
+#     "channels": ["first channel", "second channel", "..."]
+#   }
+# }
+#
+# # settings.favorites
+# Description: User's favorite items
+# Type: array of strings
+# Example: ["first favorite", "second favorite", "..."]
+#
+# # settings.notifications
+# Description: Notification preferences
+# Type: object
+# Example: {
+#   "email": true,
+#   "channels": ["first channel", "second channel", "..."]
+# }
+#
+# # settings.notifications.channels
+# Description: Notification channels to use
+# Type: array of strings
+# Example: ["first channel", "second channel", "..."]
+
 RSpec.describe Lluminary::Models::Base do
   let(:model) { described_class.new }
 
@@ -42,8 +169,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # name
-            Type: string
             Description: The person's name
+            Type: string
             Example: "your name here"
           DESCRIPTION
 
@@ -63,8 +190,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # age
-            Type: integer
             Description: The person's age
+            Type: integer
             Example: 0
           DESCRIPTION
 
@@ -84,8 +211,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # active
-            Type: boolean
             Description: Whether the person is active
+            Type: boolean
             Example: true
           DESCRIPTION
 
@@ -105,8 +232,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # score
-            Type: float
             Description: The person's score
+            Type: float
             Example: 0.0
           DESCRIPTION
 
@@ -126,8 +253,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # created_at
-            Type: datetime in ISO8601 format
             Description: When the person was created
+            Type: datetime in ISO8601 format
             Example: "2024-01-01T12:00:00+00:00"
           DESCRIPTION
 
@@ -151,8 +278,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # tags
-            Type: array of string
             Description: List of tags
+            Type: array of strings
             Example: ["first tag", "second tag", "..."]
           DESCRIPTION
 
@@ -174,8 +301,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # scores
-            Type: array of float
             Description: List of scores
+            Type: array of floats
             Example: [1.0, 2.0, 3.0]
           DESCRIPTION
 
@@ -197,8 +324,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # dates
-            Type: array of datetime in ISO8601 format
             Description: List of important dates
+            Type: array of datetimes in ISO8601 format
             Example: ["2024-01-01T12:00:00+00:00", "2024-01-02T12:00:00+00:00"]
           DESCRIPTION
 
@@ -206,11 +333,13 @@ RSpec.describe Lluminary::Models::Base do
         end
       end
 
-      context "with 2D array (matrix)" do
+      context "with 2D array (matrix) with descriptions" do
         before do
           task_class.output_schema do
             array :matrix, description: "2D array of numbers" do
-              array { integer }
+              array description: "1D array of numbers" do
+                integer description: "A number"
+              end
             end
           end
         end
@@ -220,9 +349,57 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # matrix
-            Type: array of array of integer
             Description: 2D array of numbers
-            Example: [[1, 2, 3], [1, 2, 3]]
+            Type: array of arrays
+            Example: [
+              [1, 2, 3],
+              [1, 2, 3]
+            ]
+
+            # matrix[]
+            Description: 1D array of numbers
+            Type: array
+            Example: [1, 2, 3]
+
+            # matrix[][]
+            Description: A number
+            Type: integer
+            Example: 1
+          DESCRIPTION
+
+          expect(prompt).to include(expected_description)
+        end
+      end
+
+      context "with 2D array (matrix) with some descriptions" do
+        before do
+          task_class.output_schema do
+            array :matrix, description: "2D array of numbers" do
+              array { integer description: "A number" }
+            end
+          end
+        end
+
+        it "formats 2D array field description correctly" do
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
+            # matrix
+            Description: 2D array of numbers
+            Type: array of arrays
+            Example: [
+              [1, 2, 3],
+              [1, 2, 3]
+            ]
+
+            # matrix[]
+            Type: array
+            Example: [1, 2, 3]
+
+            # matrix[][]
+            Description: A number
+            Type: integer
+            Example: 1
           DESCRIPTION
 
           expect(prompt).to include(expected_description)
@@ -233,7 +410,11 @@ RSpec.describe Lluminary::Models::Base do
         before do
           task_class.output_schema do
             array :cube, description: "3D array of strings" do
-              array { array { string } }
+              array do
+                array description: "1D array" do
+                  string
+                end
+              end
             end
           end
         end
@@ -243,9 +424,34 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # cube
-            Type: array of array of array of string
             Description: 3D array of strings
-            Example: [[["first item", "second item", "..."], ["first item", "second item", "..."]], [["first item", "second item", "..."], ["first item", "second item", "..."]]]
+            Type: array of arrays
+            Example: [
+              [
+                ["first item", "second item", "..."],
+                ["first item", "second item", "..."]
+              ],
+              [
+                ["first item", "second item", "..."],
+                ["first item", "second item", "..."]
+              ]
+            ]
+
+            # cube[]
+            Type: array of arrays
+            Example: [
+              ["first item", "second item", "..."],
+              ["first item", "second item", "..."]
+            ]
+
+            # cube[][]
+            Description: 1D array
+            Type: array of strings
+            Example: ["first item", "second item", "..."]
+
+            # cube[][][]
+            Type: string
+            Example: "first item"
           DESCRIPTION
 
           expect(prompt).to include(expected_description)
@@ -267,8 +473,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # name
-            Type: string
             Description: The person's name
+            Type: string
             Validations: must be present
             Example: "your name here"
           DESCRIPTION
@@ -290,8 +496,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # status
-            Type: string
             Description: The status
+            Type: string
             Validations: must be one of: active, inactive
             Example: "your status here"
           DESCRIPTION
@@ -313,8 +519,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # status
-            Type: string
             Description: The status
+            Type: string
             Validations: must not be one of: banned, blocked
             Example: "your status here"
           DESCRIPTION
@@ -336,8 +542,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # email
-            Type: string
             Description: Email address
+            Type: string
             Validations: must match format: (?-mix:\\A[^@\\s]+@[^@\\s]+\\z)
             Example: "your email here"
           DESCRIPTION
@@ -359,8 +565,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # password
-            Type: string
             Description: The password
+            Type: string
             Validations: must be at least 8 characters, must be at most 20 characters
             Example: "your password here"
           DESCRIPTION
@@ -386,8 +592,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # age
-            Type: integer
             Description: The age
+            Type: integer
             Validations: must be greater than 0, must be less than or equal to 120
             Example: 0
           DESCRIPTION
@@ -416,8 +622,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # username
-            Type: string
             Description: The username
+            Type: string
             Validations: must be present, must be between 3 and 20 characters, must match format: (?-mix:\\A[a-z0-9_]+\\z)
             Example: "your username here"
           DESCRIPTION
@@ -706,13 +912,21 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # config
-            Type: object with fields:
-              host: string
-              port: integer
+            Description: The configuration
+            Type: object
             Example: {
               "host": "your host here",
               "port": 0
             }
+
+            # config.host
+            Description: The host
+            Type: string
+            Example: "your host here"
+
+            # config.port
+            Type: integer
+            Example: 0
           DESCRIPTION
 
           expect(prompt).to include(expected_description)
@@ -730,14 +944,21 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # config
-            Type: object with fields:
-              host: string (The host)
-              port: integer
             Description: The configuration
+            Type: object
             Example: {
               "host": "your host here",
               "port": 0
             }
+
+            # config.host
+            Description: The host
+            Type: string
+            Example: "your host here"
+
+            # config.port
+            Type: integer
+            Example: 0
           DESCRIPTION
 
           expect(prompt).to include(expected_description)
@@ -747,8 +968,8 @@ RSpec.describe Lluminary::Models::Base do
           task_class.output_schema do
             hash :config do
               string :name
-              hash :database do
-                string :host
+              hash :database, description: "The database configuration" do
+                string :host, description: "The host"
                 integer :port
               end
             end
@@ -758,11 +979,8 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # config
-            Type: object with fields:
-              name: string
-              database: object with fields:
-                host: string
-                port: integer
+            Description: The configuration
+            Type: object
             Example: {
               "name": "your name here",
               "database": {
@@ -770,7 +988,36 @@ RSpec.describe Lluminary::Models::Base do
                 "port": 0
               }
             }
+
+            # config.name
+            Type: string
+            Example: "your name here"
+
+            # config.database
+            Description: The database configuration
+            Type: object
+            Example: {
+              "host": "your host here",
+              "port": 0
+            }
+
+            # config.database.host
+            Description: The host
+            Type: string
+            Example: "your host here"
+
+            # config.database.port
+            Type: integer
+            Example: 0
           DESCRIPTION
+
+          puts ">>>> expected_description"
+          puts expected_description
+          puts ">>>>"
+
+          puts ">>>> prompt"
+          puts prompt
+          puts ">>>>"
 
           expect(prompt).to include(expected_description)
         end
@@ -789,17 +1036,20 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # config
-            Type: object with fields:
-              name: string
-              tags: array of string
+            Description: The configuration
+            Type: object
             Example: {
               "name": "your name here",
-              "tags": [
-                "first tag",
-                "second tag",
-                "..."
-              ]
+              "tags": ["first tag", "second tag", "..."]
             }
+
+            # config.name
+            Type: string
+            Example: "your name here"
+
+            # config.tags
+            Type: array of strings
+            Example: ["first tag", "second tag", "..."]
           DESCRIPTION
 
           expect(prompt).to include(expected_description)
@@ -810,7 +1060,7 @@ RSpec.describe Lluminary::Models::Base do
             array :users do
               hash do
                 string :name
-                integer :age
+                integer :age, description: "The person's age"
               end
             end
           end
@@ -819,21 +1069,26 @@ RSpec.describe Lluminary::Models::Base do
 
           expected_description = <<~DESCRIPTION.chomp
             # users
-            Type: array of object with fields:
-              name: string
-              age: integer
-            Example: {
-              "users": [
-                {
-                  "name": "your name here",
-                  "age": 0
-                },
-                {
-                  "name": "your name here",
-                  "age": 0
-                }
-              ]
-            }
+            Type: array of objects
+            Example: [
+              {
+                "name": "your name here",
+                "age": 0
+              },
+              {
+                "name": "your name here",
+                "age": 0
+              }
+            ]
+
+            # users[].name
+            Type: string
+            Example: "your name here"
+
+            # users[].age
+            Description: The person's age
+            Type: integer
+            Example: 0
           DESCRIPTION
 
           expect(prompt).to include(expected_description)

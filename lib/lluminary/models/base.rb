@@ -49,27 +49,12 @@ module Lluminary
       def format_field_descriptions(fields)
         fields
           .map do |name, field|
-            desc = "# #{name}"
-            type_desc = format_type(field)
-
-            # For hash fields with field descriptions, append them in parentheses
-            if field[:type] == :hash && field[:fields]
-              type_desc =
-                type_desc.gsub(/^(\s+\w+: \w+)(?=\n|\z)/) do |match|
-                  field_name = match.strip.split(":").first
-                  field_desc =
-                    field[:fields][field_name.to_sym]&.[](:description)
-                  field_desc ? "#{match} (#{field_desc.chomp})" : match
-                end
-            end
-
-            desc += "\nType: #{type_desc}"
-            desc += "\nDescription: #{field[:description].chomp}" if field[
-              :description
-            ]
+            lines = []
+            lines << "# #{name}"
+            lines << format_type_and_description(field)
 
             if (validations = describe_validations(field[:validations]))
-              desc += "\nValidations: #{validations}"
+              lines << "Validations: #{validations}"
             end
 
             example_value = generate_example_value(name, field)
@@ -86,10 +71,61 @@ module Lluminary
               else
                 example_value.inspect
               end
-            desc += "\nExample: #{example_str}"
-            desc
+            lines << "Example: #{example_str}"
+            lines.join("\n")
           end
           .join("\n\n")
+      end
+
+      def format_type_and_description(field, indent_level = 0)
+        type = field[:type]
+        base_indent = "  " * indent_level
+        case type
+        when :datetime
+          lines = ["Type: datetime in ISO8601 format"]
+          lines << "Description: #{field[:description]}" if field[:description]
+          lines.join("\n")
+        when :array
+          if field[:element_type]
+            inner =
+              format_type_and_description(field[:element_type], indent_level)
+            lines = ["Type: array of:"]
+            lines.concat(inner.split("\n").map { |line| "  #{line}" })
+            if field[:description]
+              lines << "Description: #{field[:description]}"
+            end
+            lines.join("\n")
+          else
+            lines = ["Type: array"]
+            if field[:description]
+              lines << "Description: #{field[:description]}"
+            end
+            lines.join("\n")
+          end
+        when :hash
+          if field[:fields]
+            lines = ["Type: object with the following fields:"]
+            field[:fields].each do |name, subfield|
+              lines << "  #{name}:"
+              inner = format_type_and_description(subfield, indent_level + 1)
+              lines.concat(inner.split("\n").map { |line| "    #{line}" })
+            end
+            if field[:description]
+              lines << "Description: #{field[:description]}"
+            end
+            lines.join("\n")
+          else
+            lines = ["Type: object"]
+            if field[:description]
+              lines << "Description: #{field[:description]}"
+            end
+            lines.join("\n")
+          end
+        else
+          lines = ["Type: #{type}"]
+          lines << "Description: #{field[:description]}" if field[:description]
+          lines.join("\n")
+        end
       end
 
       def describe_validations(validations)
@@ -211,12 +247,17 @@ module Lluminary
         when :hash
           if field[:fields]
             nested_indent = "  " * (indent_level + 1)
-            "object with fields:\n" +
-              field[:fields]
-                .map do |name, subfield|
-                  "#{nested_indent}#{name}: #{format_type(subfield, indent_level + 1)}"
-                end
-                .join("\n")
+            result = "object with fields:\n"
+            field[:fields].each do |name, subfield|
+              result +=
+                "#{nested_indent}#{name}: #{format_type(subfield, indent_level + 1)}"
+              result +=
+                "\n#{nested_indent}Description: #{subfield[:description].chomp}" if subfield[
+                :description
+              ]
+              result += "\n"
+            end
+            result.chomp
           else
             "object"
           end
@@ -265,14 +306,14 @@ module Lluminary
         when :array
           if field[:element_type][:element_type]
             inner_example = generate_array_example("item", field[:element_type])
-            [inner_example, inner_example]
+            [inner_example, inner_example, "..."]
           else
-            [["..."], ["..."]]
+            [[], [], "..."]
           end
         when :hash
           example =
             generate_hash_example(name.to_s.singularize, field[:element_type])
-          [example, example]
+          [example, example, "..."]
         end
       end
 
