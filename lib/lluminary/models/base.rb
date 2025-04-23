@@ -49,82 +49,82 @@ module Lluminary
       def format_field_descriptions(fields)
         fields
           .map do |name, field|
+            next if field[:type] == :hash # Skip hashes for now
+
             lines = []
             lines << "# #{name}"
-            lines << format_type_and_description(field)
+            if field[:description]
+              lines << "Description: #{field[:description]}"
+            end
+            lines << "Type: #{format_type(field)}"
 
             if (validations = describe_validations(field[:validations]))
               lines << "Validations: #{validations}"
             end
 
             example_value = generate_example_value(name, field)
-            example_str =
-              case field[:type]
-              when :hash
-                JSON.pretty_generate(example_value)
-              when :array
-                if field[:element_type]&.[](:type) == :hash
-                  JSON.pretty_generate({ name => example_value })
-                else
-                  example_value.inspect
-                end
-              else
-                example_value.inspect
-              end
-            lines << "Example: #{example_str}"
+            lines << "Example: #{example_value.inspect}"
+
+            # Handle nested array fields
+            if field[:type] == :array && field[:element_type][:type] == :array
+              nested_description =
+                format_nested_array_descriptions(
+                  "#{name}[]",
+                  field[:element_type]
+                )
+              lines << "\n#{nested_description}" if nested_description
+            end
+
             lines.join("\n")
           end
+          .compact # Remove nil entries from skipped types
           .join("\n\n")
       end
 
-      def format_type_and_description(field, indent_level = 0)
-        type = field[:type]
-        base_indent = "  " * indent_level
-        case type
+      def format_nested_array_descriptions(prefix, field)
+        lines = []
+        lines << "# #{prefix}"
+        lines << "Description: #{field[:description]}" if field[:description]
+        lines << "Type: #{format_type(field)}"
+        example_value = generate_array_example("item", field)
+        lines << "Example: #{example_value.inspect}"
+
+        if field[:element_type][:type] == :array
+          nested_description =
+            format_nested_array_descriptions(
+              "#{prefix}[]",
+              field[:element_type]
+            )
+          lines << "\n#{nested_description}" if nested_description
+        else
+          # Always add description for the innermost element
+          lines << "\n# #{prefix}[]"
+          if field[:element_type][:description]
+            lines << "Description: #{field[:element_type][:description]}"
+          end
+          lines << "Type: #{field[:element_type][:type]}"
+          lines << "Example: #{generate_example_value("item", field[:element_type]).inspect}"
+        end
+
+        lines.join("\n")
+      end
+
+      def format_type(field)
+        case field[:type]
         when :datetime
-          lines = ["Type: datetime in ISO8601 format"]
-          lines << "Description: #{field[:description]}" if field[:description]
-          lines.join("\n")
+          "datetime in ISO8601 format"
         when :array
-          if field[:element_type]
-            inner =
-              format_type_and_description(field[:element_type], indent_level)
-            lines = ["Type: array of:"]
-            lines.concat(inner.split("\n").map { |line| "  #{line}" })
-            if field[:description]
-              lines << "Description: #{field[:description]}"
-            end
-            lines.join("\n")
+          if field[:element_type][:type] == :array
+            "array of arrays"
+          elsif field[:element_type][:type] == :datetime
+            "array of datetimes in ISO8601 format"
           else
-            lines = ["Type: array"]
-            if field[:description]
-              lines << "Description: #{field[:description]}"
-            end
-            lines.join("\n")
+            "array of #{field[:element_type][:type]}s"
           end
         when :hash
-          if field[:fields]
-            lines = ["Type: object with the following fields:"]
-            field[:fields].each do |name, subfield|
-              lines << "  #{name}:"
-              inner = format_type_and_description(subfield, indent_level + 1)
-              lines.concat(inner.split("\n").map { |line| "    #{line}" })
-            end
-            if field[:description]
-              lines << "Description: #{field[:description]}"
-            end
-            lines.join("\n")
-          else
-            lines = ["Type: object"]
-            if field[:description]
-              lines << "Description: #{field[:description]}"
-            end
-            lines.join("\n")
-          end
+          nil # Skip hashes for now
         else
-          lines = ["Type: #{type}"]
-          lines << "Description: #{field[:description]}" if field[:description]
-          lines.join("\n")
+          field[:type].to_s
         end
       end
 
@@ -232,44 +232,14 @@ module Lluminary
         JSON.pretty_generate(example)
       end
 
-      def format_type(field, indent_level = 0)
-        type = field[:type]
-        base_indent = "  " * indent_level
-        case type
-        when :datetime
-          "datetime in ISO8601 format"
-        when :array
-          if field[:element_type]
-            "array of #{format_type(field[:element_type], indent_level)}"
-          else
-            "array"
-          end
-        when :hash
-          if field[:fields]
-            nested_indent = "  " * (indent_level + 1)
-            result = "object with fields:\n"
-            field[:fields].each do |name, subfield|
-              result +=
-                "#{nested_indent}#{name}: #{format_type(subfield, indent_level + 1)}"
-              result +=
-                "\n#{nested_indent}Description: #{subfield[:description].chomp}" if subfield[
-                :description
-              ]
-              result += "\n"
-            end
-            result.chomp
-          else
-            "object"
-          end
-        else
-          type.to_s
-        end
-      end
-
       def generate_example_value(name, field)
         case field[:type]
         when :string
-          "your #{name} here"
+          if name == "item" # For items in arrays
+            "first #{name}"
+          else
+            "your #{name} here"
+          end
         when :integer
           0
         when :datetime
@@ -290,11 +260,7 @@ module Lluminary
 
         case field[:element_type][:type]
         when :string
-          [
-            "first #{name.to_s.singularize}",
-            "second #{name.to_s.singularize}",
-            "..."
-          ]
+          ["first #{name.to_s.singularize}", "second #{name.to_s.singularize}"]
         when :integer
           [1, 2, 3]
         when :float
@@ -306,14 +272,14 @@ module Lluminary
         when :array
           if field[:element_type][:element_type]
             inner_example = generate_array_example("item", field[:element_type])
-            [inner_example, inner_example, "..."]
+            [inner_example, inner_example]
           else
-            [[], [], "..."]
+            [[], []]
           end
         when :hash
           example =
             generate_hash_example(name.to_s.singularize, field[:element_type])
-          [example, example, "..."]
+          [example, example]
         end
       end
 
