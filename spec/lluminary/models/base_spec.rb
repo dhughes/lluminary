@@ -439,11 +439,96 @@ RSpec.describe Lluminary::Models::Base do
     end
 
     context "with hash fields" do
-      before do
-        task_class.output_schema do
-          hash :person, description: "A person" do
-            string :name, description: "The person's name"
+      context "with simple hash with one field" do
+        before do
+          task_class.output_schema do
+            hash :person do
+              string :name, description: "The person's name"
+            end
           end
+        end
+
+        it "formats hash field description correctly" do
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
+            # person
+            Type: object
+            Example: {"name":"your name here"}
+
+            # person.name
+            Description: The person's name
+            Type: string
+            Example: "your name here"
+          DESCRIPTION
+
+          expect(prompt).to include(expected_description)
+        end
+      end
+
+      context "with hash with two fields (one with description)" do
+        before do
+          task_class.output_schema do
+            hash :person, description: "A person" do
+              string :name, description: "The person's name"
+              integer :age
+            end
+          end
+        end
+
+        it "formats hash field descriptions correctly" do
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
+            # person
+            Description: A person
+            Type: object
+            Example: {"name":"your name here","age":0}
+
+            # person.name
+            Description: The person's name
+            Type: string
+            Example: "your name here"
+
+            # person.age
+            Type: integer
+            Example: 0
+          DESCRIPTION
+
+          expect(prompt).to include(expected_description)
+        end
+      end
+
+      context "with hash containing datetime field" do
+        before do
+          task_class.output_schema do
+            hash :event, description: "An event" do
+              string :title
+              datetime :scheduled_at, description: "When the event is scheduled"
+            end
+          end
+        end
+
+        it "formats hash with datetime field description correctly" do
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
+            # event
+            Description: An event
+            Type: object
+            Example: {"title":"your title here","scheduled_at":"2024-01-01T12:00:00+00:00"}
+
+            # event.title
+            Type: string
+            Example: "your title here"
+
+            # event.scheduled_at
+            Description: When the event is scheduled
+            Type: datetime in ISO8601 format
+            Example: "2024-01-01T12:00:00+00:00"
+          DESCRIPTION
+
+          expect(prompt).to include(expected_description)
         end
       end
     end

@@ -49,36 +49,101 @@ module Lluminary
       def format_field_descriptions(fields)
         fields
           .map do |name, field|
-            next if field[:type] == :hash # Skip hashes for now
-
-            lines = []
-            lines << "# #{name}"
-            if field[:description]
-              lines << "Description: #{field[:description]}"
+            case field[:type]
+            when :hash
+              format_hash_description(name, field)
+            when :array
+              format_array_description(name, field)
+            else
+              format_simple_field_description(name, field)
             end
-            lines << "Type: #{format_type(field)}"
-
-            if (validations = describe_validations(field[:validations]))
-              lines << "Validations: #{validations}"
-            end
-
-            example_value = generate_example_value(name, field)
-            lines << "Example: #{example_value.inspect}"
-
-            # Handle nested array fields
-            if field[:type] == :array && field[:element_type][:type] == :array
-              nested_description =
-                format_nested_array_descriptions(
-                  "#{name}[]",
-                  field[:element_type]
-                )
-              lines << "\n#{nested_description}" if nested_description
-            end
-
-            lines.join("\n")
           end
           .compact # Remove nil entries from skipped types
           .join("\n\n")
+      end
+
+      def format_hash_description(name, field)
+        return nil unless field[:fields]
+
+        lines = []
+        # Add hash field description
+        lines << "# #{name}"
+        lines << "Description: #{field[:description]}" if field[:description]
+        lines << "Type: object"
+
+        example_value = generate_hash_example(name, field)
+        # Format example on a single line
+        example_json =
+          (
+            if example_value.is_a?(Hash)
+              example_value.to_json
+            else
+              example_value.inspect
+            end
+          )
+        lines << "Example: #{example_json}"
+
+        # Add descriptions for each field in the hash
+        field[:fields].each do |subname, subfield|
+          lines << "\n#{format_hash_nested_field_description("#{name}.#{subname}", subfield)}"
+        end
+
+        lines.join("\n")
+      end
+
+      def format_hash_nested_field_description(path, field)
+        lines = []
+        lines << "# #{path}"
+        lines << "Description: #{field[:description]}" if field[:description]
+        lines << "Type: #{format_type(field)}"
+
+        if (validations = describe_validations(field[:validations]))
+          lines << "Validations: #{validations}"
+        end
+
+        example_value = generate_example_value(path.split(".").last, field)
+        lines << "Example: #{example_value.inspect}"
+
+        lines.join("\n")
+      end
+
+      def format_array_description(name, field)
+        lines = []
+        lines << "# #{name}"
+        lines << "Description: #{field[:description]}" if field[:description]
+        lines << "Type: #{format_type(field)}"
+
+        if (validations = describe_validations(field[:validations]))
+          lines << "Validations: #{validations}"
+        end
+
+        example_value = generate_array_example(name, field)
+        lines << "Example: #{example_value.inspect}"
+
+        # Handle nested array fields
+        if field[:element_type][:type] == :array
+          nested_description =
+            format_nested_array_descriptions("#{name}[]", field[:element_type])
+          lines << "\n#{nested_description}" if nested_description
+        end
+
+        lines.join("\n")
+      end
+
+      def format_simple_field_description(name, field)
+        lines = []
+        lines << "# #{name}"
+        lines << "Description: #{field[:description]}" if field[:description]
+        lines << "Type: #{format_type(field)}"
+
+        if (validations = describe_validations(field[:validations]))
+          lines << "Validations: #{validations}"
+        end
+
+        example_value = generate_example_value(name, field)
+        lines << "Example: #{example_value.inspect}"
+
+        lines.join("\n")
       end
 
       def format_nested_array_descriptions(prefix, field)
@@ -122,7 +187,7 @@ module Lluminary
             "array of #{field[:element_type][:type]}s"
           end
         when :hash
-          nil # Skip hashes for now
+          "object"
         else
           field[:type].to_s
         end
