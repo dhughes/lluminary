@@ -277,7 +277,7 @@ RSpec.describe Lluminary::Models::Base do
             # tags
             Description: List of tags
             Type: array of strings
-            Example: ["first tag", "second tag"]
+            Example: ["first tag","second tag"]
           DESCRIPTION
 
           expect(prompt).to include(expected_description)
@@ -300,7 +300,7 @@ RSpec.describe Lluminary::Models::Base do
             # scores
             Description: List of scores
             Type: array of floats
-            Example: [1.0, 2.0, 3.0]
+            Example: [1.0,2.0,3.0]
           DESCRIPTION
 
           expect(prompt).to include(expected_description)
@@ -323,7 +323,7 @@ RSpec.describe Lluminary::Models::Base do
             # dates
             Description: List of important dates
             Type: array of datetimes in ISO8601 format
-            Example: ["2024-01-01T12:00:00+00:00", "2024-01-02T12:00:00+00:00"]
+            Example: ["2024-01-01T12:00:00+00:00","2024-01-02T12:00:00+00:00"]
           DESCRIPTION
 
           expect(prompt).to include(expected_description)
@@ -348,12 +348,12 @@ RSpec.describe Lluminary::Models::Base do
             # matrix
             Description: 2D array of numbers
             Type: array of arrays
-            Example: [[1, 2, 3], [1, 2, 3]]
+            Example: [[1,2,3],[1,2,3]]
 
             # matrix[]
             Description: 1D array of numbers
             Type: array of integers
-            Example: [1, 2, 3]
+            Example: [1,2,3]
 
             # matrix[][]
             Description: A number
@@ -381,11 +381,11 @@ RSpec.describe Lluminary::Models::Base do
             # matrix
             Description: 2D array of numbers
             Type: array of arrays
-            Example: [[1, 2, 3], [1, 2, 3]]
+            Example: [[1,2,3],[1,2,3]]
 
             # matrix[]
             Type: array of integers
-            Example: [1, 2, 3]
+            Example: [1,2,3]
 
             # matrix[][]
             Description: A number
@@ -417,16 +417,16 @@ RSpec.describe Lluminary::Models::Base do
             # cube
             Description: 3D array of strings
             Type: array of arrays
-            Example: [[["first item", "second item"], ["first item", "second item"]], [["first item", "second item"], ["first item", "second item"]]]
+            Example: [[["first item","second item"],["first item","second item"]],[["first item","second item"],["first item","second item"]]]
 
             # cube[]
             Type: array of arrays
-            Example: [["first item", "second item"], ["first item", "second item"]]
+            Example: [["first item","second item"],["first item","second item"]]
 
             # cube[][]
             Description: 1D array
             Type: array of strings
-            Example: ["first item", "second item"]
+            Example: ["first item","second item"]
 
             # cube[][][]
             Type: string
@@ -526,6 +526,126 @@ RSpec.describe Lluminary::Models::Base do
             Description: When the event is scheduled
             Type: datetime in ISO8601 format
             Example: "2024-01-01T12:00:00+00:00"
+          DESCRIPTION
+
+          expect(prompt).to include(expected_description)
+        end
+      end
+
+      context "with hash containing array field" do
+        before do
+          task_class.output_schema do
+            hash :user, description: "A user profile" do
+              string :name, description: "The person's name"
+              array :tags, description: "User tags" do
+                string
+              end
+            end
+          end
+        end
+
+        it "formats hash with array field description correctly" do
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
+            # user
+            Description: A user profile
+            Type: object
+            Example: {"name":"your name here","tags":["first tag","second tag"]}
+
+            # user.name
+            Description: The person's name
+            Type: string
+            Example: "your name here"
+
+            # user.tags
+            Description: User tags
+            Type: array of strings
+            Example: ["first tag", "second tag"]
+          DESCRIPTION
+
+          expect(prompt).to include(expected_description)
+        end
+      end
+
+      context "with nested hashes (mixed descriptions)" do
+        before do
+          task_class.output_schema do
+            hash :person, description: "A person profile" do
+              string :name, description: "The person's name"
+              integer :age
+              hash :address do
+                string :street, description: "Street name"
+                string :city
+                string :country
+              end
+              hash :preferences, description: "User preferences" do
+                boolean :notifications
+                hash :theme do
+                  string :color, description: "Theme color"
+                  boolean :dark_mode
+                end
+              end
+            end
+          end
+        end
+
+        it "formats nested hash fields correctly with mixed descriptions" do
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
+            # person
+            Description: A person profile
+            Type: object
+            Example: {"name":"your name here","age":0,"address":{"street":"your street here","city":"your city here","country":"your country here"},"preferences":{"notifications":true,"theme":{"color":"your color here","dark_mode":true}}}
+
+            # person.name
+            Description: The person's name
+            Type: string
+            Example: "your name here"
+
+            # person.age
+            Type: integer
+            Example: 0
+
+            # person.address
+            Type: object
+            Example: {"street":"your street here","city":"your city here","country":"your country here"}
+
+            # person.address.street
+            Description: Street name
+            Type: string
+            Example: "your street here"
+
+            # person.address.city
+            Type: string
+            Example: "your city here"
+
+            # person.address.country
+            Type: string
+            Example: "your country here"
+
+            # person.preferences
+            Description: User preferences
+            Type: object
+            Example: {"notifications":true,"theme":{"color":"your color here","dark_mode":true}}
+
+            # person.preferences.notifications
+            Type: boolean
+            Example: true
+
+            # person.preferences.theme
+            Type: object
+            Example: {"color":"your color here","dark_mode":true}
+
+            # person.preferences.theme.color
+            Description: Theme color
+            Type: string
+            Example: "your color here"
+
+            # person.preferences.theme.dark_mode
+            Type: boolean
+            Example: true
           DESCRIPTION
 
           expect(prompt).to include(expected_description)

@@ -72,23 +72,32 @@ module Lluminary
         lines << "Type: object"
 
         example_value = generate_hash_example(name, field)
-        # Format example on a single line
-        example_json =
-          (
-            if example_value.is_a?(Hash)
-              example_value.to_json
-            else
-              example_value.inspect
-            end
-          )
+        # Format example on a single line - ensure all hashes are converted to JSON
+        example_json = format_json_for_examples(example_value)
         lines << "Example: #{example_json}"
 
         # Add descriptions for each field in the hash
         field[:fields].each do |subname, subfield|
-          lines << "\n#{format_hash_nested_field_description("#{name}.#{subname}", subfield)}"
+          if subfield[:type] == :hash
+            lines << "\n#{format_hash_description("#{name}.#{subname}", subfield)}"
+          else
+            lines << "\n#{format_hash_nested_field_description("#{name}.#{subname}", subfield)}"
+          end
         end
 
         lines.join("\n")
+      end
+
+      # Helper to ensure consistent JSON formatting for examples
+      def format_json_for_examples(value)
+        case value
+        when Hash
+          JSON.generate(value)
+        when Array
+          JSON.generate(value)
+        else
+          value.inspect
+        end
       end
 
       def format_hash_nested_field_description(path, field)
@@ -118,7 +127,8 @@ module Lluminary
         end
 
         example_value = generate_array_example(name, field)
-        lines << "Example: #{example_value.inspect}"
+        # Use the same formatting helper as for hashes
+        lines << "Example: #{format_json_for_examples(example_value)}"
 
         # Handle nested array fields
         if field[:element_type][:type] == :array
@@ -152,7 +162,8 @@ module Lluminary
         lines << "Description: #{field[:description]}" if field[:description]
         lines << "Type: #{format_type(field)}"
         example_value = generate_array_example("item", field)
-        lines << "Example: #{example_value.inspect}"
+        # Use the same formatting helper as for hashes
+        lines << "Example: #{format_json_for_examples(example_value)}"
 
         if field[:element_type][:type] == :array
           nested_description =
