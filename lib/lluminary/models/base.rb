@@ -25,7 +25,7 @@ module Lluminary
 
           #{output_preamble}
           
-          #{format_field_descriptions(task.class.output_fields)}
+          #{format_fields_descriptions(task.class.output_fields)}
           
           #{json_preamble}
           
@@ -46,34 +46,32 @@ module Lluminary
         "Your response must be ONLY this JSON object:"
       end
 
-      def format_field_descriptions(fields)
+      def format_fields_descriptions(fields)
         fields
-          .map do |name, field|
-            case field[:type]
-            when :hash
-              format_hash_description(name, field)
-            when :array
-              format_array_description(name, field)
-            else
-              format_simple_field_description(name, field)
-            end
-          end
+          .map { |name, field| format_field_description(name, field) }
           .compact # Remove nil entries from skipped types
           .join("\n\n")
       end
 
-      def format_hash_description(name, field)
+      def format_field_description(name, field, name_for_example = nil)
+        case field[:type]
+        when :hash
+          format_hash_description(name, field, name_for_example)
+        when :array
+          format_array_description(name, field, name_for_example)
+        else
+          format_simple_field_description(name, field, name_for_example)
+        end
+      end
+
+      def format_hash_description(name, field, name_for_example = nil)
         return nil unless field[:fields]
 
-        lines = build_field_description_lines(name, field)
+        lines = build_field_description_lines(name, field, name_for_example)
 
         # Add descriptions for each field in the hash
         field[:fields].each do |subname, subfield|
-          if subfield[:type] == :hash
-            lines << "\n#{format_hash_description("#{name}.#{subname}", subfield)}"
-          else
-            lines << "\n#{format_simple_field_description("#{name}.#{subname}", subfield)}"
-          end
+          lines << "\n#{format_field_description("#{name}.#{subname}", subfield, subname)}"
         end
 
         lines.join("\n")
@@ -89,22 +87,21 @@ module Lluminary
         end
       end
 
-      def format_simple_field_description(name, field)
-        build_field_description_lines(name, field).join("\n")
+      def format_simple_field_description(name, field, name_for_example = nil)
+        build_field_description_lines(name, field, name_for_example).join("\n")
       end
 
-      def format_array_description(name, field)
-        lines = build_field_description_lines(name, field)
+      def format_array_description(name, field, name_for_example = nil)
+        lines = build_field_description_lines(name, field, name_for_example)
 
-        # Handle nested array fields
         if field[:element_type]
           if field[:element_type][:type] == :array
+            # Create a nested array field by adding [] to the name
+            # and recursively call format_array_description
+            element_field = field[:element_type].dup
             nested_description =
-              format_nested_array_descriptions(
-                "#{name}[]",
-                field[:element_type]
-              )
-            lines << "\n#{nested_description}" if nested_description
+              format_array_description("#{name}[]", element_field, "item")
+            lines << "\n#{nested_description}"
           elsif field[:element_type][:type] == :hash &&
                 field[:element_type][:fields]
             field[:element_type][:fields].each do |subname, subfield|
@@ -120,6 +117,14 @@ module Lluminary
                 )
               lines << "\n#{inner_lines.join("\n")}"
             end
+          else
+            inner_field = {
+              type: field[:element_type][:type],
+              description: field[:element_type][:description]
+            }
+            inner_lines =
+              build_field_description_lines("#{name}[]", inner_field, "item")
+            lines << "\n#{inner_lines.join("\n")}"
           end
         end
 
@@ -148,32 +153,6 @@ module Lluminary
         lines << "Example: #{format_json_for_examples(example_value)}"
 
         lines
-      end
-
-      def format_nested_array_descriptions(prefix, field)
-        lines = build_field_description_lines(prefix, field, "item")
-
-        if field[:element_type][:type] == :array
-          nested_description =
-            format_nested_array_descriptions(
-              "#{prefix}[]",
-              field[:element_type]
-            )
-          lines << "\n#{nested_description}" if nested_description
-        else
-          # Use the common method for the innermost element, building up a
-          # temporary field hash with the element_type properties
-          inner_field = {
-            type: field[:element_type][:type],
-            description: field[:element_type][:description]
-          }
-          inner_lines =
-            build_field_description_lines("#{prefix}[]", inner_field, "item")
-
-          lines << "\n#{inner_lines.join("\n")}"
-        end
-
-        lines.join("\n")
       end
 
       def format_type(field)
