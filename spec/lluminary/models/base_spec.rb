@@ -436,6 +436,34 @@ RSpec.describe Lluminary::Models::Base do
           expect(prompt).to include(expected_description)
         end
       end
+
+      context "with array containing hash" do
+        before do
+          task_class.output_schema do
+            array :contacts, description: "List of contacts" do
+              hash { string :name, description: "Contact name" }
+            end
+          end
+        end
+
+        it "formats array of hashes field description correctly" do
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
+            # contacts
+            Description: List of contacts
+            Type: array of objects
+            Example: [{"name":"your name here"},{"name":"your name here"}]
+
+            # contacts[].name
+            Description: Contact name
+            Type: string
+            Example: "your name here"
+          DESCRIPTION
+
+          expect(prompt).to include(expected_description)
+        end
+      end
     end
 
     context "with hash fields" do

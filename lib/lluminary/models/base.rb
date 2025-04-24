@@ -135,6 +135,18 @@ module Lluminary
           nested_description =
             format_nested_array_descriptions("#{name}[]", field[:element_type])
           lines << "\n#{nested_description}" if nested_description
+          # Add this block to handle hash elements inside arrays
+        elsif field[:element_type][:type] == :hash &&
+              field[:element_type][:fields]
+          field[:element_type][:fields].each do |subname, subfield|
+            lines << "\n# #{name}[].#{subname}"
+            if subfield[:description]
+              lines << "Description: #{subfield[:description]}"
+            end
+            lines << "Type: #{format_type(subfield)}"
+            example_value = generate_example_value(subname, subfield)
+            lines << "Example: #{example_value.inspect}"
+          end
         end
 
         lines.join("\n")
@@ -194,6 +206,8 @@ module Lluminary
             "array of arrays"
           elsif field[:element_type][:type] == :datetime
             "array of datetimes in ISO8601 format"
+          elsif field[:element_type][:type] == :hash
+            "array of objects"
           else
             "array of #{field[:element_type][:type]}s"
           end
