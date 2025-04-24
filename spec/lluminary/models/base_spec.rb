@@ -1005,6 +1005,34 @@ RSpec.describe Lluminary::Models::Base do
           end
         end
       end
+
+      context "hash validations" do
+        context "presence validation" do
+          before do
+            task_class.output_schema do
+              hash :user_settings, description: "User configuration settings" do
+                string :theme
+                boolean :notifications_enabled
+              end
+              validates :user_settings, presence: true
+            end
+          end
+
+          it "includes presence validation in hash field description" do
+            prompt = model.format_prompt(task)
+
+            expected_description = <<~DESCRIPTION.chomp
+              # user_settings
+              Description: User configuration settings
+              Type: object
+              Validations: must be present
+              Example: {"theme":"your theme here","notifications_enabled":true}
+            DESCRIPTION
+
+            expect(prompt).to include(expected_description)
+          end
+        end
+      end
     end
 
     # context "JSON example generation" do

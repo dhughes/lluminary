@@ -71,6 +71,11 @@ module Lluminary
         lines << "Description: #{field[:description]}" if field[:description]
         lines << "Type: object"
 
+        # Add validation info for the hash field itself
+        if (validations = describe_validations(field[:validations], field))
+          lines << "Validations: #{validations}"
+        end
+
         example_value = generate_hash_example(name, field)
         # Format example on a single line - ensure all hashes are converted to JSON
         example_json = format_json_for_examples(example_value)
