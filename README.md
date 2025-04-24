@@ -180,7 +180,7 @@ Lluminary supports these field types:
    end
    ```
 
-   When used in output schemas, the LLM will be instructed to return the hash with all its nested fields in the correct structure.
+   When used in output schemas, the LLM will be instructed to return the hash with all its nested fields in the correct structure. All hash keys will be strings, not symbols, since Lluminary is creating hashes from deserialized JSON returned by the LLM.
 
 All of these field definitions allow nil values by default, ensuring that optional data can be omitted.
 
