@@ -25,11 +25,11 @@ module Lluminary
 
           #{output_preamble}
           
-          #{format_field_descriptions(task.class.output_fields)}
+          #{format_fields_descriptions(task.class.output_fields)}
           
           #{json_preamble}
           
-          #{format_json_example(task.class.output_fields)}
+          #{generate_example_json_object(task.class.output_fields)}
         PROMPT
       end
 
@@ -46,30 +46,142 @@ module Lluminary
         "Your response must be ONLY this JSON object:"
       end
 
-      def format_field_descriptions(fields)
+      def format_fields_descriptions(fields)
         fields
-          .map do |name, field|
-            desc = "# #{name}"
-            desc += "\nType: #{format_type(field)}"
-
-            desc += "\nDescription: #{field[:description].chomp}" if field[
-              :description
-            ]
-
-            if (validations = describe_validations(field[:validations]))
-              desc += "\nValidations: #{validations}"
-            end
-
-            desc += "\nExample: #{generate_example_value(name, field)}"
-            desc
-          end
+          .map { |name, field| format_field_description(name, field) }
+          .compact # Remove nil entries from skipped types
           .join("\n\n")
       end
 
-      def describe_validations(validations)
-        return unless validations&.any?
+      def format_field_description(name, field, name_for_example = nil)
+        case field[:type]
+        when :hash
+          format_hash_description(name, field, name_for_example)
+        when :array
+          format_array_description(name, field, name_for_example)
+        else
+          format_simple_field_description(name, field, name_for_example)
+        end
+      end
 
-        validations
+      def format_hash_description(name, field, name_for_example = nil)
+        return nil unless field[:fields]
+
+        lines = build_field_description_lines(name, field, name_for_example)
+
+        # Add descriptions for each field in the hash
+        field[:fields].each do |subname, subfield|
+          lines << "\n#{format_field_description("#{name}.#{subname}", subfield, subname)}"
+        end
+
+        lines.join("\n")
+      end
+
+      # Helper to ensure consistent JSON formatting for examples
+      def format_json_for_examples(value)
+        case value
+        when Hash, Array
+          JSON.generate(value)
+        else
+          value.inspect
+        end
+      end
+
+      def format_simple_field_description(name, field, name_for_example = nil)
+        build_field_description_lines(name, field, name_for_example).join("\n")
+      end
+
+      def format_array_description(name, field, name_for_example = nil)
+        lines = build_field_description_lines(name, field, name_for_example)
+
+        if field[:element_type]
+          if field[:element_type][:type] == :array
+            # Create a nested array field by adding [] to the name
+            # and recursively call format_array_description
+            element_field = field[:element_type].dup
+            nested_description =
+              format_array_description("#{name}[]", element_field, "item")
+            lines << "\n#{nested_description}"
+          elsif field[:element_type][:type] == :hash &&
+                field[:element_type][:fields]
+            field[:element_type][:fields].each do |subname, subfield|
+              inner_field = {
+                type: subfield[:type],
+                description: subfield[:description]
+              }
+              inner_lines =
+                build_field_description_lines(
+                  "#{name}[].#{subname}",
+                  inner_field,
+                  subname
+                )
+              lines << "\n#{inner_lines.join("\n")}"
+            end
+          else
+            inner_field = {
+              type: field[:element_type][:type],
+              description: field[:element_type][:description]
+            }
+            inner_lines =
+              build_field_description_lines("#{name}[]", inner_field, "item")
+            lines << "\n#{inner_lines.join("\n")}"
+          end
+        end
+
+        lines.join("\n")
+      end
+
+      # Common method for building field description lines
+      def build_field_description_lines(name, field, name_for_example = nil)
+        lines = []
+        # Add field description
+        lines << "# #{name}"
+        lines << "Description: #{field[:description]}" if field[:description]
+        lines << "Type: #{format_type(field)}"
+
+        # Add validation info
+        if (validations = describe_validations(field))
+          lines << "Validations: #{validations}"
+        end
+
+        # Generate and add example
+        example_value =
+          generate_example_value(
+            name_for_example || name.to_s.split(".").last,
+            field
+          )
+        lines << "Example: #{format_json_for_examples(example_value)}"
+
+        lines
+      end
+
+      def format_type(field)
+        case field[:type]
+        when :datetime
+          "datetime in ISO8601 format"
+        when :array
+          if field[:element_type].nil?
+            "array"
+          elsif field[:element_type][:type] == :array
+            "array of arrays"
+          elsif field[:element_type][:type] == :datetime
+            "array of datetimes in ISO8601 format"
+          elsif field[:element_type][:type] == :hash
+            "array of objects"
+          else
+            "array of #{field[:element_type][:type]}s"
+          end
+        when :hash
+          "object"
+        else
+          field[:type].to_s
+        end
+      end
+
+      def describe_validations(field)
+        return unless field[:validations]&.any?
+
+        field[:validations]
           .map do |options|
             case options.keys.first
             when :presence
@@ -81,7 +193,7 @@ module Lluminary
             when :format
               "must match format: #{options[:format][:with]}"
             when :length
-              describe_length_validation(options[:length])
+              describe_length_validation(options[:length], field[:type])
             when :numericality
               describe_numericality_validation(options[:numericality])
             when :comparison
@@ -94,43 +206,29 @@ module Lluminary
           .join(", ")
       end
 
-      def describe_length_validation(options)
+      def describe_length_validation(options, field_type = nil)
         descriptions = []
+        units = field_type == :array ? "elements" : "characters"
+
         if options[:minimum]
-          descriptions << "must be at least #{options[:minimum]} characters"
+          descriptions << "must have at least #{options[:minimum]} #{units}"
         end
         if options[:maximum]
-          descriptions << "must be at most #{options[:maximum]} characters"
+          descriptions << "must have at most #{options[:maximum]} #{units}"
         end
         if options[:is]
-          descriptions << "must be exactly #{options[:is]} characters"
+          descriptions << "must have exactly #{options[:is]} #{units}"
         end
         if options[:in]
-          descriptions << "must be between #{options[:in].min} and #{options[:in].max} characters"
+          descriptions << "must have between #{options[:in].min} and #{options[:in].max} #{units}"
         end
         descriptions.join(", ")
       end
 
       def describe_numericality_validation(options)
         descriptions = []
-        if options[:greater_than]
-          descriptions << "must be greater than #{options[:greater_than]}"
-        end
-        if options[:greater_than_or_equal_to]
-          descriptions << "must be greater than or equal to #{options[:greater_than_or_equal_to]}"
-        end
-        if options[:equal_to]
-          descriptions << "must be equal to #{options[:equal_to]}"
-        end
-        if options[:less_than]
-          descriptions << "must be less than #{options[:less_than]}"
-        end
-        if options[:less_than_or_equal_to]
-          descriptions << "must be less than or equal to #{options[:less_than_or_equal_to]}"
-        end
-        if options[:other_than]
-          descriptions << "must be other than #{options[:other_than]}"
-        end
+        descriptions.concat(describe_common_comparisons(options))
+
         if options[:in]
           descriptions << "must be in: #{options[:in].to_a.join(", ")}"
         end
@@ -140,6 +238,10 @@ module Lluminary
       end
 
       def describe_comparison_validation(options)
+        describe_common_comparisons(options).join(", ")
+      end
+
+      def describe_common_comparisons(options)
         descriptions = []
         if options[:greater_than]
           descriptions << "must be greater than #{options[:greater_than]}"
@@ -159,10 +261,10 @@ module Lluminary
         if options[:other_than]
           descriptions << "must be other than #{options[:other_than]}"
         end
-        descriptions.join(", ")
+        descriptions
       end
 
-      def format_json_example(fields)
+      def generate_example_json_object(fields)
         example =
           fields.each_with_object({}) do |(name, field), hash|
             hash[name] = generate_example_value(name, field)
@@ -170,26 +272,14 @@ module Lluminary
         JSON.pretty_generate(example)
       end
 
-      def format_type(field)
-        type = field[:type]
-        case type
-        when :datetime
-          "datetime in ISO8601 format"
-        when :array
-          if field[:element_type]
-            "array of #{format_type(field[:element_type])}"
-          else
-            "array"
-          end
-        else
-          type.to_s
-        end
-      end
-
       def generate_example_value(name, field)
         case field[:type]
         when :string
-          "your #{name} here"
+          if name == "item" # For items in arrays
+            "first #{name}"
+          else
+            "your #{name} here"
+          end
         when :integer
           0
         when :datetime
@@ -200,6 +290,8 @@ module Lluminary
           0.0
         when :array
           generate_array_example(name, field)
+        when :hash
+          generate_hash_example(name, field)
         end
       end
 
@@ -208,11 +300,7 @@ module Lluminary
 
         case field[:element_type][:type]
         when :string
-          [
-            "first #{name.to_s.singularize}",
-            "second #{name.to_s.singularize}",
-            "..."
-          ]
+          ["first #{name.to_s.singularize}", "second #{name.to_s.singularize}"]
         when :integer
           [1, 2, 3]
         when :float
@@ -226,8 +314,20 @@ module Lluminary
             inner_example = generate_array_example("item", field[:element_type])
             [inner_example, inner_example]
           else
-            [["..."], ["..."]]
+            [[], []]
           end
+        when :hash
+          example =
+            generate_hash_example(name.to_s.singularize, field[:element_type])
+          [example, example]
+        end
+      end
+
+      def generate_hash_example(name, field)
+        return {} unless field[:fields]
+
+        field[:fields].each_with_object({}) do |(subname, subfield), hash|
+          hash[subname] = generate_example_value(subname, subfield)
         end
       end
     end
