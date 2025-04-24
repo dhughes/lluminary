@@ -86,7 +86,7 @@ module Lluminary
           if subfield[:type] == :hash
             lines << "\n#{format_hash_description("#{name}.#{subname}", subfield)}"
           else
-            lines << "\n#{format_hash_nested_field_description("#{name}.#{subname}", subfield)}"
+            lines << "\n#{format_simple_field_description("#{name}.#{subname}", subfield)}"
           end
         end
 
@@ -105,9 +105,9 @@ module Lluminary
         end
       end
 
-      def format_hash_nested_field_description(path, field)
+      def format_simple_field_description(name, field)
         lines = []
-        lines << "# #{path}"
+        lines << "# #{name}"
         lines << "Description: #{field[:description]}" if field[:description]
         lines << "Type: #{format_type(field)}"
 
@@ -115,7 +115,7 @@ module Lluminary
           lines << "Validations: #{validations}"
         end
 
-        example_value = generate_example_value(path.split(".").last, field)
+        example_value = generate_example_value(name.to_s.split(".").last, field)
         lines << "Example: #{example_value.inspect}"
 
         lines.join("\n")
@@ -158,22 +158,6 @@ module Lluminary
             end
           end
         end
-
-        lines.join("\n")
-      end
-
-      def format_simple_field_description(name, field)
-        lines = []
-        lines << "# #{name}"
-        lines << "Description: #{field[:description]}" if field[:description]
-        lines << "Type: #{format_type(field)}"
-
-        if (validations = describe_validations(field[:validations], field))
-          lines << "Validations: #{validations}"
-        end
-
-        example_value = generate_example_value(name, field)
-        lines << "Example: #{example_value.inspect}"
 
         lines.join("\n")
       end
@@ -230,6 +214,7 @@ module Lluminary
         end
       end
 
+      # TODO: field contains validations, why pass validations in separately?
       def describe_validations(validations, field)
         return unless validations&.any?
 
@@ -279,24 +264,8 @@ module Lluminary
 
       def describe_numericality_validation(options)
         descriptions = []
-        if options[:greater_than]
-          descriptions << "must be greater than #{options[:greater_than]}"
-        end
-        if options[:greater_than_or_equal_to]
-          descriptions << "must be greater than or equal to #{options[:greater_than_or_equal_to]}"
-        end
-        if options[:equal_to]
-          descriptions << "must be equal to #{options[:equal_to]}"
-        end
-        if options[:less_than]
-          descriptions << "must be less than #{options[:less_than]}"
-        end
-        if options[:less_than_or_equal_to]
-          descriptions << "must be less than or equal to #{options[:less_than_or_equal_to]}"
-        end
-        if options[:other_than]
-          descriptions << "must be other than #{options[:other_than]}"
-        end
+        descriptions.concat(describe_common_comparisons(options))
+
         if options[:in]
           descriptions << "must be in: #{options[:in].to_a.join(", ")}"
         end
@@ -306,6 +275,10 @@ module Lluminary
       end
 
       def describe_comparison_validation(options)
+        describe_common_comparisons(options).join(", ")
+      end
+
+      def describe_common_comparisons(options)
         descriptions = []
         if options[:greater_than]
           descriptions << "must be greater than #{options[:greater_than]}"
@@ -325,7 +298,7 @@ module Lluminary
         if options[:other_than]
           descriptions << "must be other than #{options[:other_than]}"
         end
-        descriptions.join(", ")
+        descriptions
       end
 
       def format_json_example(fields)
