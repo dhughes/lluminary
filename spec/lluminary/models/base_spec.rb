@@ -681,179 +681,331 @@ RSpec.describe Lluminary::Models::Base do
       end
     end
 
-    # context "with validations" do
-    #   context "presence validation" do
-    #     before do
-    #       task_class.output_schema do
-    #         string :name, description: "The person's name"
-    #         validates :name, presence: true
-    #       end
-    #     end
+    context "with validations" do
+      context "presence validation" do
+        before do
+          task_class.output_schema do
+            string :name, description: "The person's name"
+            validates :name, presence: true
+          end
+        end
 
-    #     it "includes presence validation in field description" do
-    #       prompt = model.format_prompt(task)
+        it "includes presence validation in field description" do
+          prompt = model.format_prompt(task)
 
-    #       expected_description = <<~DESCRIPTION.chomp
-    #         # name
-    #         Description: The person's name
-    #         Type: string
-    #         Validations: must be present
-    #         Example: "your name here"
-    #       DESCRIPTION
+          expected_description = <<~DESCRIPTION.chomp
+            # name
+            Description: The person's name
+            Type: string
+            Validations: must be present
+            Example: "your name here"
+          DESCRIPTION
 
-    #       expect(prompt).to include(expected_description)
-    #     end
-    #   end
+          expect(prompt).to include(expected_description)
+        end
+      end
 
-    #   context "inclusion validation" do
-    #     before do
-    #       task_class.output_schema do
-    #         string :status, description: "The status"
-    #         validates :status, inclusion: { in: %w[active inactive] }
-    #       end
-    #     end
+      context "inclusion validation" do
+        before do
+          task_class.output_schema do
+            string :status, description: "The status"
+            validates :status, inclusion: { in: %w[active inactive] }
+          end
+        end
 
-    #     it "includes inclusion validation in field description" do
-    #       prompt = model.format_prompt(task)
+        it "includes inclusion validation in field description" do
+          prompt = model.format_prompt(task)
 
-    #       expected_description = <<~DESCRIPTION.chomp
-    #         # status
-    #         Description: The status
-    #         Type: string
-    #         Validations: must be one of: active, inactive
-    #         Example: "your status here"
-    #       DESCRIPTION
+          expected_description = <<~DESCRIPTION.chomp
+            # status
+            Description: The status
+            Type: string
+            Validations: must be one of: active, inactive
+            Example: "your status here"
+          DESCRIPTION
 
-    #       expect(prompt).to include(expected_description)
-    #     end
-    #   end
+          expect(prompt).to include(expected_description)
+        end
+      end
 
-    #   context "exclusion validation" do
-    #     before do
-    #       task_class.output_schema do
-    #         string :status, description: "The status"
-    #         validates :status, exclusion: { in: %w[banned blocked] }
-    #       end
-    #     end
+      context "exclusion validation" do
+        before do
+          task_class.output_schema do
+            string :status, description: "The status"
+            validates :status, exclusion: { in: %w[banned blocked] }
+          end
+        end
 
-    #     it "includes exclusion validation in field description" do
-    #       prompt = model.format_prompt(task)
+        it "includes exclusion validation in field description" do
+          prompt = model.format_prompt(task)
 
-    #       expected_description = <<~DESCRIPTION.chomp
-    #         # status
-    #         Description: The status
-    #         Type: string
-    #         Validations: must not be one of: banned, blocked
-    #         Example: "your status here"
-    #       DESCRIPTION
+          expected_description = <<~DESCRIPTION.chomp
+            # status
+            Description: The status
+            Type: string
+            Validations: must not be one of: banned, blocked
+            Example: "your status here"
+          DESCRIPTION
 
-    #       expect(prompt).to include(expected_description)
-    #     end
-    #   end
+          expect(prompt).to include(expected_description)
+        end
+      end
 
-    #   context "format validation" do
-    #     before do
-    #       task_class.output_schema do
-    #         string :email, description: "Email address"
-    #         validates :email, format: { with: /\A[^@\s]+@[^@\s]+\z/ }
-    #       end
-    #     end
+      context "format validation" do
+        before do
+          task_class.output_schema do
+            string :email, description: "Email address"
+            validates :email, format: { with: /\A[^@\s]+@[^@\s]+\z/ }
+          end
+        end
 
-    #     it "includes format validation in field description" do
-    #       prompt = model.format_prompt(task)
+        it "includes format validation in field description" do
+          prompt = model.format_prompt(task)
 
-    #       expected_description = <<~DESCRIPTION.chomp
-    #         # email
-    #         Description: Email address
-    #         Type: string
-    #         Validations: must match format: (?-mix:\\A[^@\\s]+@[^@\\s]+\\z)
-    #         Example: "your email here"
-    #       DESCRIPTION
+          expected_description = <<~DESCRIPTION.chomp
+            # email
+            Description: Email address
+            Type: string
+            Validations: must match format: (?-mix:\\A[^@\\s]+@[^@\\s]+\\z)
+            Example: "your email here"
+          DESCRIPTION
 
-    #       expect(prompt).to include(expected_description)
-    #     end
-    #   end
+          expect(prompt).to include(expected_description)
+        end
+      end
 
-    #   context "length validation" do
-    #     before do
-    #       task_class.output_schema do
-    #         string :password, description: "The password"
-    #         validates :password, length: { minimum: 8, maximum: 20 }
-    #       end
-    #     end
+      context "length validation" do
+        before do
+          task_class.output_schema do
+            string :password, description: "The password"
+            validates :password, length: { minimum: 8, maximum: 20 }
+          end
+        end
 
-    #     it "includes length validation in field description" do
-    #       prompt = model.format_prompt(task)
+        it "includes length validation in field description" do
+          prompt = model.format_prompt(task)
 
-    #       expected_description = <<~DESCRIPTION.chomp
-    #         # password
-    #         Description: The password
-    #         Type: string
-    #         Validations: must be at least 8 characters, must be at most 20 characters
-    #         Example: "your password here"
-    #       DESCRIPTION
+          expected_description = <<~DESCRIPTION.chomp
+            # password
+            Description: The password
+            Type: string
+            Validations: must have at least 8 characters, must have at most 20 characters
+            Example: "your password here"
+          DESCRIPTION
 
-    #       expect(prompt).to include(expected_description)
-    #     end
-    #   end
+          expect(prompt).to include(expected_description)
+        end
+      end
 
-    #   context "numericality validation" do
-    #     before do
-    #       task_class.output_schema do
-    #         integer :age, description: "The age"
-    #         validates :age,
-    #                   numericality: {
-    #                     greater_than: 0,
-    #                     less_than_or_equal_to: 120
-    #                   }
-    #       end
-    #     end
+      context "numericality validation" do
+        before do
+          task_class.output_schema do
+            integer :age, description: "The age"
+            validates :age,
+                      numericality: {
+                        greater_than: 0,
+                        less_than_or_equal_to: 120
+                      }
+          end
+        end
 
-    #     it "includes numericality validation in field description" do
-    #       prompt = model.format_prompt(task)
+        it "includes numericality validation in field description" do
+          prompt = model.format_prompt(task)
 
-    #       expected_description = <<~DESCRIPTION.chomp
-    #         # age
-    #         Description: The age
-    #         Type: integer
-    #         Validations: must be greater than 0, must be less than or equal to 120
-    #         Example: 0
-    #       DESCRIPTION
+          expected_description = <<~DESCRIPTION.chomp
+            # age
+            Description: The age
+            Type: integer
+            Validations: must be greater than 0, must be less than or equal to 120
+            Example: 0
+          DESCRIPTION
 
-    #       expect(prompt).to include(expected_description)
-    #     end
-    #   end
+          expect(prompt).to include(expected_description)
+        end
+      end
 
-    #   context "multiple validations" do
-    #     before do
-    #       task_class.output_schema do
-    #         string :username, description: "The username"
-    #         validates :username,
-    #                   presence: true,
-    #                   length: {
-    #                     in: 3..20
-    #                   },
-    #                   format: {
-    #                     with: /\A[a-z0-9_]+\z/
-    #                   }
-    #       end
-    #     end
+      context "multiple validations" do
+        before do
+          task_class.output_schema do
+            string :username, description: "The username"
+            validates :username,
+                      presence: true,
+                      length: {
+                        in: 3..20
+                      },
+                      format: {
+                        with: /\A[a-z0-9_]+\z/
+                      }
+          end
+        end
 
-    #     it "includes all validations in field description" do
-    #       prompt = model.format_prompt(task)
+        it "includes all validations in field description" do
+          prompt = model.format_prompt(task)
 
-    #       expected_description = <<~DESCRIPTION.chomp
-    #         # username
-    #         Description: The username
-    #         Type: string
-    #         Validations: must be present, must be between 3 and 20 characters, must match format: (?-mix:\\A[a-z0-9_]+\\z)
-    #         Example: "your username here"
-    #       DESCRIPTION
+          expected_description = <<~DESCRIPTION.chomp
+            # username
+            Description: The username
+            Type: string
+            Validations: must be present, must have between 3 and 20 characters, must match format: (?-mix:\\A[a-z0-9_]+\\z)
+            Example: "your username here"
+          DESCRIPTION
 
-    #       expect(prompt).to include(expected_description)
-    #     end
-    #   end
-    # end
+          expect(prompt).to include(expected_description)
+        end
+      end
+
+      context "array validations" do
+        context "presence validation" do
+          before do
+            task_class.output_schema do
+              array :tags, description: "List of tags" do
+                string
+              end
+              validates :tags, presence: true
+            end
+          end
+
+          it "includes presence validation in array description" do
+            prompt = model.format_prompt(task)
+
+            expected_description = <<~DESCRIPTION.chomp
+              # tags
+              Description: List of tags
+              Type: array of strings
+              Validations: must be present
+              Example: ["first tag","second tag"]
+            DESCRIPTION
+
+            expect(prompt).to include(expected_description)
+          end
+        end
+
+        context "length validation - minimum" do
+          before do
+            task_class.output_schema do
+              array :categories, description: "List of categories" do
+                string
+              end
+              validates :categories, length: { minimum: 2 }
+            end
+          end
+
+          it "includes minimum length validation in array description" do
+            prompt = model.format_prompt(task)
+
+            expected_description = <<~DESCRIPTION.chomp
+              # categories
+              Description: List of categories
+              Type: array of strings
+              Validations: must have at least 2 elements
+              Example: ["first category","second category"]
+            DESCRIPTION
+
+            expect(prompt).to include(expected_description)
+          end
+        end
+
+        context "length validation - maximum" do
+          before do
+            task_class.output_schema do
+              array :roles, description: "User roles" do
+                string
+              end
+              validates :roles, length: { maximum: 5 }
+            end
+          end
+
+          it "includes maximum length validation in array description" do
+            prompt = model.format_prompt(task)
+
+            expected_description = <<~DESCRIPTION.chomp
+              # roles
+              Description: User roles
+              Type: array of strings
+              Validations: must have at most 5 elements
+              Example: ["first role","second role"]
+            DESCRIPTION
+
+            expect(prompt).to include(expected_description)
+          end
+        end
+
+        context "length validation - range" do
+          before do
+            task_class.output_schema do
+              array :features, description: "Product features" do
+                string
+              end
+              validates :features, length: { in: 2..4 }
+            end
+          end
+
+          it "includes range length validation in array description" do
+            prompt = model.format_prompt(task)
+
+            expected_description = <<~DESCRIPTION.chomp
+              # features
+              Description: Product features
+              Type: array of strings
+              Validations: must have between 2 and 4 elements
+              Example: ["first feature","second feature"]
+            DESCRIPTION
+
+            expect(prompt).to include(expected_description)
+          end
+        end
+
+        context "length validation - exact" do
+          before do
+            task_class.output_schema do
+              array :coordinates, description: "Point coordinates" do
+                float
+              end
+              validates :coordinates, length: { is: 3 }
+            end
+          end
+
+          it "includes exact length validation in array description" do
+            prompt = model.format_prompt(task)
+
+            expected_description = <<~DESCRIPTION.chomp
+              # coordinates
+              Description: Point coordinates
+              Type: array of floats
+              Validations: must have exactly 3 elements
+              Example: [1.0,2.0,3.0]
+            DESCRIPTION
+
+            expect(prompt).to include(expected_description)
+          end
+        end
+
+        context "absence validation" do
+          before do
+            task_class.output_schema do
+              array :deprecated_fields, description: "Deprecated fields" do
+                string
+              end
+              validates :deprecated_fields, absence: true
+            end
+          end
+
+          it "includes absence validation in array description" do
+            prompt = model.format_prompt(task)
+
+            expected_description = <<~DESCRIPTION.chomp
+              # deprecated_fields
+              Description: Deprecated fields
+              Type: array of strings
+              Validations: must be absent
+              Example: ["first deprecated_field","second deprecated_field"]
+            DESCRIPTION
+
+            expect(prompt).to include(expected_description)
+          end
+        end
+      end
+    end
 
     # context "JSON example generation" do
     #   context "with simple field types" do

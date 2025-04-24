@@ -106,7 +106,7 @@ module Lluminary
         lines << "Description: #{field[:description]}" if field[:description]
         lines << "Type: #{format_type(field)}"
 
-        if (validations = describe_validations(field[:validations]))
+        if (validations = describe_validations(field[:validations], field))
           lines << "Validations: #{validations}"
         end
 
@@ -122,7 +122,7 @@ module Lluminary
         lines << "Description: #{field[:description]}" if field[:description]
         lines << "Type: #{format_type(field)}"
 
-        if (validations = describe_validations(field[:validations]))
+        if (validations = describe_validations(field[:validations], field))
           lines << "Validations: #{validations}"
         end
 
@@ -158,7 +158,7 @@ module Lluminary
         lines << "Description: #{field[:description]}" if field[:description]
         lines << "Type: #{format_type(field)}"
 
-        if (validations = describe_validations(field[:validations]))
+        if (validations = describe_validations(field[:validations], field))
           lines << "Validations: #{validations}"
         end
 
@@ -218,7 +218,7 @@ module Lluminary
         end
       end
 
-      def describe_validations(validations)
+      def describe_validations(validations, field)
         return unless validations&.any?
 
         validations
@@ -233,7 +233,7 @@ module Lluminary
             when :format
               "must match format: #{options[:format][:with]}"
             when :length
-              describe_length_validation(options[:length])
+              describe_length_validation(options[:length], field[:type])
             when :numericality
               describe_numericality_validation(options[:numericality])
             when :comparison
@@ -246,19 +246,21 @@ module Lluminary
           .join(", ")
       end
 
-      def describe_length_validation(options)
+      def describe_length_validation(options, field_type = nil)
         descriptions = []
+        units = field_type == :array ? "elements" : "characters"
+
         if options[:minimum]
-          descriptions << "must be at least #{options[:minimum]} characters"
+          descriptions << "must have at least #{options[:minimum]} #{units}"
         end
         if options[:maximum]
-          descriptions << "must be at most #{options[:maximum]} characters"
+          descriptions << "must have at most #{options[:maximum]} #{units}"
         end
         if options[:is]
-          descriptions << "must be exactly #{options[:is]} characters"
+          descriptions << "must have exactly #{options[:is]} #{units}"
         end
         if options[:in]
-          descriptions << "must be between #{options[:in].min} and #{options[:in].max} characters"
+          descriptions << "must have between #{options[:in].min} and #{options[:in].max} #{units}"
         end
         descriptions.join(", ")
       end
