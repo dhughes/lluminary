@@ -1035,463 +1035,348 @@ RSpec.describe Lluminary::Models::Base do
       end
     end
 
-    # context "JSON example generation" do
-    #   context "with simple field types" do
-    #     it "generates correct JSON example for string field" do
-    #       task_class.output_schema do
-    #         string :name, description: "The person's name"
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_json = <<~JSON.chomp
-    #         {
-    #           "name": "your name here"
-    #         }
-    #       JSON
-
-    #       expect(prompt).to include(expected_json)
-    #     end
-
-    #     it "generates correct JSON example for integer field" do
-    #       task_class.output_schema do
-    #         integer :age, description: "The person's age"
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_json = <<~JSON.chomp
-    #         {
-    #           "age": 0
-    #         }
-    #       JSON
-
-    #       expect(prompt).to include(expected_json)
-    #     end
-
-    #     it "generates correct JSON example for boolean field" do
-    #       task_class.output_schema do
-    #         boolean :is_active, description: "Whether the person is active"
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_json = <<~JSON.chomp
-    #         {
-    #           "is_active": true
-    #         }
-    #       JSON
-
-    #       expect(prompt).to include(expected_json)
-    #     end
-
-    #     it "generates correct JSON example for float field" do
-    #       task_class.output_schema { float :score, description: "The score" }
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_json = <<~JSON.chomp
-    #         {
-    #           "score": 0.0
-    #         }
-    #       JSON
-
-    #       expect(prompt).to include(expected_json)
-    #     end
-
-    #     it "generates correct JSON example for datetime field" do
-    #       task_class.output_schema do
-    #         datetime :created_at, description: "When it was created"
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_json = <<~JSON.chomp
-    #         {
-    #           "created_at": "2024-01-01T12:00:00+00:00"
-    #         }
-    #       JSON
-
-    #       expect(prompt).to include(expected_json)
-    #     end
-    #   end
-
-    #   context "with array fields" do
-    #     it "generates correct JSON example for array of strings" do
-    #       task_class.output_schema do
-    #         array :tags, description: "List of tags" do
-    #           string
-    #         end
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_json = <<~JSON.chomp
-    #         {
-    #           "tags": [
-    #             "first tag",
-    #             "second tag"
-    #           ]
-    #         }
-    #       JSON
-
-    #       expect(prompt).to include(expected_json)
-    #     end
-
-    #     it "generates correct JSON example for array of integers" do
-    #       task_class.output_schema do
-    #         array :counts, description: "List of counts" do
-    #           integer
-    #         end
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_json = <<~JSON.chomp
-    #         {
-    #           "counts": [
-    #             1,
-    #             2,
-    #             3
-    #           ]
-    #         }
-    #       JSON
-
-    #       expect(prompt).to include(expected_json)
-    #     end
-
-    #     it "generates correct JSON example for array of datetimes" do
-    #       task_class.output_schema do
-    #         array :timestamps, description: "List of timestamps" do
-    #           datetime
-    #         end
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_json = <<~JSON.chomp
-    #         {
-    #           "timestamps": [
-    #             "2024-01-01T12:00:00+00:00",
-    #             "2024-01-02T12:00:00+00:00"
-    #           ]
-    #         }
-    #       JSON
-
-    #       expect(prompt).to include(expected_json)
-    #     end
-
-    #     it "generates correct JSON example for array without element type" do
-    #       task_class.output_schema do
-    #         array :items, description: "List of items"
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_json = <<~JSON.chomp
-    #         {
-    #           "items": []
-    #         }
-    #       JSON
-
-    #       expect(prompt).to include(expected_json)
-    #     end
-
-    #     it "generates correct JSON example for nested array of strings" do
-    #       task_class.output_schema do
-    #         array :groups, description: "Groups of items" do
-    #           array { string }
-    #         end
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_json = <<~JSON.chomp
-    #         {
-    #           "groups": [
-    #             [
-    #               "first item",
-    #               "second item"
-    #             ],
-    #             [
-    #               "first item",
-    #               "second item"
-    #             ]
-    #           ]
-    #         }
-    #       JSON
-
-    #       expect(prompt).to include(expected_json)
-    #     end
-
-    #     it "generates correct JSON example for three-dimensional array of integers" do
-    #       task_class.output_schema do
-    #         array :matrices, description: "Collection of matrices" do
-    #           array { array { integer } }
-    #         end
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_json = <<~JSON.chomp
-    #         {
-    #           "matrices": [
-    #             [
-    #               [
-    #                 1,
-    #                 2,
-    #                 3
-    #               ],
-    #               [
-    #                 1,
-    #                 2,
-    #                 3
-    #               ]
-    #             ],
-    #             [
-    #               [
-    #                 1,
-    #                 2,
-    #                 3
-    #               ],
-    #               [
-    #                 1,
-    #                 2,
-    #                 3
-    #               ]
-    #             ]
-    #           ]
-    #         }
-    #       JSON
-
-    #       expect(prompt).to include(expected_json)
-    #     end
-    #   end
-
-    #   context "with multiple fields" do
-    #     it "generates correct JSON example for mixed field types" do
-    #       task_class.output_schema do
-    #         string :name, description: "The person's name"
-    #         integer :age, description: "The person's age"
-    #         array :hobbies, description: "List of hobbies" do
-    #           string
-    #         end
-    #         datetime :joined_at, description: "When they joined"
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_json = <<~JSON.chomp
-    #         {
-    #           "name": "your name here",
-    #           "age": 0,
-    #           "hobbies": [
-    #             "first hobby",
-    #             "second hobby"
-    #           ],
-    #           "joined_at": "2024-01-01T12:00:00+00:00"
-    #         }
-    #       JSON
-
-    #       expect(prompt).to include(expected_json)
-    #     end
-    #   end
-
-    #   context "with hash fields" do
-    #     it "generates correct JSON example for simple hash" do
-    #       task_class.output_schema do
-    #         hash :config do
-    #           string :host
-    #           integer :port
-    #         end
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_description = <<~DESCRIPTION.chomp
-    #         # config
-    #         Description: The configuration
-    #         Type: object
-    #         Example: {
-    #           "host": "your host here",
-    #           "port": 0
-    #         }
-
-    #         # config.host
-    #         Description: The host
-    #         Type: string
-    #         Example: "your host here"
-
-    #         # config.port
-    #         Type: integer
-    #         Example: 0
-    #       DESCRIPTION
-
-    #       expect(prompt).to include(expected_description)
-    #     end
-
-    #     it "generates correct JSON example for simple hash with descriptions" do
-    #       task_class.output_schema do
-    #         hash :config, description: "The configuration" do
-    #           string :host, description: "The host"
-    #           integer :port
-    #         end
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_description = <<~DESCRIPTION.chomp
-    #         # config
-    #         Description: The configuration
-    #         Type: object
-    #         Example: {
-    #           "host": "your host here",
-    #           "port": 0
-    #         }
-
-    #         # config.host
-    #         Description: The host
-    #         Type: string
-    #         Example: "your host here"
-
-    #         # config.port
-    #         Type: integer
-    #         Example: 0
-    #       DESCRIPTION
-
-    #       expect(prompt).to include(expected_description)
-    #     end
-
-    #     it "generates correct JSON example for nested hash" do
-    #       task_class.output_schema do
-    #         hash :config do
-    #           string :name
-    #           hash :database, description: "The database configuration" do
-    #             string :host, description: "The host"
-    #             integer :port
-    #           end
-    #         end
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_description = <<~DESCRIPTION.chomp
-    #         # config
-    #         Description: The configuration
-    #         Type: object
-    #         Example: {
-    #           "name": "your name here",
-    #           "database": {
-    #             "host": "your host here",
-    #             "port": 0
-    #           }
-    #         }
-
-    #         # config.name
-    #         Type: string
-    #         Example: "your name here"
-
-    #         # config.database
-    #         Description: The database configuration
-    #         Type: object
-    #         Example: {
-    #           "host": "your host here",
-    #           "port": 0
-    #         }
-
-    #         # config.database.host
-    #         Description: The host
-    #         Type: string
-    #         Example: "your host here"
-
-    #         # config.database.port
-    #         Type: integer
-    #         Example: 0
-    #       DESCRIPTION
-
-    #       puts ">>>> expected_description"
-    #       puts expected_description
-    #       puts ">>>>"
-
-    #       puts ">>>> prompt"
-    #       puts prompt
-    #       puts ">>>>"
-
-    #       expect(prompt).to include(expected_description)
-    #     end
-
-    #     it "generates correct JSON example for hash with array" do
-    #       task_class.output_schema do
-    #         hash :config do
-    #           string :name
-    #           array :tags do
-    #             string
-    #           end
-    #         end
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_description = <<~DESCRIPTION.chomp
-    #         # config
-    #         Description: The configuration
-    #         Type: object
-    #         Example: {
-    #           "name": "your name here",
-    #           "tags": ["first tag", "second tag"]
-    #         }
-
-    #         # config.name
-    #         Type: string
-    #         Example: "your name here"
-
-    #         # config.tags
-    #         Type: array of strings
-    #         Example: ["first tag", "second tag"]
-    #       DESCRIPTION
-
-    #       expect(prompt).to include(expected_description)
-    #     end
-
-    #     it "generates correct JSON example for array of objects" do
-    #       task_class.output_schema do
-    #         array :users do
-    #           hash do
-    #             string :name
-    #             integer :age, description: "The person's age"
-    #           end
-    #         end
-    #       end
-
-    #       prompt = model.format_prompt(task)
-
-    #       expected_description = <<~DESCRIPTION.chomp
-    #         # users
-    #         Type: array of objects
-    #         Example: [
-    #           {
-    #             "name": "your name here",
-    #             "age": 0
-    #           },
-    #           {
-    #             "name": "your name here",
-    #             "age": 0
-    #           }
-    #         ]
-
-    #         # users[].name
-    #         Type: string
-    #         Example: "your name here"
-
-    #         # users[].age
-    #         Description: The person's age
-    #         Type: integer
-    #         Example: 0
-    #       DESCRIPTION
-
-    #       expect(prompt).to include(expected_description)
-    #     end
-    #   end
-    # end
+    context "JSON example generation" do
+      context "with simple field types" do
+        it "generates correct JSON example for string field" do
+          task_class.output_schema do
+            string :name, description: "The person's name"
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+          {
+            "name": "your name here"
+          }
+        JSON
+
+          expect(prompt).to include(expected_json)
+        end
+
+        it "generates correct JSON example for integer field" do
+          task_class.output_schema do
+            integer :age, description: "The person's age"
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+            {
+              "age": 0
+            }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+
+        it "generates correct JSON example for boolean field" do
+          task_class.output_schema do
+            boolean :is_active, description: "Whether the person is active"
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+            {
+              "is_active": true
+            }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+
+        it "generates correct JSON example for float field" do
+          task_class.output_schema { float :score, description: "The score" }
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+            {
+              "score": 0.0
+            }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+
+        it "generates correct JSON example for datetime field" do
+          task_class.output_schema do
+            datetime :created_at, description: "When it was created"
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+            {
+              "created_at": "2024-01-01T12:00:00+00:00"
+            }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+      end
+
+      context "with array fields" do
+        it "generates correct JSON example for array of strings" do
+          task_class.output_schema do
+            array :tags, description: "List of tags" do
+              string
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+            {
+              "tags": [
+                "first tag",
+                "second tag"
+              ]
+            }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+
+        it "generates correct JSON example for array of integers" do
+          task_class.output_schema do
+            array :counts, description: "List of counts" do
+              integer
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+            {
+              "counts": [
+                1,
+                2,
+                3
+              ]
+            }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+
+        it "generates correct JSON example for array of datetimes" do
+          task_class.output_schema do
+            array :timestamps, description: "List of timestamps" do
+              datetime
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+            {
+              "timestamps": [
+                "2024-01-01T12:00:00+00:00",
+                "2024-01-02T12:00:00+00:00"
+              ]
+            }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+
+        it "generates correct JSON example for array without element type" do
+          task_class.output_schema do
+            array :items, description: "List of items"
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+            {
+              "items": []
+            }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+
+        it "generates correct JSON example for nested array of strings" do
+          task_class.output_schema do
+            array :groups, description: "Groups of items" do
+              array { string }
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+            {
+              "groups": [
+                [
+                  "first item",
+                  "second item"
+                ],
+                [
+                  "first item",
+                  "second item"
+                ]
+              ]
+            }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+
+        it "generates correct JSON example for three-dimensional array of integers" do
+          task_class.output_schema do
+            array :matrices, description: "Collection of matrices" do
+              array { array { integer } }
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+            {
+              "matrices": [
+                [
+                  [
+                    1,
+                    2,
+                    3
+                  ],
+                  [
+                    1,
+                    2,
+                    3
+                  ]
+                ],
+                [
+                  [
+                    1,
+                    2,
+                    3
+                  ],
+                  [
+                    1,
+                    2,
+                    3
+                  ]
+                ]
+              ]
+            }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+      end
+
+      context "with multiple fields" do
+        it "generates correct JSON example for mixed field types" do
+          task_class.output_schema do
+            string :name, description: "The person's name"
+            integer :age, description: "The person's age"
+            array :hobbies, description: "List of hobbies" do
+              string
+            end
+            datetime :joined_at, description: "When they joined"
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+              {
+                "name": "your name here",
+                "age": 0,
+                "hobbies": [
+                  "first hobby",
+                  "second hobby"
+                ],
+                "joined_at": "2024-01-01T12:00:00+00:00"
+              }
+            JSON
+
+          expect(prompt).to include(expected_json)
+        end
+      end
+
+      context "with hash fields" do
+        it "generates correct JSON example for simple hash" do
+          task_class.output_schema do
+            hash :config, description: "Configuration options" do
+              string :host, description: "Server hostname"
+              integer :port
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+          {
+            "config": {
+              "host": "your host here",
+              "port": 0
+            }
+          }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+
+        it "generates correct JSON example for nested hash" do
+          task_class.output_schema do
+            hash :user, description: "User profile" do
+              string :name
+              hash :address do
+                string :street
+                string :city
+                string :country
+              end
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+          {
+            "user": {
+              "name": "your name here",
+              "address": {
+                "street": "your street here",
+                "city": "your city here",
+                "country": "your country here"
+              }
+            }
+          }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+
+        it "generates correct JSON example for hash with array" do
+          task_class.output_schema do
+            hash :user_data, description: "User data" do
+              string :username
+              array :permissions do
+                string
+              end
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+          {
+            "user_data": {
+              "username": "your username here",
+              "permissions": [
+                "first permission",
+                "second permission"
+              ]
+            }
+          }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+      end
+    end
   end
 end

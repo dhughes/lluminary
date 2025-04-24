@@ -136,21 +136,26 @@ module Lluminary
         lines << "Example: #{format_json_for_examples(example_value)}"
 
         # Handle nested array fields
-        if field[:element_type][:type] == :array
-          nested_description =
-            format_nested_array_descriptions("#{name}[]", field[:element_type])
-          lines << "\n#{nested_description}" if nested_description
-          # Add this block to handle hash elements inside arrays
-        elsif field[:element_type][:type] == :hash &&
-              field[:element_type][:fields]
-          field[:element_type][:fields].each do |subname, subfield|
-            lines << "\n# #{name}[].#{subname}"
-            if subfield[:description]
-              lines << "Description: #{subfield[:description]}"
+        if field[:element_type]
+          if field[:element_type][:type] == :array
+            nested_description =
+              format_nested_array_descriptions(
+                "#{name}[]",
+                field[:element_type]
+              )
+            lines << "\n#{nested_description}" if nested_description
+            # Add this block to handle hash elements inside arrays
+          elsif field[:element_type][:type] == :hash &&
+                field[:element_type][:fields]
+            field[:element_type][:fields].each do |subname, subfield|
+              lines << "\n# #{name}[].#{subname}"
+              if subfield[:description]
+                lines << "Description: #{subfield[:description]}"
+              end
+              lines << "Type: #{format_type(subfield)}"
+              example_value = generate_example_value(subname, subfield)
+              lines << "Example: #{example_value.inspect}"
             end
-            lines << "Type: #{format_type(subfield)}"
-            example_value = generate_example_value(subname, subfield)
-            lines << "Example: #{example_value.inspect}"
           end
         end
 
@@ -207,7 +212,9 @@ module Lluminary
         when :datetime
           "datetime in ISO8601 format"
         when :array
-          if field[:element_type][:type] == :array
+          if field[:element_type].nil?
+            "array"
+          elsif field[:element_type][:type] == :array
             "array of arrays"
           elsif field[:element_type][:type] == :datetime
             "array of datetimes in ISO8601 format"
