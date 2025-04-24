@@ -29,7 +29,7 @@ module Lluminary
           
           #{json_preamble}
           
-          #{format_json_example(task.class.output_fields)}
+          #{generate_example_json_object(task.class.output_fields)}
         PROMPT
       end
 
@@ -65,21 +65,7 @@ module Lluminary
       def format_hash_description(name, field)
         return nil unless field[:fields]
 
-        lines = []
-        # Add hash field description
-        lines << "# #{name}"
-        lines << "Description: #{field[:description]}" if field[:description]
-        lines << "Type: object"
-
-        # Add validation info for the hash field itself
-        if (validations = describe_validations(field))
-          lines << "Validations: #{validations}"
-        end
-
-        example_value = generate_hash_example(name, field)
-        # Format example on a single line - ensure all hashes are converted to JSON
-        example_json = format_json_for_examples(example_value)
-        lines << "Example: #{example_json}"
+        lines = build_field_description_lines(name, field)
 
         # Add descriptions for each field in the hash
         field[:fields].each do |subname, subfield|
@@ -96,9 +82,7 @@ module Lluminary
       # Helper to ensure consistent JSON formatting for examples
       def format_json_for_examples(value)
         case value
-        when Hash
-          JSON.generate(value)
-        when Array
+        when Hash, Array
           JSON.generate(value)
         else
           value.inspect
@@ -106,34 +90,11 @@ module Lluminary
       end
 
       def format_simple_field_description(name, field)
-        lines = []
-        lines << "# #{name}"
-        lines << "Description: #{field[:description]}" if field[:description]
-        lines << "Type: #{format_type(field)}"
-
-        if (validations = describe_validations(field))
-          lines << "Validations: #{validations}"
-        end
-
-        example_value = generate_example_value(name.to_s.split(".").last, field)
-        lines << "Example: #{example_value.inspect}"
-
-        lines.join("\n")
+        build_field_description_lines(name, field).join("\n")
       end
 
       def format_array_description(name, field)
-        lines = []
-        lines << "# #{name}"
-        lines << "Description: #{field[:description]}" if field[:description]
-        lines << "Type: #{format_type(field)}"
-
-        if (validations = describe_validations(field))
-          lines << "Validations: #{validations}"
-        end
-
-        example_value = generate_array_example(name, field)
-        # Use the same formatting helper as for hashes
-        lines << "Example: #{format_json_for_examples(example_value)}"
+        lines = build_field_description_lines(name, field)
 
         # Handle nested array fields
         if field[:element_type]
@@ -144,17 +105,20 @@ module Lluminary
                 field[:element_type]
               )
             lines << "\n#{nested_description}" if nested_description
-            # Add this block to handle hash elements inside arrays
           elsif field[:element_type][:type] == :hash &&
                 field[:element_type][:fields]
             field[:element_type][:fields].each do |subname, subfield|
-              lines << "\n# #{name}[].#{subname}"
-              if subfield[:description]
-                lines << "Description: #{subfield[:description]}"
-              end
-              lines << "Type: #{format_type(subfield)}"
-              example_value = generate_example_value(subname, subfield)
-              lines << "Example: #{example_value.inspect}"
+              inner_field = {
+                type: subfield[:type],
+                description: subfield[:description]
+              }
+              inner_lines =
+                build_field_description_lines(
+                  "#{name}[].#{subname}",
+                  inner_field,
+                  subname
+                )
+              lines << "\n#{inner_lines.join("\n")}"
             end
           end
         end
@@ -162,14 +126,32 @@ module Lluminary
         lines.join("\n")
       end
 
-      def format_nested_array_descriptions(prefix, field)
+      # Common method for building field description lines
+      def build_field_description_lines(name, field, name_for_example = nil)
         lines = []
-        lines << "# #{prefix}"
+        # Add field description
+        lines << "# #{name}"
         lines << "Description: #{field[:description]}" if field[:description]
         lines << "Type: #{format_type(field)}"
-        example_value = generate_array_example("item", field)
-        # Use the same formatting helper as for hashes
+
+        # Add validation info
+        if (validations = describe_validations(field))
+          lines << "Validations: #{validations}"
+        end
+
+        # Generate and add example
+        example_value =
+          generate_example_value(
+            name_for_example || name.to_s.split(".").last,
+            field
+          )
         lines << "Example: #{format_json_for_examples(example_value)}"
+
+        lines
+      end
+
+      def format_nested_array_descriptions(prefix, field)
+        lines = build_field_description_lines(prefix, field, "item")
 
         if field[:element_type][:type] == :array
           nested_description =
@@ -179,13 +161,16 @@ module Lluminary
             )
           lines << "\n#{nested_description}" if nested_description
         else
-          # Always add description for the innermost element
-          lines << "\n# #{prefix}[]"
-          if field[:element_type][:description]
-            lines << "Description: #{field[:element_type][:description]}"
-          end
-          lines << "Type: #{field[:element_type][:type]}"
-          lines << "Example: #{generate_example_value("item", field[:element_type]).inspect}"
+          # Use the common method for the innermost element, building up a
+          # temporary field hash with the element_type properties
+          inner_field = {
+            type: field[:element_type][:type],
+            description: field[:element_type][:description]
+          }
+          inner_lines =
+            build_field_description_lines("#{prefix}[]", inner_field, "item")
+
+          lines << "\n#{inner_lines.join("\n")}"
         end
 
         lines.join("\n")
@@ -300,7 +285,7 @@ module Lluminary
         descriptions
       end
 
-      def format_json_example(fields)
+      def generate_example_json_object(fields)
         example =
           fields.each_with_object({}) do |(name, field), hash|
             hash[name] = generate_example_value(name, field)

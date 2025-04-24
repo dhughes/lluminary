@@ -589,7 +589,7 @@ RSpec.describe Lluminary::Models::Base do
             # user.tags
             Description: User tags
             Type: array of strings
-            Example: ["first tag", "second tag"]
+            Example: ["first tag","second tag"]
           DESCRIPTION
 
           expect(prompt).to include(expected_description)
