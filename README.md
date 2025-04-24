@@ -118,7 +118,69 @@ Lluminary supports these field types:
    end
    ```
 
+   Arrays can also contain hashes (objects), allowing for lists of structured data:
+   ```ruby
+   class ProductListTask < Lluminary::Task
+     output_schema do
+       array :products, description: "List of products" do
+         hash do
+           string :name, description: "Product name"
+           float :price, description: "Product price"
+           integer :stock, description: "Units in stock"
+         end
+       end
+     end
+   end
+   ```
+
    When used in output schemas, the LLM will be instructed to return arrays in the appropriate format based on the element type.
+
+7. **Hash** (Object)  
+   Hashes allow you to define nested structured data with their own sets of fields. You can nest hashes within each other to create complex data structures.
+   
+   Usage example:  
+   ```ruby
+   class UserProfileTask < Lluminary::Task
+     output_schema do
+       hash :user, description: "User profile data" do
+         string :name, description: "User's full name"
+         integer :age
+         hash :address do
+           string :street, description: "Street address"
+           string :city
+           string :country
+         end
+       end
+     end
+   end
+   ```
+
+   Hash fields can contain any other field types, including nested hashes, arrays, and primitive types:
+   ```ruby
+   class UserDataTask < Lluminary::Task
+     output_schema do
+       hash :user_data, description: "Complete user information" do
+         string :username
+         # Nested hash
+         hash :contact_info do
+           string :email
+           string :phone
+         end
+         # Array within a hash
+         array :permissions do
+           string
+         end
+         # Hash with datetime
+         hash :account_info do
+           datetime :created_at, description: "Account creation date"
+           boolean :is_active
+         end
+       end
+     end
+   end
+   ```
+
+   When used in output schemas, the LLM will be instructed to return the hash with all its nested fields in the correct structure.
 
 All of these field definitions allow nil values by default, ensuring that optional data can be omitted.
 
@@ -346,6 +408,8 @@ class AnalyzeText < Lluminary::Task
   end
 end
 ```
+
+These descriptions are automatically formatted and included in prompts to the LLM, helping it understand the expected structure and content of each field, including nested objects and arrays.
 
 ### Input and Output Validation
 
