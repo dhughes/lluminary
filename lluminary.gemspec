@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 Gem::Specification.new do |s|
   s.name = "lluminary"
-  s.version = "0.1.4"
+  s.version = "0.2.0"
   s.summary = "A library for building LLM-powered applications"
   s.description = <<~DESC
     Lluminary is a framework for building applications that leverage Large Language Models. It provides a structured way to define tasks, manage prompts, and handle LLM interactions.
