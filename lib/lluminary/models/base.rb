@@ -72,7 +72,7 @@ module Lluminary
         lines << "Type: object"
 
         # Add validation info for the hash field itself
-        if (validations = describe_validations(field[:validations], field))
+        if (validations = describe_validations(field))
           lines << "Validations: #{validations}"
         end
 
@@ -111,7 +111,7 @@ module Lluminary
         lines << "Description: #{field[:description]}" if field[:description]
         lines << "Type: #{format_type(field)}"
 
-        if (validations = describe_validations(field[:validations], field))
+        if (validations = describe_validations(field))
           lines << "Validations: #{validations}"
         end
 
@@ -127,7 +127,7 @@ module Lluminary
         lines << "Description: #{field[:description]}" if field[:description]
         lines << "Type: #{format_type(field)}"
 
-        if (validations = describe_validations(field[:validations], field))
+        if (validations = describe_validations(field))
           lines << "Validations: #{validations}"
         end
 
@@ -214,11 +214,10 @@ module Lluminary
         end
       end
 
-      # TODO: field contains validations, why pass validations in separately?
-      def describe_validations(validations, field)
-        return unless validations&.any?
+      def describe_validations(field)
+        return unless field[:validations]&.any?
 
-        validations
+        field[:validations]
           .map do |options|
             case options.keys.first
             when :presence
