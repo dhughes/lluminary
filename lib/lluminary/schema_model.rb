@@ -19,13 +19,14 @@ module Lluminary
       "#<#{self.class.name} #{attrs.inspect}>"
     end
 
-    def self.build(fields:, validations:)
+    def self.build(fields:, validations:, custom_validations: [])
       Class.new(self) do
         class << self
-          attr_accessor :schema_fields
+          attr_accessor :schema_fields, :custom_validation_methods
         end
 
         self.schema_fields = fields
+        self.custom_validation_methods = custom_validations
 
         # Add accessors for each field
         fields.each_key do |name|

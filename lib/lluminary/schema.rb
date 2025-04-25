@@ -9,6 +9,7 @@ module Lluminary
     def initialize
       @fields = {}
       @validations = []
+      @custom_validations = []
     end
 
     def string(name, description: nil)
@@ -57,7 +58,7 @@ module Lluminary
       }
     end
 
-    attr_reader :fields
+    attr_reader :fields, :custom_validations
 
     def validates(*args, **options)
       @validations << [args, options]
@@ -72,13 +73,22 @@ module Lluminary
       end
     end
 
+    # Add support for custom validation methods
+    def validate_with(method_name)
+      @custom_validations << method_name
+    end
+
     def validations_for(field_name)
       @validations.select { |args, _| args.include?(field_name) }
     end
 
     def schema_model
       @schema_model ||=
-        SchemaModel.build(fields: @fields, validations: @validations)
+        SchemaModel.build(
+          fields: @fields,
+          validations: @validations,
+          custom_validations: @custom_validations
+        )
     end
 
     def validate(values)
