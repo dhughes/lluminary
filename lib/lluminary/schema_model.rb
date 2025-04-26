@@ -8,6 +8,7 @@ module Lluminary
     include ActiveModel::Validations
 
     attr_reader :attributes
+    attr_accessor :task_instance
 
     def initialize(attributes = {})
       @attributes = attributes.transform_keys(&:to_s)
@@ -38,6 +39,27 @@ module Lluminary
         define_method(:raw_response) { @attributes["raw_response"] }
         define_method("raw_response=") do |value|
           @attributes["raw_response"] = value
+        end
+
+        # Add custom validation hook
+        validate do |record|
+          # Run custom validations from the task if present
+          if record.task_instance &&
+               !record.class.custom_validation_methods.empty?
+            initial_error_count = record.errors.count
+            # Track if any validation methods add errors
+            record.class.custom_validation_methods.each do |method_name|
+              if record.task_instance.respond_to?(method_name)
+                record.task_instance.send(method_name)
+              end
+            end
+            # If new errors were added, ensure the model is invalid by adding a base error if needed
+            if record.errors.count > initial_error_count
+              if record.errors.empty?
+                record.errors.add(:base, "Custom validation failed")
+              end
+            end
+          end
         end
 
         validate do |record|

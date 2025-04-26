@@ -47,7 +47,6 @@ end
 if __FILE__ == $PROGRAM_NAME
   puts "#> Running SentimentAnalyzerWithValidation example"
 
-  # Example with valid input
   puts "\n# Example with valid input"
   result = SentimentAnalyzerWithValidation.call(text: "I love this product!")
 

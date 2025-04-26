@@ -10,6 +10,22 @@ RSpec.describe Lluminary::Schema do
     end
   end
 
+  describe "#validate" do
+    it "registers a custom validation method" do
+      schema.validate(:validate_something)
+      expect(schema.custom_validations).to contain_exactly(:validate_something)
+    end
+
+    it "can register multiple validation methods" do
+      schema.validate(:validate_something)
+      schema.validate(:validate_something_else)
+      expect(schema.custom_validations).to contain_exactly(
+        :validate_something,
+        :validate_something_else
+      )
+    end
+  end
+
   describe "#string" do
     it "adds a string field to the schema" do
       schema.string(:name)
@@ -536,7 +552,7 @@ RSpec.describe Lluminary::Schema do
     end
   end
 
-  describe "#validate" do
+  describe "#check_validity" do
     let(:schema) do
       described_class.new.tap do |s|
         s.string(:name)
@@ -686,6 +702,32 @@ RSpec.describe Lluminary::Schema do
       schema_model = schema.schema_model
       instance = schema_model.new(name: "John", age: 30)
       expect(instance.valid?).to be true
+    end
+  end
+
+  describe "custom method validations" do
+    it "passes custom validations to schema model" do
+      schema = described_class.new
+      schema.integer(:score)
+      schema.validate(:validate_score_range)
+
+      model_class = schema.schema_model
+      expect(model_class.custom_validation_methods).to contain_exactly(
+        :validate_score_range
+      )
+    end
+
+    it "accepts multiple custom validations" do
+      schema = described_class.new
+      schema.integer(:score)
+      schema.validate(:validate_score_range)
+      schema.validate(:validate_score_parity)
+
+      model_class = schema.schema_model
+      expect(model_class.custom_validation_methods).to contain_exactly(
+        :validate_score_range,
+        :validate_score_parity
+      )
     end
   end
 end
