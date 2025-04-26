@@ -37,8 +37,9 @@ class SentimentAnalyzerWithValidation < Lluminary::Task
   def validate_confidence_score
     return if @output.nil? || @output.confidence.nil?
 
-    if @output.confidence < 0 || @output.confidence > 100
-      add_error(:confidence, "must be between 0 and 100")
+    # Intentionally bad logic to test custom validation
+    if @output.confidence < 10 || @output.confidence > 90
+      errors.add(:confidence, "must be between 0 and 100")
     end
   end
 end
@@ -50,44 +51,17 @@ if __FILE__ == $PROGRAM_NAME
   puts "\n# Example with valid input"
   result = SentimentAnalyzerWithValidation.call(text: "I love this product!")
 
+  puts "##> Input"
+  puts "Ingredients: #{result.input.text}"
+
+  puts "\n##> Generated prompt"
+  puts result.prompt
+
+  puts "\n##> Output"
   puts "Valid? #{result.output.valid?}"
-  unless result.output.valid?
-    puts "Errors: #{result.output.errors.full_messages}"
-  end
-  puts "Output: #{result.output.attributes.inspect}"
+  puts "Errors: #{result.output.errors.full_messages}"
 
-  # Create a more robust test for invalid data
-  puts "\n# Example with manually created invalid confidence"
-
-  # Create a task instance
-  task = SentimentAnalyzerWithValidation.new(text: "I hate this product!")
-
-  # Manually create schema model with invalid data
-  output_model =
-    SentimentAnalyzerWithValidation.output_schema_model.new(
-      sentiment: "negative",
-      explanation: "User expresses dislike for the product.",
-      confidence: 150 # Invalid confidence score
-    )
-
-  # Set as task's output
-  task.instance_variable_set(:@output, output_model)
-
-  # Run the custom validations
-  puts "Before custom validations: #{output_model.valid?}"
-  puts "Before errors: #{output_model.errors.full_messages.inspect}"
-
-  # Run custom validations
-  task.run_custom_validations
-
-  # Check validation results
-  puts "After custom validations valid? #{output_model.valid?}"
-  puts "After errors: #{output_model.errors.full_messages.inspect}"
-  puts "Output: #{output_model.attributes.inspect}"
-
-  # Try direct validation
-  puts "\n# Direct validation test"
-  output_model.errors.add(:confidence, "direct test error")
-  puts "After direct error add: #{output_model.errors.full_messages.inspect}"
-  puts "Valid? #{output_model.valid?}"
+  puts "Sentiment: #{result.output.sentiment}"
+  puts "Explanation: #{result.output.explanation}"
+  puts "Confidence: #{result.output.confidence}"
 end
