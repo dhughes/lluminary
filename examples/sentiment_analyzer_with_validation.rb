@@ -22,7 +22,7 @@ class SentimentAnalyzerWithValidation < Lluminary::Task
     validates :sentiment, inclusion: { in: %w[positive negative neutral] }
 
     # Add custom validation for confidence score
-    validate_with :validate_confidence_score
+    validate :validate_confidence_score
   end
 
   def task_prompt
@@ -47,7 +47,7 @@ end
 if __FILE__ == $PROGRAM_NAME
   puts "#> Running SentimentAnalyzerWithValidation example"
 
-  # Example with valid confidence
+  # Example with valid input
   puts "\n# Example with valid input"
   result = SentimentAnalyzerWithValidation.call(text: "I love this product!")
 

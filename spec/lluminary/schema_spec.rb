@@ -215,7 +215,7 @@ RSpec.describe Lluminary::Schema do
 
     it "validates array elements" do
       schema.array(:numbers) { integer }
-      errors = schema.validate(numbers: [1, "2", 3])
+      errors = schema.check_validity(numbers: [1, "2", 3])
       expect(errors).to contain_exactly("Numbers[1] must be an Integer")
     end
 
@@ -258,7 +258,7 @@ RSpec.describe Lluminary::Schema do
       end
 
       errors =
-        schema.validate(
+        schema.check_validity(
           users: [
             { name: "Alice", age: 30 },
             { name: 123, age: "invalid" }, # name should be string, age should be integer
@@ -314,7 +314,7 @@ RSpec.describe Lluminary::Schema do
       end
 
       errors =
-        schema.validate(
+        schema.check_validity(
           config: {
             host: 123, # should be string
             port: "80" # should be integer
@@ -330,7 +330,7 @@ RSpec.describe Lluminary::Schema do
     it "validates that value is a hash" do
       schema.hash(:config) { string :host }
 
-      errors = schema.validate(config: "not a hash")
+      errors = schema.check_validity(config: "not a hash")
       expect(errors).to contain_exactly("Config must be a Hash")
     end
 
@@ -403,7 +403,7 @@ RSpec.describe Lluminary::Schema do
       end
 
       errors =
-        schema.validate(
+        schema.check_validity(
           config: {
             name: "test",
             database: {
@@ -464,7 +464,7 @@ RSpec.describe Lluminary::Schema do
       end
 
       errors =
-        schema.validate(
+        schema.check_validity(
           config: {
             name: "test",
             tags: ["valid", 123, "also valid"] # second element should be string
@@ -514,23 +514,23 @@ RSpec.describe Lluminary::Schema do
       let(:schema) { described_class.new.tap { |s| s.datetime(:start_time) } }
 
       it "accepts DateTime values" do
-        errors = schema.validate(start_time: DateTime.now)
+        errors = schema.check_validity(start_time: DateTime.now)
         expect(errors).to be_empty
       end
 
       it "accepts nil values" do
-        errors = schema.validate(start_time: nil)
+        errors = schema.check_validity(start_time: nil)
         expect(errors).to be_empty
       end
 
       it "returns errors for non-DateTime values" do
-        errors = schema.validate(start_time: "2024-01-01")
+        errors = schema.check_validity(start_time: "2024-01-01")
         expect(errors).to contain_exactly("Start time must be a DateTime")
       end
 
       it "can be required using presence validation" do
         schema.validates :start_time, presence: true
-        errors = schema.validate(start_time: nil)
+        errors = schema.check_validity(start_time: nil)
         expect(errors).to contain_exactly("Start time can't be blank")
       end
     end
@@ -545,12 +545,12 @@ RSpec.describe Lluminary::Schema do
     end
 
     it "returns no errors when all values match their field types" do
-      errors = schema.validate(name: "John", age: 30)
+      errors = schema.check_validity(name: "John", age: 30)
       expect(errors).to be_empty
     end
 
     it "returns errors for type mismatches" do
-      errors = schema.validate(name: 123, age: "30")
+      errors = schema.check_validity(name: 123, age: "30")
       expect(errors).to contain_exactly(
         "Name must be a String",
         "Age must be an Integer"
@@ -561,31 +561,31 @@ RSpec.describe Lluminary::Schema do
       let(:schema) { described_class.new.tap { |s| s.boolean(:active) } }
 
       it "accepts true values" do
-        errors = schema.validate(active: true)
+        errors = schema.check_validity(active: true)
         expect(errors).to be_empty
       end
 
       it "accepts false values" do
-        errors = schema.validate(active: false)
+        errors = schema.check_validity(active: false)
         expect(errors).to be_empty
       end
 
       it "accepts nil values" do
-        errors = schema.validate(active: nil)
+        errors = schema.check_validity(active: nil)
         expect(errors).to be_empty
       end
 
       it "returns errors for non-boolean values" do
-        errors = schema.validate(active: "true")
+        errors = schema.check_validity(active: "true")
         expect(errors).to contain_exactly("Active must be true or false")
 
-        errors = schema.validate(active: 1)
+        errors = schema.check_validity(active: 1)
         expect(errors).to contain_exactly("Active must be true or false")
       end
 
       it "can be required using presence validation" do
         schema.validates :active, presence: true
-        errors = schema.validate(active: nil)
+        errors = schema.check_validity(active: nil)
         expect(errors).to contain_exactly("Active can't be blank")
       end
     end
@@ -594,23 +594,23 @@ RSpec.describe Lluminary::Schema do
       let(:schema) { described_class.new.tap { |s| s.string(:name) } }
 
       it "accepts string values" do
-        errors = schema.validate(name: "John")
+        errors = schema.check_validity(name: "John")
         expect(errors).to be_empty
       end
 
       it "accepts nil values" do
-        errors = schema.validate(name: nil)
+        errors = schema.check_validity(name: nil)
         expect(errors).to be_empty
       end
 
       it "returns errors for non-string values" do
-        errors = schema.validate(name: 123)
+        errors = schema.check_validity(name: 123)
         expect(errors).to contain_exactly("Name must be a String")
       end
 
       it "can be required using presence validation" do
         schema.validates :name, presence: true
-        errors = schema.validate(name: nil)
+        errors = schema.check_validity(name: nil)
         expect(errors).to contain_exactly("Name can't be blank")
       end
     end
@@ -619,23 +619,23 @@ RSpec.describe Lluminary::Schema do
       let(:schema) { described_class.new.tap { |s| s.integer(:age) } }
 
       it "accepts integer values" do
-        errors = schema.validate(age: 30)
+        errors = schema.check_validity(age: 30)
         expect(errors).to be_empty
       end
 
       it "accepts nil values" do
-        errors = schema.validate(age: nil)
+        errors = schema.check_validity(age: nil)
         expect(errors).to be_empty
       end
 
       it "returns errors for non-integer values" do
-        errors = schema.validate(age: "30")
+        errors = schema.check_validity(age: "30")
         expect(errors).to contain_exactly("Age must be an Integer")
       end
 
       it "can be required using presence validation" do
         schema.validates :age, presence: true
-        errors = schema.validate(age: nil)
+        errors = schema.check_validity(age: nil)
         expect(errors).to contain_exactly("Age can't be blank")
       end
     end

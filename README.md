@@ -15,6 +15,7 @@ A Ruby library for building LLM-powered applications with structured outputs.
 - Field descriptions for better LLM understanding
 - Rich result objects with access to prompts and responses
 - Global and task-specific provider configuration
+- Custom validations using Rails-like API
 
 ## Lluminary Schemas
 
@@ -207,7 +208,34 @@ end
 
 For a complete list of available validations, see the [ActiveModel Validations documentation](https://guides.rubyonrails.org/active_record_validations.html).
 
-Note: While you can use all standard ActiveModel validations, custom validation methods and classes are not yet supported. This feature is planned for a future release.
+### Custom Validations
+
+Like ActiveRecord, Lluminary supports custom validation methods in your task classes. You can define custom validation methods and register them in your schema:
+
+```ruby
+class ScoreAnalyzer < Lluminary::Task
+  output_schema do
+    string :analysis
+    integer :score, description: "Score from 0-100"
+    
+    # Register a custom validation method
+    validate :validate_score_range
+  end
+  
+  # Define the custom validation method
+  def validate_score_range
+    if score && (score < 0 || score > 100)
+      errors.add(:score, "must be between 0 and 100")
+    end
+  end
+end
+```
+
+The validation method has access to:
+- All output attributes as accessor methods (e.g., `score`, `analysis`)
+- An `errors` object that works just like in Rails
+
+Custom validations are run after the model is returned from the LLM and standard validations have been applied.
 
 ### How Output Schemas Work
 
@@ -225,6 +253,7 @@ Output schemas in Lluminary serve two important purposes:
    - Validate that the response matches the expected structure
    - Ensure all fields are of the correct type
    - Apply any ActiveModel validations to the returned data
+   - Run custom validation methods defined in your task class
 
 For example, when you define an output schema:
 ```ruby
@@ -234,6 +263,13 @@ class AnalysisTask < Lluminary::Task
     float :score, description: "Confidence score"
     
     validates :score, numericality: { greater_than: 0, less_than: 1 }
+    validate :validate_title_format
+  end
+  
+  def validate_title_format
+    if title && !title.match?(/^[A-Z]/)
+      errors.add(:title, "must start with a capital letter")
+    end
   end
 end
 ```
@@ -244,6 +280,7 @@ Lluminary will:
    - The `title` is a string
    - The `score` is a float between 0 and 1
    - All required fields are present
+   - The title starts with a capital letter (custom validation)
 
 You can check the validation results and access the output values:
 ```ruby
@@ -463,11 +500,21 @@ class AnalyzeText < Lluminary::Task
     
     integer :word_count, description: "Total number of words"
     validates :word_count, numericality: { greater_than: 0 }
+    
+    # Custom validation
+    validate :validate_word_count_consistency
+  end
+  
+  def validate_word_count_consistency
+    # Ensure the word count is reasonable compared to the key points
+    if word_count && key_points && word_count < key_points.split.size
+      errors.add(:word_count, "should be at least as large as the word count in key_points")
+    end
   end
 end
 ```
 
-Note: Custom validation methods and classes are not yet supported. This feature is planned for a future release. Additionally, future updates will include:
+Additional updates planned for future releases include:
 - Automatic validation rule sharing with the LLM to guide responses
 - Retry mechanisms for failed output validation
 
