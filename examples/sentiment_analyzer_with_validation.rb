@@ -37,8 +37,8 @@ class SentimentAnalyzerWithValidation < Lluminary::Task
   def validate_confidence_score
     return if @output.nil? || @output.confidence.nil?
 
-    # Intentionally bad logic to test custom validation
-    return unless @output.confidence < 10 || @output.confidence > 90
+    # Yes, we could do this with a range, but we want to test the custom validation
+    return unless @output.confidence < 0 || @output.confidence > 100
       errors.add(:confidence, "must be between 0 and 100")
     
   end
