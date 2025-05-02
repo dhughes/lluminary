@@ -231,7 +231,7 @@ class ScoreAnalyzer < Lluminary::Task
 end
 ```
 
-You may provide an optional `description:` argument when registering a custom validation. If present (and non-nil), this description will be included in the generated LLM prompt under an **Additional Validations:** section. This helps communicate important business rules or constraints to the LLM that are not easily expressed with standard validations.
+You may provide an optional `description:` argument when registering a custom validation. If present, this description will be included in the generated LLM prompt under an **Additional Validations:** section. This helps communicate important business rules or constraints to the LLM that are not easily expressed with standard validations.
 
 For example, the above schema will generate a prompt section like:
 
@@ -241,7 +241,9 @@ Additional Validations:
 ```
 
 The validation method has access to:
-- All output attributes as accessor methods (e.g., `score`, `analysis`)
+- All schema attributes as accessor methods (e.g., `score`, `analysis`).
+  - When validating the input schema (before the LLM call), only input schema fields are available as accessors.
+  - When validating the output schema (after the LLM call), only output schema fields are available as accessors.
 - An `errors` object that works just like in Rails
 
 Custom validations are run after the model is returned from the LLM and standard validations have been applied.
