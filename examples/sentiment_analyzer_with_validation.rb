@@ -22,7 +22,7 @@ class SentimentAnalyzerWithValidation < Lluminary::Task
     validates :sentiment, inclusion: { in: %w[positive negative neutral] }
 
     # Add custom validation for confidence score
-    validate :validate_confidence_score
+    validate :validate_confidence_score, description: "Confidence score must be between 0 and 100"
   end
 
   def task_prompt
@@ -38,9 +38,9 @@ class SentimentAnalyzerWithValidation < Lluminary::Task
     return if @output.nil? || @output.confidence.nil?
 
     # Intentionally bad logic to test custom validation
-    if @output.confidence < 10 || @output.confidence > 90
+    return unless @output.confidence < 10 || @output.confidence > 90
       errors.add(:confidence, "must be between 0 and 100")
-    end
+    
   end
 end
 

@@ -74,8 +74,8 @@ module Lluminary
     end
 
     # Add support for custom validation methods, matching Rails convention
-    def validate(method_name)
-      @custom_validations << method_name
+    def validate(method_name, description: nil)
+      @custom_validations << { method: method_name, description: description }
     end
 
     def validations_for(field_name)

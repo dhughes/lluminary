@@ -13,16 +13,34 @@ RSpec.describe Lluminary::Schema do
   describe "#validate" do
     it "registers a custom validation method" do
       schema.validate(:validate_something)
-      expect(schema.custom_validations).to contain_exactly(:validate_something)
+      expect(schema.custom_validations).to eq([
+        { method: :validate_something, description: nil }
+      ])
     end
 
     it "can register multiple validation methods" do
       schema.validate(:validate_something)
       schema.validate(:validate_something_else)
-      expect(schema.custom_validations).to contain_exactly(
-        :validate_something,
-        :validate_something_else
-      )
+      expect(schema.custom_validations).to eq([
+        { method: :validate_something, description: nil },
+        { method: :validate_something_else, description: nil }
+      ])
+    end
+
+    it "registers a custom validation method with a description" do
+      schema.validate(:validate_score_range, description: "Score must be between 0 and 100")
+      expect(schema.custom_validations).to eq([
+        { method: :validate_score_range, description: "Score must be between 0 and 100" }
+      ])
+    end
+
+    it "registers multiple custom validations with and without descriptions" do
+      schema.validate(:validate_score_range, description: "Score must be between 0 and 100")
+      schema.validate(:validate_score_parity)
+      expect(schema.custom_validations).to eq([
+        { method: :validate_score_range, description: "Score must be between 0 and 100" },
+        { method: :validate_score_parity, description: nil }
+      ])
     end
   end
 
@@ -712,9 +730,8 @@ RSpec.describe Lluminary::Schema do
       schema.validate(:validate_score_range)
 
       model_class = schema.schema_model
-      expect(model_class.custom_validation_methods).to contain_exactly(
-        :validate_score_range
-      )
+      method_names = model_class.custom_validation_methods.map { |v| v[:method] }
+      expect(method_names).to contain_exactly(:validate_score_range)
     end
 
     it "accepts multiple custom validations" do
@@ -724,10 +741,8 @@ RSpec.describe Lluminary::Schema do
       schema.validate(:validate_score_parity)
 
       model_class = schema.schema_model
-      expect(model_class.custom_validation_methods).to contain_exactly(
-        :validate_score_range,
-        :validate_score_parity
-      )
+      method_names = model_class.custom_validation_methods.map { |v| v[:method] }
+      expect(method_names).to contain_exactly(:validate_score_range, :validate_score_parity)
     end
   end
 end
