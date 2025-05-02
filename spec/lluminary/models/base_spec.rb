@@ -1040,7 +1040,8 @@ RSpec.describe Lluminary::Models::Base do
         task_class.output_schema do
           string :name, description: "The person's name"
           integer :confidence, description: "Confidence score from 0-100"
-          validate :validate_confidence_score, description: "Confidence score must be between 0 and 100"
+          validate :validate_confidence_score,
+                   description: "Confidence score must be between 0 and 100"
           validate :validate_other_thing, description: nil
         end
       end
@@ -1048,7 +1049,9 @@ RSpec.describe Lluminary::Models::Base do
       it "includes an Additional Validations section with non-nil descriptions" do
         prompt = model.format_prompt(task)
         expect(prompt).to include("Additional Validations:")
-        expect(prompt).to include("- Confidence score must be between 0 and 100")
+        expect(prompt).to include(
+          "- Confidence score must be between 0 and 100"
+        )
         expect(prompt).not_to include("- \n") # Should not include a blank bullet for nil
       end
 

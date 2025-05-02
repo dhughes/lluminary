@@ -13,3 +13,4 @@
 .idea
 *.gem
 .irb_history
+.vscode

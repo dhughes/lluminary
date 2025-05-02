@@ -20,7 +20,8 @@ module Lluminary
       end
 
       def format_prompt(task)
-        additional_validations = format_additional_validations(task.class.output_custom_validations)
+        additional_validations =
+          format_additional_validations(task.class.output_custom_validations)
         <<~PROMPT
           #{task.task_prompt.chomp}
 
@@ -336,6 +337,7 @@ module Lluminary
       def format_additional_validations(custom_validations)
         descriptions = custom_validations.map { |v| v[:description] }.compact
         return "" if descriptions.empty?
+
         section = ["Additional Validations:"]
         descriptions.each { |desc| section << "- #{desc}" }
         "#{section.join("\n")}\n"

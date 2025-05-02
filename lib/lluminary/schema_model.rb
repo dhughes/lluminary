@@ -55,9 +55,10 @@ module Lluminary
               end
             end
             # If new errors were added, ensure the model is invalid by adding a base error if needed
-            if (record.errors.count > initial_error_count) && record.errors.empty?
-                record.errors.add(:base, "Custom validation failed")
-              end
+            if (record.errors.count > initial_error_count) &&
+                 record.errors.empty?
+              record.errors.add(:base, "Custom validation failed")
+            end
           end
         end
 

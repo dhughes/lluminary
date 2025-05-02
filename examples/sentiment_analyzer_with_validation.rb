@@ -22,7 +22,8 @@ class SentimentAnalyzerWithValidation < Lluminary::Task
     validates :sentiment, inclusion: { in: %w[positive negative neutral] }
 
     # Add custom validation for confidence score
-    validate :validate_confidence_score, description: "Confidence score must be between 0 and 100"
+    validate :validate_confidence_score,
+             description: "Confidence score must be between 0 and 100"
   end
 
   def task_prompt
@@ -39,8 +40,7 @@ class SentimentAnalyzerWithValidation < Lluminary::Task
 
     # Yes, we could do this with a range, but we want to test the custom validation
     return unless @output.confidence < 0 || @output.confidence > 100
-      errors.add(:confidence, "must be between 0 and 100")
-    
+    errors.add(:confidence, "must be between 0 and 100")
   end
 end
 

@@ -73,7 +73,6 @@ module Lluminary
       end
     end
 
-    # Add support for custom validation methods, matching Rails convention
     def validate(method_name, description: nil)
       @custom_validations << { method: method_name, description: description }
     end
@@ -91,7 +90,6 @@ module Lluminary
         )
     end
 
-    # Method to check value validity against schema - renamed to avoid conflicts
     def check_validity(values)
       instance = schema_model.new(values)
       instance.valid? ? [] : instance.errors.full_messages
