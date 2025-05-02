@@ -1,4 +1,7 @@
 # frozen_string_literal: true
+require "simplecov"
+SimpleCov.start { add_filter "/spec/" } if ENV["COVERAGE"]
+
 require "dotenv"
 Dotenv.load
 
