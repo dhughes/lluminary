@@ -20,8 +20,6 @@ module Lluminary
       end
 
       def format_prompt(task)
-        additional_validations =
-          format_additional_validations(task.class.output_custom_validations)
         <<~PROMPT
           #{task.task_prompt.chomp}
 
@@ -29,7 +27,8 @@ module Lluminary
           
           #{format_fields_descriptions(task.class.output_fields)}
           
-          #{additional_validations}
+          #{format_additional_validations(task.class.output_custom_validations)}
+
           #{json_preamble}
           
           #{generate_example_json_object(task.class.output_fields)}
