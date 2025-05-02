@@ -90,11 +90,6 @@ module Lluminary
         )
     end
 
-    def check_validity(values)
-      instance = schema_model.new(values)
-      instance.valid? ? [] : instance.errors.full_messages
-    end
-
     # Internal class for defining array element types
     class ArrayElementSchema
       def string(description: nil)
