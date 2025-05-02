@@ -218,17 +218,26 @@ class ScoreAnalyzer < Lluminary::Task
     string :analysis
     integer :score, description: "Score from 0-100"
     
-    # Register a custom validation method
-    validate :validate_score_range
+    # Register a custom validation method (optionally with a description)
+    validate :validate_score_divisible_by_3, description: "Score must be divisible by 3"
   end
   
-  # Define the custom validation method
-  def validate_score_range
-    if score && (score < 0 || score > 100)
-      errors.add(:score, "must be between 0 and 100")
+  # Define the custom validation method. This example is silly since LLMs are bad with math.
+  def validate_score_divisible_by_3
+    if score && score % 3 != 0
+      errors.add(:score, "must be divisible by 3")
     end
   end
 end
+```
+
+You may provide an optional `description:` argument when registering a custom validation. If present (and non-nil), this description will be included in the generated LLM prompt under an **Additional Validations:** section. This helps communicate important business rules or constraints to the LLM that are not easily expressed with standard validations.
+
+For example, the above schema will generate a prompt section like:
+
+```
+Additional Validations:
+- Score must be divisible by 3
 ```
 
 The validation method has access to:
@@ -481,6 +490,7 @@ Common validations include:
 - `length`: Validates string length
 - `uniqueness`: Ensures a value is unique
 
+
 For a complete list of validations, see the [ActiveModel Validations documentation](https://guides.rubyonrails.org/active_record_validations.html).
 
 #### Output Validation
@@ -515,7 +525,6 @@ end
 ```
 
 Additional updates planned for future releases include:
-- Automatic validation rule sharing with the LLM to guide responses
 - Retry mechanisms for failed output validation
 
 #### Accessing Validation Results
