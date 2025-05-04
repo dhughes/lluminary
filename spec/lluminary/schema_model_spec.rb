@@ -397,4 +397,35 @@ RSpec.describe Lluminary::SchemaModel do
       )
     end
   end
+
+  describe "float field validation" do
+    let(:fields) { { score: { type: :float, description: "The score" } } }
+    let(:model_class) { described_class.build(fields: fields, validations: []) }
+
+    it "accepts float values" do
+      instance = model_class.new(score: 3.14)
+      expect(instance.valid?).to be true
+      expect(instance.errors.full_messages).to be_empty
+    end
+
+    it "accepts nil values" do
+      instance = model_class.new(score: nil)
+      expect(instance.valid?).to be true
+      expect(instance.errors.full_messages).to be_empty
+    end
+
+    it "returns errors for non-float values" do
+      instance = model_class.new(score: "not a float")
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Score must be a float"
+      )
+
+      instance = model_class.new(score: 42)
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Score must be a float"
+      )
+    end
+  end
 end
