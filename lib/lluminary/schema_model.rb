@@ -46,23 +46,14 @@ module Lluminary
           # Run custom validations from the task if present
           if record.task_instance &&
                !record.class.custom_validation_methods.empty?
-            initial_error_count = record.errors.count
-            # Track if any validation methods add errors
             record.class.custom_validation_methods.each do |validation|
               method_name = validation[:method]
               if record.task_instance.respond_to?(method_name)
                 record.task_instance.send(method_name)
               end
             end
-            # If new errors were added, ensure the model is invalid by adding a base error if needed
-            if (record.errors.count > initial_error_count) &&
-                 record.errors.empty?
-              record.errors.add(:base, "Custom validation failed")
-            end
           end
-        end
 
-        validate do |record|
           if record.raw_response
             begin
               JSON.parse(record.raw_response)
