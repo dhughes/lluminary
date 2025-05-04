@@ -9,6 +9,7 @@ module Lluminary
     def initialize
       @fields = {}
       @validations = []
+      @custom_validations = []
     end
 
     def string(name, description: nil)
@@ -57,7 +58,7 @@ module Lluminary
       }
     end
 
-    attr_reader :fields
+    attr_reader :fields, :custom_validations
 
     def validates(*args, **options)
       @validations << [args, options]
@@ -72,18 +73,21 @@ module Lluminary
       end
     end
 
+    def validate(method_name, description: nil)
+      @custom_validations << { method: method_name, description: description }
+    end
+
     def validations_for(field_name)
       @validations.select { |args, _| args.include?(field_name) }
     end
 
     def schema_model
       @schema_model ||=
-        SchemaModel.build(fields: @fields, validations: @validations)
-    end
-
-    def validate(values)
-      instance = schema_model.new(values)
-      instance.valid? ? [] : instance.errors.full_messages
+        SchemaModel.build(
+          fields: @fields,
+          validations: @validations,
+          custom_validations: @custom_validations
+        )
     end
 
     # Internal class for defining array element types

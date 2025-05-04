@@ -10,6 +10,58 @@ RSpec.describe Lluminary::Schema do
     end
   end
 
+  describe "#validate" do
+    it "registers a custom validation method" do
+      schema.validate(:validate_something)
+      expect(schema.custom_validations).to eq(
+        [{ method: :validate_something, description: nil }]
+      )
+    end
+
+    it "can register multiple validation methods" do
+      schema.validate(:validate_something)
+      schema.validate(:validate_something_else)
+      expect(schema.custom_validations).to eq(
+        [
+          { method: :validate_something, description: nil },
+          { method: :validate_something_else, description: nil }
+        ]
+      )
+    end
+
+    it "registers a custom validation method with a description" do
+      schema.validate(
+        :validate_score_range,
+        description: "Score must be between 0 and 100"
+      )
+      expect(schema.custom_validations).to eq(
+        [
+          {
+            method: :validate_score_range,
+            description: "Score must be between 0 and 100"
+          }
+        ]
+      )
+    end
+
+    it "registers multiple custom validations with and without descriptions" do
+      schema.validate(
+        :validate_score_range,
+        description: "Score must be between 0 and 100"
+      )
+      schema.validate(:validate_score_parity)
+      expect(schema.custom_validations).to eq(
+        [
+          {
+            method: :validate_score_range,
+            description: "Score must be between 0 and 100"
+          },
+          { method: :validate_score_parity, description: nil }
+        ]
+      )
+    end
+  end
+
   describe "#string" do
     it "adds a string field to the schema" do
       schema.string(:name)
@@ -213,12 +265,6 @@ RSpec.describe Lluminary::Schema do
       )
     end
 
-    it "validates array elements" do
-      schema.array(:numbers) { integer }
-      errors = schema.validate(numbers: [1, "2", 3])
-      expect(errors).to contain_exactly("Numbers[1] must be an Integer")
-    end
-
     it "supports hashes inside arrays" do
       schema.array(:users) do
         hash do
@@ -246,29 +292,6 @@ RSpec.describe Lluminary::Schema do
             }
           }
         }
-      )
-    end
-
-    it "validates hashes inside arrays" do
-      schema.array(:users) do
-        hash do
-          string :name
-          integer :age
-        end
-      end
-
-      errors =
-        schema.validate(
-          users: [
-            { name: "Alice", age: 30 },
-            { name: 123, age: "invalid" }, # name should be string, age should be integer
-            { name: "Bob", age: 25 }
-          ]
-        )
-
-      expect(errors).to contain_exactly(
-        "Users[1][name] must be a String",
-        "Users[1][age] must be an Integer"
       )
     end
   end
@@ -305,33 +328,6 @@ RSpec.describe Lluminary::Schema do
           }
         }
       )
-    end
-
-    it "validates hash values" do
-      schema.hash(:config) do
-        string :host
-        integer :port
-      end
-
-      errors =
-        schema.validate(
-          config: {
-            host: 123, # should be string
-            port: "80" # should be integer
-          }
-        )
-
-      expect(errors).to contain_exactly(
-        "Config[host] must be a String",
-        "Config[port] must be an Integer"
-      )
-    end
-
-    it "validates that value is a hash" do
-      schema.hash(:config) { string :host }
-
-      errors = schema.validate(config: "not a hash")
-      expect(errors).to contain_exactly("Config must be a Hash")
     end
 
     it "supports nested hashes" do
@@ -389,42 +385,6 @@ RSpec.describe Lluminary::Schema do
       )
     end
 
-    it "validates nested hashes" do
-      schema.hash(:config) do
-        string :name
-        hash :database do
-          string :host
-          integer :port
-          hash :credentials do
-            string :username
-            string :password
-          end
-        end
-      end
-
-      errors =
-        schema.validate(
-          config: {
-            name: "test",
-            database: {
-              host: 123, # should be string
-              port: "80", # should be integer
-              credentials: {
-                username: 456, # should be string
-                password: 789 # should be string
-              }
-            }
-          }
-        )
-
-      expect(errors).to contain_exactly(
-        "Config[database][host] must be a String",
-        "Config[database][port] must be an Integer",
-        "Config[database][credentials][username] must be a String",
-        "Config[database][credentials][password] must be a String"
-      )
-    end
-
     it "supports arrays inside hashes" do
       schema.hash(:config) do
         string :name
@@ -453,25 +413,6 @@ RSpec.describe Lluminary::Schema do
           }
         }
       )
-    end
-
-    it "validates arrays inside hashes" do
-      schema.hash(:config) do
-        string :name
-        array :tags do
-          string
-        end
-      end
-
-      errors =
-        schema.validate(
-          config: {
-            name: "test",
-            tags: ["valid", 123, "also valid"] # second element should be string
-          }
-        )
-
-      expect(errors).to contain_exactly("Config[tags][1] must be a String")
     end
   end
 
@@ -508,136 +449,6 @@ RSpec.describe Lluminary::Schema do
       first_call = schema.fields
       second_call = schema.fields
       expect(first_call).to be(second_call)
-    end
-
-    context "with datetime fields" do
-      let(:schema) { described_class.new.tap { |s| s.datetime(:start_time) } }
-
-      it "accepts DateTime values" do
-        errors = schema.validate(start_time: DateTime.now)
-        expect(errors).to be_empty
-      end
-
-      it "accepts nil values" do
-        errors = schema.validate(start_time: nil)
-        expect(errors).to be_empty
-      end
-
-      it "returns errors for non-DateTime values" do
-        errors = schema.validate(start_time: "2024-01-01")
-        expect(errors).to contain_exactly("Start time must be a DateTime")
-      end
-
-      it "can be required using presence validation" do
-        schema.validates :start_time, presence: true
-        errors = schema.validate(start_time: nil)
-        expect(errors).to contain_exactly("Start time can't be blank")
-      end
-    end
-  end
-
-  describe "#validate" do
-    let(:schema) do
-      described_class.new.tap do |s|
-        s.string(:name)
-        s.integer(:age)
-      end
-    end
-
-    it "returns no errors when all values match their field types" do
-      errors = schema.validate(name: "John", age: 30)
-      expect(errors).to be_empty
-    end
-
-    it "returns errors for type mismatches" do
-      errors = schema.validate(name: 123, age: "30")
-      expect(errors).to contain_exactly(
-        "Name must be a String",
-        "Age must be an Integer"
-      )
-    end
-
-    context "with boolean fields" do
-      let(:schema) { described_class.new.tap { |s| s.boolean(:active) } }
-
-      it "accepts true values" do
-        errors = schema.validate(active: true)
-        expect(errors).to be_empty
-      end
-
-      it "accepts false values" do
-        errors = schema.validate(active: false)
-        expect(errors).to be_empty
-      end
-
-      it "accepts nil values" do
-        errors = schema.validate(active: nil)
-        expect(errors).to be_empty
-      end
-
-      it "returns errors for non-boolean values" do
-        errors = schema.validate(active: "true")
-        expect(errors).to contain_exactly("Active must be true or false")
-
-        errors = schema.validate(active: 1)
-        expect(errors).to contain_exactly("Active must be true or false")
-      end
-
-      it "can be required using presence validation" do
-        schema.validates :active, presence: true
-        errors = schema.validate(active: nil)
-        expect(errors).to contain_exactly("Active can't be blank")
-      end
-    end
-
-    context "with string fields" do
-      let(:schema) { described_class.new.tap { |s| s.string(:name) } }
-
-      it "accepts string values" do
-        errors = schema.validate(name: "John")
-        expect(errors).to be_empty
-      end
-
-      it "accepts nil values" do
-        errors = schema.validate(name: nil)
-        expect(errors).to be_empty
-      end
-
-      it "returns errors for non-string values" do
-        errors = schema.validate(name: 123)
-        expect(errors).to contain_exactly("Name must be a String")
-      end
-
-      it "can be required using presence validation" do
-        schema.validates :name, presence: true
-        errors = schema.validate(name: nil)
-        expect(errors).to contain_exactly("Name can't be blank")
-      end
-    end
-
-    context "with integer fields" do
-      let(:schema) { described_class.new.tap { |s| s.integer(:age) } }
-
-      it "accepts integer values" do
-        errors = schema.validate(age: 30)
-        expect(errors).to be_empty
-      end
-
-      it "accepts nil values" do
-        errors = schema.validate(age: nil)
-        expect(errors).to be_empty
-      end
-
-      it "returns errors for non-integer values" do
-        errors = schema.validate(age: "30")
-        expect(errors).to contain_exactly("Age must be an Integer")
-      end
-
-      it "can be required using presence validation" do
-        schema.validates :age, presence: true
-        errors = schema.validate(age: nil)
-        expect(errors).to contain_exactly("Age can't be blank")
-      end
     end
   end
 
@@ -686,6 +497,34 @@ RSpec.describe Lluminary::Schema do
       schema_model = schema.schema_model
       instance = schema_model.new(name: "John", age: 30)
       expect(instance.valid?).to be true
+    end
+  end
+
+  describe "custom method validations" do
+    it "passes custom validations to schema model" do
+      schema = described_class.new
+      schema.integer(:score)
+      schema.validate(:validate_score_range)
+
+      model_class = schema.schema_model
+      method_names =
+        model_class.custom_validation_methods.map { |v| v[:method] }
+      expect(method_names).to contain_exactly(:validate_score_range)
+    end
+
+    it "accepts multiple custom validations" do
+      schema = described_class.new
+      schema.integer(:score)
+      schema.validate(:validate_score_range)
+      schema.validate(:validate_score_parity)
+
+      model_class = schema.schema_model
+      method_names =
+        model_class.custom_validation_methods.map { |v| v[:method] }
+      expect(method_names).to contain_exactly(
+        :validate_score_range,
+        :validate_score_parity
+      )
     end
   end
 end

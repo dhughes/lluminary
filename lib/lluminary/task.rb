@@ -74,12 +74,23 @@ module Lluminary
       def output_schema_model
         @output_schema&.schema_model || Schema.new.schema_model
       end
+
+      def output_custom_validations
+        @output_schema&.custom_validations || []
+      end
+
+      def input_custom_validations
+        @input_schema&.custom_validations || []
+      end
     end
 
     attr_reader :input, :output, :parsed_response
+    attr_accessor :validation_failed
 
     def initialize(input = {})
       @input = self.class.input_schema_model.new(input)
+      @input.task_instance = self
+      @validation_failed = false
       define_input_methods
     end
 
@@ -120,7 +131,29 @@ module Lluminary
       raise NotImplementedError, "Subclasses must implement task_prompt"
     end
 
+    # Helper for validation methods to add errors
+    def errors
+      # Points to the current model being validated - used by custom validation methods
+      if @current_model == :output && @output
+        @output.errors
+      else
+        @input.errors
+      end
+    end
+
     private
+
+    def define_output_accessor_methods
+      return unless @output
+
+      # Define accessor methods for each output field
+      @output.attributes.each_key do |name|
+        next if name == "raw_response"
+        singleton_class.class_eval do
+          define_method(name) { @output.attributes[name.to_s] }
+        end
+      end
+    end
 
     def validate_input
       validate_input!
@@ -129,6 +162,7 @@ module Lluminary
     def process_response(response)
       @parsed_response = response[:parsed]
       @output = self.class.output_schema_model.new
+      @output.task_instance = self
       @output.raw_response = response[:raw]
 
       # Merge the parsed response first, then validate
@@ -159,6 +193,9 @@ module Lluminary
 
         @output.attributes.merge!(converted_response)
       end
+
+      # Define methods to access output attributes directly in validation methods
+      define_output_accessor_methods
 
       # Validate after merging
       @output.valid?

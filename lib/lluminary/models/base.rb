@@ -27,6 +27,8 @@ module Lluminary
           
           #{format_fields_descriptions(task.class.output_fields)}
           
+          #{format_additional_validations(task.class.output_custom_validations)}
+
           #{json_preamble}
           
           #{generate_example_json_object(task.class.output_fields)}
@@ -329,6 +331,15 @@ module Lluminary
         field[:fields].each_with_object({}) do |(subname, subfield), hash|
           hash[subname] = generate_example_value(subname, subfield)
         end
+      end
+
+      def format_additional_validations(custom_validations)
+        descriptions = custom_validations.map { |v| v[:description] }.compact
+        return "" if descriptions.empty?
+
+        section = ["Additional Validations:"]
+        descriptions.each { |desc| section << "- #{desc}" }
+        "#{section.join("\n")}\n"
       end
     end
   end

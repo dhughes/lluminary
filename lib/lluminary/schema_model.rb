@@ -8,6 +8,7 @@ module Lluminary
     include ActiveModel::Validations
 
     attr_reader :attributes
+    attr_accessor :task_instance
 
     def initialize(attributes = {})
       @attributes = attributes.transform_keys(&:to_s)
@@ -19,13 +20,14 @@ module Lluminary
       "#<#{self.class.name} #{attrs.inspect}>"
     end
 
-    def self.build(fields:, validations:)
+    def self.build(fields:, validations:, custom_validations: [])
       Class.new(self) do
         class << self
-          attr_accessor :schema_fields
+          attr_accessor :schema_fields, :custom_validation_methods
         end
 
         self.schema_fields = fields
+        self.custom_validation_methods = custom_validations
 
         # Add accessors for each field
         fields.each_key do |name|
@@ -39,7 +41,19 @@ module Lluminary
           @attributes["raw_response"] = value
         end
 
+        # Add custom validation hook
         validate do |record|
+          # Run custom validations from the task if present
+          if record.task_instance &&
+               !record.class.custom_validation_methods.empty?
+            record.class.custom_validation_methods.each do |validation|
+              method_name = validation[:method]
+              if record.task_instance.respond_to?(method_name)
+                record.task_instance.send(method_name)
+              end
+            end
+          end
+
           if record.raw_response
             begin
               JSON.parse(record.raw_response)

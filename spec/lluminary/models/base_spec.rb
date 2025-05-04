@@ -1035,6 +1035,38 @@ RSpec.describe Lluminary::Models::Base do
       end
     end
 
+    context "with custom validation descriptions" do
+      before do
+        task_class.output_schema do
+          string :name, description: "The person's name"
+          integer :confidence, description: "Confidence score from 0-100"
+          validate :validate_confidence_score,
+                   description: "Confidence score must be between 0 and 100"
+          validate :validate_other_thing, description: nil
+        end
+      end
+
+      it "includes an Additional Validations section with non-nil descriptions" do
+        prompt = model.format_prompt(task)
+        expect(prompt).to include("Additional Validations:")
+        expect(prompt).to include(
+          "- Confidence score must be between 0 and 100"
+        )
+        expect(prompt).not_to include("- \n") # Should not include a blank bullet for nil
+      end
+
+      it "omits Additional Validations section if all descriptions are nil" do
+        # Redefine schema with only nil descriptions
+        task_class.output_schema do
+          string :name, description: "The person's name"
+          validate :validate_confidence_score, description: nil
+          validate :validate_other_thing, description: nil
+        end
+        prompt = model.format_prompt(task)
+        expect(prompt).not_to include("Additional Validations:")
+      end
+    end
+
     context "JSON example generation" do
       context "with simple field types" do
         it "generates correct JSON example for string field" do

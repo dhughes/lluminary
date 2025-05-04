@@ -169,4 +169,263 @@ RSpec.describe Lluminary::SchemaModel do
       )
     end
   end
+
+  describe "boolean field validation" do
+    let(:fields) do
+      { active: { type: :boolean, description: "Whether the item is active" } }
+    end
+    let(:model_class) { described_class.build(fields: fields, validations: []) }
+
+    it "accepts true values" do
+      instance = model_class.new(active: true)
+      expect(instance.valid?).to be true
+      expect(instance.errors.full_messages).to be_empty
+    end
+
+    it "accepts false values" do
+      instance = model_class.new(active: false)
+      expect(instance.valid?).to be true
+      expect(instance.errors.full_messages).to be_empty
+    end
+
+    it "accepts nil values" do
+      instance = model_class.new(active: nil)
+      expect(instance.valid?).to be true
+      expect(instance.errors.full_messages).to be_empty
+    end
+
+    it "returns errors for non-boolean values" do
+      instance = model_class.new(active: "true")
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Active must be true or false"
+      )
+
+      instance = model_class.new(active: 1)
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Active must be true or false"
+      )
+    end
+
+    it "can be required using presence validation" do
+      validations = [[[:active], { presence: true }]]
+      model_class_with_presence =
+        described_class.build(fields: fields, validations: validations)
+      instance = model_class_with_presence.new(active: nil)
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Active can't be blank"
+      )
+    end
+  end
+
+  describe "hash field with array validation" do
+    let(:fields) do
+      {
+        config: {
+          type: :hash,
+          description: "Configuration",
+          fields: {
+            name: {
+              type: :string,
+              description: nil
+            },
+            tags: {
+              type: :array,
+              description: nil,
+              element_type: {
+                type: :string,
+                description: nil
+              }
+            }
+          }
+        }
+      }
+    end
+    let(:model_class) { described_class.build(fields: fields, validations: []) }
+
+    it "validates arrays inside hashes" do
+      instance =
+        model_class.new(
+          config: {
+            name: "test",
+            tags: ["valid", 123, "also valid"]
+          }
+        )
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Config[tags][1] must be a String"
+      )
+    end
+  end
+
+  describe "nested hash validation" do
+    let(:fields) do
+      {
+        config: {
+          type: :hash,
+          description: nil,
+          fields: {
+            name: {
+              type: :string,
+              description: nil
+            },
+            database: {
+              type: :hash,
+              description: nil,
+              fields: {
+                host: {
+                  type: :string,
+                  description: nil
+                },
+                port: {
+                  type: :integer,
+                  description: nil
+                },
+                credentials: {
+                  type: :hash,
+                  description: nil,
+                  fields: {
+                    username: {
+                      type: :string,
+                      description: nil
+                    },
+                    password: {
+                      type: :string,
+                      description: nil
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    end
+    let(:model_class) { described_class.build(fields: fields, validations: []) }
+
+    it "validates nested hashes" do
+      instance =
+        model_class.new(
+          config: {
+            name: "test",
+            database: {
+              host: 123, # should be string
+              port: "80", # should be integer
+              credentials: {
+                username: 456, # should be string
+                password: 789 # should be string
+              }
+            }
+          }
+        )
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Config[database][host] must be a String",
+        "Config[database][port] must be an Integer",
+        "Config[database][credentials][username] must be a String",
+        "Config[database][credentials][password] must be a String"
+      )
+    end
+  end
+
+  describe "hash type enforcement" do
+    let(:fields) do
+      {
+        config: {
+          type: :hash,
+          description: nil,
+          fields: {
+            host: {
+              type: :string,
+              description: nil
+            }
+          }
+        }
+      }
+    end
+    let(:model_class) { described_class.build(fields: fields, validations: []) }
+
+    it "validates that value is a hash" do
+      instance = model_class.new(config: "not a hash")
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Config must be a Hash"
+      )
+    end
+  end
+
+  describe "array of hashes validation" do
+    let(:fields) do
+      {
+        users: {
+          type: :array,
+          description: nil,
+          element_type: {
+            type: :hash,
+            description: nil,
+            fields: {
+              name: {
+                type: :string,
+                description: nil
+              },
+              age: {
+                type: :integer,
+                description: nil
+              }
+            }
+          }
+        }
+      }
+    end
+    let(:model_class) { described_class.build(fields: fields, validations: []) }
+
+    it "validates hashes inside arrays" do
+      instance =
+        model_class.new(
+          users: [
+            { name: "Alice", age: 30 },
+            { name: 123, age: "invalid" }, # name should be string, age should be integer
+            { name: "Bob", age: 25 }
+          ]
+        )
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Users[1][name] must be a String",
+        "Users[1][age] must be an Integer"
+      )
+    end
+  end
+
+  describe "float field validation" do
+    let(:fields) { { score: { type: :float, description: "The score" } } }
+    let(:model_class) { described_class.build(fields: fields, validations: []) }
+
+    it "accepts float values" do
+      instance = model_class.new(score: 3.14)
+      expect(instance.valid?).to be true
+      expect(instance.errors.full_messages).to be_empty
+    end
+
+    it "accepts nil values" do
+      instance = model_class.new(score: nil)
+      expect(instance.valid?).to be true
+      expect(instance.errors.full_messages).to be_empty
+    end
+
+    it "returns errors for non-float values" do
+      instance = model_class.new(score: "not a float")
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Score must be a float"
+      )
+
+      instance = model_class.new(score: 42)
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Score must be a float"
+      )
+    end
+  end
 end
