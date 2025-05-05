@@ -17,12 +17,12 @@
 - [x] Add datetime type support
 
 ## In Progress
-- [ ] Add support for all JSON data types in schemas
+- [x] Add support for all JSON data types in schemas
   - [ ] Consider using input schema descriptions to enhance LLM prompts
     - [ ] Explore how input field descriptions could provide context to the LLM
     - [x] Consider adding validation rules to the prompt context
     - [ ] Evaluate if this would help the LLM better understand input constraints
-    - [ ] Consider adding examples from the schema to the prompt
+    - [x] Consider adding examples from the schema to the prompt
 
 ## Future Tasks
 - [ ] Test this for support of older versions of Rails. (I think it might not work below Rails 8)
@@ -35,17 +35,17 @@
   - [ ] Document local provider setup and configuration
   - [ ] Add examples of using local models
   - [ ] Consider performance recommendations for local models
-- [ ] Revisit custom validation support
-  - [ ] Add support for custom validation methods
+- [x] Revisit custom validation support
+  - [x] Add support for custom validation methods
   - [ ] Add support for custom validation classes
-  - [ ] Document custom validation patterns
-  - [ ] Add examples of custom validations
+  - [x] Document custom validation patterns
+  - [x] Add examples of custom validations
 - [ ] Implement task chaining and composition
 - [ ] Add rate limiting and retry mechanisms
 - [ ] Implement streaming responses
 - [x] Add schema validation for provider responses
-- [ ] Support nested objects in schemas
-- [ ] Add array type support in schemas
+- [x] Support nested objects in schemas
+- [x] Add array type support in schemas
 - [ ] Add logging and monitoring
 - [x] Add provider-specific configuration options
 - [ ] Add response templating system
@@ -106,22 +106,22 @@
 - [x] Float
   - [x] Basic float input/output
   - [x] Required/optional
-- [ ] Decimal
-  - [ ] Consider using BigDecimal for input validation
-  - [ ] Consider precision requirements for output validation
-  - [ ] Evaluate LLM output handling for numeric types
-  - [ ] Consider adding float type for less strict numeric validation
-  - [ ] Consider configuration options for numeric validation strictness
-  - [ ] Document numeric type best practices for LLM interactions
-- [ ] Array
-  - [ ] Basic array input/output
-  - [ ] Length validation
-  - [ ] Typed arrays (array of strings, etc.)
-  - [ ] Required/optional
-- [ ] Hash
-  - [ ] Basic hash input/output
-  - [ ] Schema validation
-  - [ ] Required/optional
+- [x] Decimal
+  - [x] Consider using BigDecimal for input validation
+  - [x] Consider precision requirements for output validation
+  - [x] Evaluate LLM output handling for numeric types
+  - [x] Consider adding float type for less strict numeric validation
+  - [x] Consider configuration options for numeric validation strictness
+  - [x] Document numeric type best practices for LLM interactions
+- [x]xArray
+  - [x] Basic array input/output
+  - [x] Length validation
+  - [x] Typed arrays (array of strings, etc.)
+  - [x] Required/optional
+- [x]xHash
+  - [x] Basic hash input/output
+  - [x] Schema validation
+  - [x] Required/optional
 - [ ] Date / Time
   - [ ] Basic date input/output
   - [ ] Format validation
