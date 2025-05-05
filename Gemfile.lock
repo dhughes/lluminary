@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    lluminary (0.2.0)
+    lluminary (0.2.1)
       activemodel (>= 5.2, < 9)
       aws-sdk-bedrock (~> 1.0)
       aws-sdk-bedrockruntime (~> 1.0)
