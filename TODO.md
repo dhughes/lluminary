@@ -145,9 +145,9 @@
   - [ ] Add optional detailed logging
 - [ ] Prompt optimization system
   - [ ] Default prompt optimizer
-    - [ ] Generic prompt formatting
+    - [x] Generic prompt formatting
     - [x] Schema information integration
-    - [ ] Basic instructions
+    - [x] Basic instructions
   - [ ] Model-specific prompt optimizers
     - [ ] Support for different models across providers
     - [ ] Custom formatting for specific models
@@ -159,6 +159,7 @@
     - [x] Schema-aware formatting
     - [ ] Model-specific instructions
     - [ ] Context and examples integration
+    - If I create  a system to record inputs and outputs in a database and 👍 or 👎 them, then this could be used for automatically including "few shot" examples in prompts. The automatic tuning system I'm thinking about might be able to test accuracy against token usage by iterating on the number of examples it provides.
 - [x] Response validation
 - [x] Error handling
 - [ ] Retry logic
@@ -386,3 +387,90 @@ The gemini-ai gem seems to be abandoned. (10 months with no activity).
 I may want to crib from their work. 
 Or, Google has an openai compatible endpoint. See: https://ai.google.dev/gemini-api/docs/openai
 
+## Ideas
+
+### Optimization
+
+It might be interesting to have an `#optimize` method on `Task` that would take the prompt and use another Task to optimize the prompt for the specified provider and model. Maybe it could optionally update the Task's source on disk? That wouldn't be great in non-dev environments. It could also maybe store the optimized prompt in memory, in a file on disk, or in a database. The database idea is more along the lines of my thumbs up/down ideal for few-shot prompting, but could tie into this idea as well.
+
+### Thinking / Reasoning
+
+It might be interesting to provide access to the thinking / reasoning output if using one of these models. Maybe this could be tacked onto the response from `call`?
+
+### Justification
+
+Maybe there should be a DSL-level option to add a field to the output called something like `lluminary.justification` that prompts the LLM to provide a justification for its response? Maybe this gets put on the response from calling the LLM? 
+
+## Provider capabilities to consider implementing
+
+Some of these might just be provider-specific in the prompt generation or provider implementation. Like, maybe we automatically use predictions with OpenAI, since it might always be helpful (given the known JSON structure), but maybe not useful on other providers. 
+
+### Image generation
+
+
+
+### Batching
+
+This is used to send multiple prompts at the same time in the same request.
+
+[Open AI supports sending up to 20 requests at the same time](https://platform.openai.com/docs/guides/production-best-practices#batching)
+
+### Open AI Prompt caching 
+
+OpenAI says to [put static or repeated content at the beginning of prompts and the variable bits at the end](https://platform.openai.com/docs/guides/prompt-caching#best-practices). This is the opposite of what we're doing right now, so we should make this change.
+
+### Predictions
+
+OpenAI [allows us to send predictions](https://platform.openai.com/docs/guides/predicted-outputs) for output and that this can speed processing. Since we know we're going to be getting back structured JSON, could we pregenerate the JSON structure and include that in the request to speed up responses?
+
+
+### Streaming
+
+OpenAI (at least) supports streaming. It looks like this happens in chunks, where we get individual tokens as they're available. Is there a streaming JSON parser for ruby? I know there's a streaming XML parser... maybe we could leverage that somehow? I'm guessing it would mostly be applicable to arrays or lists of data. 
+
+Maybe there's an alternative output format that is tabular, like CSV? Something we can iterate over line by line that could be streamed?
+
+Bedrock also supports streaming.
+
+### File inputs
+
+It seems like OpenAI might only [support PDFs](https://platform.openai.com/docs/guides/pdf-files?api-mode=responses) as file inputs. It looks like images can be [referenced by URL or uploaded in base64](https://platform.openai.com/docs/guides/images-vision?api-mode=responses).
+
+There are options for audio. It seems like right now they require using the Chat API or Realtime API. This means I might actually need to automatically use different OpenAI endpoints based on the features being used within Lluminary.
+
+### Customized Models
+
+OpenAI allows you to [fine-tune models](https://platform.openai.com/docs/guides/fine-tuning). How are those accessible? 
+
+One OpenAI fine-tuning approach uses [preferred outputs](https://platform.openai.com/docs/guides/direct-preference-optimization), similar to what I have in mind for the system to tune prompts. Maybe they can be tied together?
+
+Bedrock somehow lets you privately customize foundation models. How are those exposed?
+
+### Knowledge Bases
+
+Bedrock allows you to "augment responses" with info from data (presumably at AWS). Called [Retrieval Augmented Generation](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html). Is that something that needs to be addressed / triggered via a prompt or a particular API call? A quick glance makes me think this is not API-driven.
+
+### Agents
+
+OpenAI has a [python SDK for creating agents](https://openai.github.io/openai-agents-python/). I need to do more research in this area.
+
+### Guardrails
+
+OpenAI has a [moderation](https://platform.openai.com/docs/guides/moderation) system that I think is related to agents.
+
+### Get information about model and capabilities.
+
+Bedrock has `ListFoundationModels` and `GetFoundationModel` to get this information. 
+Bedrock will tell you if a model is legacy or active. Could be useful when generating the manifest.
+
+### Managed prompts
+
+Bedrock has a UI tool (and corresponding API) to create managed prompts and tune them for various models.
+
+### Text to video
+
+Bedrock has a text-to-video capability for via [Amazon Nova Reel](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-runtime_example_bedrock-runtime_Scenario_AmazonNova_TextToVideo_section.html). This is an async call. Could anything else in the library be async? Could we somehow have LLM calls with high latency be async with a callback, or something of the sort. (Not super rubyish.) Could we leverage background jobs like Sidekiq, Resque, etc?
+
+### Reasoning 
+
+How can I (and should I?) provide access to reasoning? What utility does it have in this library?

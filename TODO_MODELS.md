@@ -120,6 +120,7 @@ So this would ultimately tell the `Provider`, load the `Model` class configured 
 
 1. [Spike] Figure out how to attach files for LLMs
   - OpenAI
+    - https://platform.openai.com/docs/api-reference
   - Bedrock
 
 2. [Spike] Figure out how to use tools with LLMs
@@ -156,6 +157,7 @@ So this would ultimately tell the `Provider`, load the `Model` class configured 
         - image
         - ???
     - configuration options (ideally, this would use the schema system behind the scenes)
+      - I think Bedrock calls these Inference Parameters
       - temperature
       - ???
   - Should define specific models
