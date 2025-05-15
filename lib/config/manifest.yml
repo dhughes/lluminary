@@ -1,0 +1,13 @@
+
+providers:
+  openai:
+    class: Lluminary::Providers::OpenAI
+    configurations:
+      api_key:
+        type: string
+        required: true
+      log_errors:
+        type: boolean
+        required: false
+        default: false
+      

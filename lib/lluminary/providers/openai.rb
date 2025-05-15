@@ -20,6 +20,8 @@ module Lluminary
       end
 
       def call(prompt, _task)
+        # TODO: would it be helpful to toggle between using the .chat or .responses based on the content and model?
+        # Either way, it seems like maybe responses is a more robust option.
         response =
           client.chat(
             parameters: {
