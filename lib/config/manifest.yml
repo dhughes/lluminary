@@ -10,4 +10,27 @@ providers:
         type: boolean
         required: false
         default: false
-      
+  
+  bedrock:
+    class: Lluminary::Providers::Bedrock
+    configurations:
+      access_key_id:
+        type: string
+        required: true
+      secret_access_key:
+        type: string
+        required: true
+      region:
+        type: string
+        required: true
+
+  anthropic:
+    class: Lluminary::Providers::Anthropic
+    configurations:
+      api_key:
+        type: string
+        required: true
+      max_tokens:
+        type: integer
+        required: true
+        default: 1024

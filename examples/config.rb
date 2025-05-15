@@ -23,4 +23,6 @@ Lluminary.configure do |config|
     region: ENV["AWS_REGION"],
     model: Lluminary::Models::Bedrock::AnthropicClaudeInstantV1
   )
+
+  config.provider(:anthropic, api_key: ENV["ANTHROPIC_API_KEY"])
 end
