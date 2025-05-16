@@ -129,6 +129,7 @@ So this would ultimately tell the `Provider`, load the `Model` class configured 
 
 3. Create an Anthropic provider
   - Should let us run tasks directly against Anthropic's API
+  - STATUS: I created the provider in `anthropic-provider` branch based off of `model-support`. I'm consider rebasing it onto `main` and only committing the required changes and rebasing `model-support` from there.
 
 5. Create a Google Vertex provider
   - Only make it work with Claude for the moment
