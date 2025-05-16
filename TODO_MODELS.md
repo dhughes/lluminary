@@ -122,13 +122,15 @@ So this would ultimately tell the `Provider`, load the `Model` class configured 
   - OpenAI
     - https://platform.openai.com/docs/api-reference
   - Bedrock
+  - Anthropic
 
 2. [Spike] Figure out how to use tools with LLMs
   - OpenAI
   - Bedrock
+  - Anthropic
 
-3. Create an Anthropic provider
-  - Should let us run tasks directly against Anthropic's API
+3. ~~Create an Anthropic provider~~
+  - ~~Should let us run tasks directly against Anthropic's API~~
 
 5. Create a Google Vertex provider
   - Only make it work with Claude for the moment
