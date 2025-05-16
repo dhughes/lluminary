@@ -10,7 +10,7 @@ A Ruby library for building LLM-powered applications with structured outputs.
 - Automatic JSON response formatting based on output schemas
 - Input and output schema validation
 - Provider abstraction for different LLM services
-- Built-in support for OpenAI and AWS Bedrock
+- Built-in support for OpenAI, AWS Bedrock, and Anthropic
 - Easy to extend with custom providers
 - Field descriptions for better LLM understanding
 - Rich result objects with access to prompts and responses
@@ -366,6 +366,12 @@ Lluminary.configure do |config|
     region: ENV['AWS_REGION'],
     model: Lluminary::Models::Bedrock::MetaLlama38bInstructV10
   )
+  
+  # Anthropic Configuration
+  config.provider(:anthropic,
+    api_key: ENV['ANTHROPIC_API_KEY'],
+    model: Lluminary::Models::Anthropic::ClaudeV3Sonnet
+  )
 end
 ```
 
@@ -375,6 +381,7 @@ Each provider has a default model that will be used if none is specified: (At th
 
 - OpenAI: `Lluminary::Models::OpenAi::Gpt35Turbo`
 - AWS Bedrock: `Lluminary::Models::Bedrock::AnthropicClaudeInstantV1`
+- Anthropic: `Lluminary::Models::Anthropic::ClaudeV3Sonnet`
 
 You can override the model at both the global configuration level and the task level:
 
@@ -410,6 +417,13 @@ class CustomConfigTask < Lluminary::Task
   use_provider :openai, 
     api_key: 'custom-key', 
     model: Lluminary::Models::OpenAi::Gpt4 
+end
+
+# Using Anthropic provider
+class AnthropicTask < Lluminary::Task
+  # Uses the Anthropic provider with a specific model
+  use_provider :anthropic, 
+    model: Lluminary::Models::Anthropic::ClaudeV3Opus
 end
 ```
 
@@ -567,6 +581,9 @@ The examples in the `examples/` directory demonstrate various Lluminary features
    AWS_ACCESS_KEY_ID=your_aws_access_key
    AWS_SECRET_ACCESS_KEY=your_aws_secret_key
    AWS_REGION=your_aws_region
+   
+   # Anthropic Configuration (required for Anthropic examples)
+   ANTHROPIC_API_KEY=your_anthropic_api_key
    ```
 
 2. Run an example:
@@ -580,17 +597,23 @@ Note: You only need to configure the providers you plan to use. For example, if 
 
 ### OpenAI Provider
 
-| Option | Required | Default | Description |
-|--------|----------|---------|-------------|
-| `api_key` | Yes | - | Your OpenAI API key |
+| Option    | Required | Default | Description         |
+| --------- | -------- | ------- | ------------------- |
+| `api_key` | Yes      | -       | Your OpenAI API key |
 
 ### AWS Bedrock Provider
 
-| Option | Required | Default | Description |
-|--------|----------|---------|-------------|
-| `access_key_id` | Yes | - | Your AWS access key ID |
-| `secret_access_key` | Yes | - | Your AWS secret access key |
-| `region` | Yes | - | The AWS region to use |
+| Option              | Required | Default | Description                |
+| ------------------- | -------- | ------- | -------------------------- |
+| `access_key_id`     | Yes      | -       | Your AWS access key ID     |
+| `secret_access_key` | Yes      | -       | Your AWS secret access key |
+| `region`            | Yes      | -       | The AWS region to use      |
+
+### Anthropic Provider
+
+| Option    | Required | Default | Description            |
+| --------- | -------- | ------- | ---------------------- |
+| `api_key` | Yes      | -       | Your Anthropic API key |
 
 ## Development
 

@@ -19,6 +19,9 @@ RSpec.describe Lluminary::Task do
   end
 
   let(:task_with_test) { Class.new(described_class) { use_provider :test } }
+  let(:task_with_anthropic) do
+    Class.new(described_class) { use_provider :anthropic, api_key: "test" }
+  end
 
   describe ".call" do
     it "returns a result with a raw response from the provider" do
@@ -43,6 +46,12 @@ RSpec.describe Lluminary::Task do
       custom_provider = double("CustomProvider")
       task_class.provider = custom_provider
       expect(task_class.provider).to eq(custom_provider)
+    end
+
+    it "with :anthropic provider sets the Anthropic provider" do
+      expect(task_with_anthropic.provider).to be_a(
+        Lluminary::Providers::Anthropic
+      )
     end
   end
 
@@ -73,6 +82,15 @@ RSpec.describe Lluminary::Task do
         secret_access_key: "test",
         region: "us-east-1",
         model: Lluminary::Models::Bedrock::AnthropicClaudeInstantV1
+      )
+    end
+
+    it "with :anthropic instantiates Anthropic provider with config" do
+      task_class.use_provider(:anthropic, api_key: "test")
+      expect(task_class.provider).to be_a(Lluminary::Providers::Anthropic)
+      expect(task_class.provider.config).to include(
+        api_key: "test",
+        model: Lluminary::Models::Anthropic::Claude35Sonnet
       )
     end
 
