@@ -3,10 +3,16 @@
 require_relative "lluminary/version"
 require_relative "lluminary/result"
 require_relative "lluminary/task"
-# automatically require all providers
-Dir[File.join(__dir__, "lluminary/providers/*.rb")].each { |file| require file }
-# automatically require all models
+# require base model first
+require_relative "lluminary/models/base"
+# automatically require all models first
 Dir[File.join(__dir__, "lluminary/models/**/*.rb")].each { |file| require file }
+# require base provider first
+require_relative "lluminary/providers/base"
+# then require all other providers
+Dir[File.join(__dir__, "lluminary/providers/*.rb")].each do |file|
+  require file unless file.end_with?("base.rb")
+end
 require_relative "lluminary/config"
 
 # Lluminary is a framework for building and running LLM-powered tasks.

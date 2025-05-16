@@ -34,6 +34,9 @@ module Lluminary
           when :bedrock
             require_relative "providers/bedrock"
             Providers::Bedrock
+          when :anthropic
+            require_relative "providers/anthropic"
+            Providers::Anthropic
           else
             raise ArgumentError, "Unknown provider: #{provider_name}"
           end
