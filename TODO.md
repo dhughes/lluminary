@@ -323,3 +323,53 @@
     - [ ] Make tasks use default provider when none specified
     - [ ] Add tests for default provider behavior
     - [ ] Update documentation for default provider 
+
+
+# Notes on supporting Gemini (and maybe Vertex)
+
+- Google has Google AI Studio
+  - You can get an API token from there.
+- There are a few ruby gems that claim to support gemini
+  - they seem to indicate support for both ai studio and vertex, but I'm not 100% clear.
+  - I'm leaning towards gemini-ai: https://github.com/gbaptista/gemini-ai
+
+The docs for credentials mentions that you can create a key in google cloud console OR via AI studio, but that AI studio actually creates a cloud project for you. https://github.com/gbaptista/gemini-ai?tab=readme-ov-file#option-1-api-key-generative-language-api
+
+I think the config (in the current form) might look something like these:
+
+```ruby
+# for keys created via https://aistudio.google.com/apikey 
+# TODO: maybe this is always `:vertex`?
+config.provider(
+  :google_ai_studio,
+  api_key: ENV["GOOGLE_API_KEY"],
+  model: '????'
+)
+
+# when using a gcp service account with a credentials file
+config.provider(
+  :vertex,
+  credentials_file: ENV["GOOGLE_APPLICATION_CREDENTIALS"],
+  region: ENV["GOOGLE_CLOUD_LOCATION"],
+  model: '????'
+)
+
+# when using a gcp service account with the contents of a credentials file
+# TODO: or maybe `credentials` takes either a string or hash and figures it out from there?
+config.provider(
+  :vertex,
+  credentials: { ... },
+  region: ENV["GOOGLE_CLOUD_LOCATION"],
+  model: '????'
+)
+
+# default credentials for local dev 
+config.provider(
+  :vertex,
+  region: ENV["GOOGLE_CLOUD_LOCATION"],
+  model: '????'
+)
+
+# The above might have an optional `project_id` field as well, but I'm not sure why yet.
+
+```

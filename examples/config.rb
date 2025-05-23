@@ -25,4 +25,10 @@ Lluminary.configure do |config|
   )
 
   config.provider(:anthropic, api_key: ENV["ANTHROPIC_API_KEY"])
+
+  config.provider(
+    :google,
+    api_key: ENV["GOOGLE_AI_STUDIO_API_KEY"],
+    model: Lluminary::Models::Google::GeminiPro
+  )
 end
