@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "anthropic-sdk-beta", "~> 0.1.0.pre.beta.6" # Required for Anthropic provider
   s.add_runtime_dependency "aws-sdk-bedrock", "~> 1.0" # Required for AWS Bedrock model listing
   s.add_runtime_dependency "aws-sdk-bedrockruntime", "~> 1.0" # Required for AWS Bedrock provider
+  s.add_runtime_dependency "google-cloud-ai_platform", "~> 2.0" # Required for Google Vertex provider
   s.add_runtime_dependency "ruby-openai", "~> 6.3" # Required for OpenAI provider
 
   # Development dependencies

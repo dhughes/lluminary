@@ -6,7 +6,7 @@ require_relative "validation_error"
 require_relative "models/base"
 require_relative "models/openai/gpt35_turbo"
 require_relative "models/bedrock/anthropic_claude_instant_v1"
-
+require_relative "models/vertex/gemini_pro"
 module Lluminary
   # Base class for all Lluminary tasks.
   # Provides the core functionality for defining and running LLM-powered tasks.
@@ -37,6 +37,9 @@ module Lluminary
           when :anthropic
             require_relative "providers/anthropic"
             Providers::Anthropic
+          when :vertex
+            require_relative "providers/vertex"
+            Providers::Vertex
           else
             raise ArgumentError, "Unknown provider: #{provider_name}"
           end

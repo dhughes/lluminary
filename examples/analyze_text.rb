@@ -4,7 +4,7 @@ require_relative "config"
 # A task that analyzes text using LLM to extract structured information.
 # Takes text input and returns a structured analysis based on a predefined schema.
 class AnalyzeText < Lluminary::Task
-  use_provider :anthropic
+  use_provider :vertex
 
   input_schema { string :text }
 
