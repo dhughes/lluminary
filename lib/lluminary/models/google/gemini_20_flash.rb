@@ -3,8 +3,8 @@
 module Lluminary
   module Models
     module Google
-      class GeminiPro < Lluminary::Models::Base
-        NAME = "gemini-pro"
+      class Gemini20Flash < Lluminary::Models::Base
+        NAME = "gemini-2.0-flash"
 
         def compatible_with?(provider_name)
           provider_name == :google

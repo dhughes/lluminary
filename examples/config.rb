@@ -29,6 +29,6 @@ Lluminary.configure do |config|
   config.provider(
     :google,
     api_key: ENV["GOOGLE_AI_STUDIO_API_KEY"],
-    model: Lluminary::Models::Google::GeminiPro
+    model: Lluminary::Models::Google::Gemini20Flash
   )
 end
