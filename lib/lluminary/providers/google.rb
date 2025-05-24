@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# TODO: the gemini-ai gem appears to be abandoned. I may need to borrow from it to get the full range of support
+# But also, apparently google has an openai compatible endpoint. See: https://ai.google.dev/gemini-api/docs/openai
+#
 require "gemini-ai"
 require "json"
 require_relative "../provider_error"
@@ -39,6 +42,7 @@ module Lluminary
               generation_config: {
                 response_mime_type: "application/json"
               }
+              # TODO: generate `response_schema` from the task's output schema
             }
           )
 
@@ -66,9 +70,11 @@ module Lluminary
       end
 
       def models
-        # For now, we'll just return the Gemini Pro model
-        # In the future, we could fetch this from the API
-        ["gemini-pro"]
+        # The models endpoint returns a fair amount of info about the available models
+        # However, the list doesn't seem complete. It's not paginating. This is an issue with
+        # the gemini-ai gem. I'm considering forking the gem, but it seems pretty dead at 10 months
+        # without any activity.
+        client.models["models"].map { |model| model["name"] }
       end
 
       private
