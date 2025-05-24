@@ -3,11 +3,6 @@ require "ostruct"
 require "json"
 require_relative "schema"
 require_relative "validation_error"
-# TODO: it seems like there must be a better way to load the models
-require_relative "models/base"
-require_relative "models/openai/gpt35_turbo"
-require_relative "models/bedrock/anthropic_claude_instant_v1"
-require_relative "models/google/gemini_20_flash"
 
 module Lluminary
   # Base class for all Lluminary tasks.

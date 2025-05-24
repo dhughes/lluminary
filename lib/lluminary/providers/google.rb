@@ -4,7 +4,7 @@ require "openai"
 require "json"
 require_relative "../provider_error"
 
-# This is a quick and dirty implementation of a provided that works with Google's AI studio.
+# This is a quick and dirty implementation of a provider that works with Google's AI studio.
 # It does not currently support vertex. Plans are to eventually create a separate gem similar
 # `gemini-ai` that can work with either AI studio or Vertex. For now, this just uses the
 # OpenAI compatible endpoint.
