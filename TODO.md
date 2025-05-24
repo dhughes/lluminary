@@ -331,11 +331,11 @@
   - You can get an API token from there.
 - There are a few ruby gems that claim to support gemini
   - they seem to indicate support for both ai studio and vertex, but I'm not 100% clear.
-  - I'm leaning towards gemini-ai: https://github.com/gbaptista/gemini-ai
+  - ~~I'm leaning towards gemini-ai: https://github.com/gbaptista/gemini-ai~~ Appears abandoned.
 
 The docs for credentials mentions that you can create a key in google cloud console OR via AI studio, but that AI studio actually creates a cloud project for you. https://github.com/gbaptista/gemini-ai?tab=readme-ov-file#option-1-api-key-generative-language-api
 
-I think the config (in the current form) might look something like these:
+I think the config (in the current form) could look something like these, though it'll be different in the future. Right now there's no support for GCP credentials files.
 
 ```ruby
 # for keys created via https://aistudio.google.com/apikey 
@@ -374,9 +374,9 @@ config.provider(
 
 ```
 
-The `gemini-ai` gem provides a way to configure safety settings.
+~~The `gemini-ai` gem provides a way to configure safety settings.~~
 
-Different gemini models allow you to provide a json schema (or not):
+~~Different gemini models allow you to provide a json schema (or not):~~
 
 > While Gemini 1.5 Flash models only accept a text description of the JSON schema you want returned, the Gemini 1.5 Pro models let you pass a schema object (or a Python type equivalent), and the model output will strictly follow that schema. This is also known as controlled generation or constrained decoding.
 
