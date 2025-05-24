@@ -3,7 +3,6 @@
 require "openai"
 require "json"
 require_relative "../provider_error"
-require "pry-byebug"
 
 # This is a quick and dirty implementation of a provided that works with Google's AI studio.
 # It does not currently support vertex. Plans are to eventually create a separate gem similar
