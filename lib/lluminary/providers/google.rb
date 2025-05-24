@@ -59,7 +59,7 @@ module Lluminary
 
       def models
         response = @client.models.list
-        response["data"].map { |model| model["id"] }
+        response["data"].map { |model| model["id"].split("/").last }
       end
     end
   end
