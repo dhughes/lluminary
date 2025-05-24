@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
-# TODO: the gemini-ai gem appears to be abandoned. I may need to borrow from it to get the full range of support
-# But also, apparently google has an openai compatible endpoint. See: https://ai.google.dev/gemini-api/docs/openai
-#
-require "gemini-ai"
+require "openai"
 require "json"
 require_relative "../provider_error"
 require "pry-byebug"
 
+# This is a quick and dirty implementation of a provided that works with Google's AI studio.
+# It does not currently support vertex. Plans are to eventually create a separate gem similar
+# `gemini-ai` that can work with either AI studio or Vertex. For now, this just uses the
+# OpenAI compatible endpoint.
 module Lluminary
   module Providers
     class Google < Base
@@ -20,39 +21,26 @@ module Lluminary
         super
         @config = { model: DEFAULT_MODEL }.merge(config)
         @client =
-          Gemini.new(
-            credentials: credentials,
-            options: {
-              model: model.class::NAME,
-              server_sent_events: true
-            }
+          ::OpenAI::Client.new(
+            access_token: config[:api_key],
+            api_version: "",
+            uri_base: "https://generativelanguage.googleapis.com/v1beta/openai"
           )
       end
 
       def call(prompt, _task)
-        result =
-          @client.stream_generate_content(
-            {
-              contents: {
-                role: "user",
-                parts: {
-                  text: prompt
-                }
-              },
-              generation_config: {
-                response_mime_type: "application/json"
+        response =
+          client.chat(
+            parameters: {
+              model: model.class::NAME,
+              messages: [{ role: "user", content: prompt }],
+              response_format: {
+                type: "json_object"
               }
-              # TODO: generate `response_schema` from the task's output schema
             }
           )
 
-        content =
-          result
-            .map do |response|
-              response.dig("candidates", 0, "content", "parts")
-            end
-            .map { |parts| parts.map { |part| part["text"] }.join }
-            .join
+        content = response.dig("choices", 0, "message", "content")
 
         {
           raw: content,
@@ -70,42 +58,8 @@ module Lluminary
       end
 
       def models
-        # The models endpoint returns a fair amount of info about the available models
-        # However, the list doesn't seem complete. It's not paginating. This is an issue with
-        # the gemini-ai gem. I'm considering forking the gem, but it seems pretty dead at 10 months
-        # without any activity.
-        client.models["models"].map { |model| model["name"] }
-      end
-
-      private
-
-      def credentials
-        if api?
-          { service: service, api_key: config[:api_key], version: "v1beta" }
-        else
-          {
-            service: service,
-            credentials: gcp_credentials,
-            region: config[:region],
-            version: "v1beta"
-          }
-        end
-      end
-
-      def gcp_credentials
-        if File.exist?(config[:credentials])
-          File.read(config[:credentials])
-        else
-          config[:credentials]
-        end
-      end
-
-      def service
-        api? ? "generative-language-api" : "vertex-ai-api"
-      end
-
-      def api?
-        !config[:api_key].nil?
+        response = @client.models.list
+        response["data"].map { |model| model["id"] }
       end
     end
   end
