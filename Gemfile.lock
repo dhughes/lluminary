@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    lluminary (0.2.2)
+    lluminary (0.2.3)
       activemodel (>= 5.2, < 9)
       anthropic-sdk-beta (~> 0.1.0.pre.beta.6)
       aws-sdk-bedrock (~> 1.0)

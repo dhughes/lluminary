@@ -10,7 +10,7 @@ A Ruby library for building LLM-powered applications with structured outputs.
 - Automatic JSON response formatting based on output schemas
 - Input and output schema validation
 - Provider abstraction for different LLM services
-- Built-in support for OpenAI, AWS Bedrock, and Anthropic
+- Built-in support for OpenAI, AWS Bedrock, Anthropic, and Google (via AI Studio)
 - Easy to extend with custom providers
 - Field descriptions for better LLM understanding
 - Rich result objects with access to prompts and responses
@@ -372,6 +372,12 @@ Lluminary.configure do |config|
     api_key: ENV['ANTHROPIC_API_KEY'],
     model: Lluminary::Models::Anthropic::ClaudeV3Sonnet
   )
+
+  # Google Configuration (via AI Studio)
+  config.provider(:google,
+    api_key: ENV['GOOGLE_AI_STUDIO_API_KEY'],
+    model: Lluminary::Models::Google::Gemini20Flash
+  )
 end
 ```
 
@@ -382,6 +388,7 @@ Each provider has a default model that will be used if none is specified: (At th
 - OpenAI: `Lluminary::Models::OpenAi::Gpt35Turbo`
 - AWS Bedrock: `Lluminary::Models::Bedrock::AnthropicClaudeInstantV1`
 - Anthropic: `Lluminary::Models::Anthropic::ClaudeV3Sonnet`
+- Google: `Lluminary::Models::Google::Gemini20Flash`
 
 You can override the model at both the global configuration level and the task level:
 
@@ -584,6 +591,9 @@ The examples in the `examples/` directory demonstrate various Lluminary features
    
    # Anthropic Configuration (required for Anthropic examples)
    ANTHROPIC_API_KEY=your_anthropic_api_key
+
+   # Google Configuration (required for Google examples)
+   GOOGLE_AI_STUDIO_API_KEY=your_google_ai_studio_api_key
    ```
 
 2. Run an example:
@@ -614,6 +624,14 @@ Note: You only need to configure the providers you plan to use. For example, if 
 | Option    | Required | Default | Description            |
 | --------- | -------- | ------- | ---------------------- |
 | `api_key` | Yes      | -       | Your Anthropic API key |
+
+### Google Provider (AI Studio)
+
+| Option    | Required | Default | Description                      |
+| --------- | -------- | ------- | -------------------------------- |
+| `api_key` | Yes      | -       | Your Google AI Studio API key    |
+
+**Note**: The Google provider currently supports Google AI Studio only. Vertex AI support is planned for future releases.
 
 ## Development
 
