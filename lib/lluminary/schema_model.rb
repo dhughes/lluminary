@@ -70,8 +70,8 @@ module Lluminary
             next unless field
 
             case field[:type]
-            when :hash
-              validate_hash_field(record, name.to_s.capitalize, value, field)
+            when :struct
+              validate_struct_field(record, name.to_s.capitalize, value, field)
             when :array
               validate_array_field(
                 record,
@@ -113,7 +113,7 @@ module Lluminary
 
         private
 
-        def validate_hash_field(
+        def validate_struct_field(
           record,
           name,
           value,
@@ -135,8 +135,14 @@ module Lluminary
             next if field_value.nil?
 
             case field[:type]
-            when :hash
-              validate_hash_field(record, key, field_value, field, current_path)
+            when :struct
+              validate_struct_field(
+                record,
+                key,
+                field_value,
+                field,
+                current_path
+              )
             when :array
               validate_array_field(
                 record,
@@ -183,8 +189,8 @@ module Lluminary
             current_path = "#{field_name}[#{index}]"
 
             case element_type[:type]
-            when :hash
-              validate_hash_field(
+            when :struct
+              validate_struct_field(
                 record,
                 name,
                 element,

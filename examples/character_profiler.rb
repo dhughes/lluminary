@@ -14,13 +14,13 @@ class CharacterProfiler < Lluminary::Task
   end
 
   output_schema do
-    hash :character_profile,
-         description: "Structured profile of the character" do
+    struct :character_profile,
+           description: "Structured profile of the character" do
       string :name, description: "Character's full name or main identifier"
       string :personality,
              description: "Brief description of character's personality traits"
 
-      hash :appearance do
+      struct :appearance do
         string :physical_traits, description: "Notable physical characteristics"
         string :style, description: "How the character typically dresses"
       end
@@ -30,7 +30,7 @@ class CharacterProfiler < Lluminary::Task
         string
       end
 
-      hash :relationships do
+      struct :relationships do
         array :allies, description: "Characters that support this character" do
           string
         end

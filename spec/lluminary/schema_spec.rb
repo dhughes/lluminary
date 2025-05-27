@@ -265,9 +265,9 @@ RSpec.describe Lluminary::Schema do
       )
     end
 
-    it "supports hashes inside arrays" do
+    it "supports structs inside arrays" do
       schema.array(:users) do
-        hash do
+        struct do
           string :name
           integer :age
         end
@@ -278,7 +278,7 @@ RSpec.describe Lluminary::Schema do
           type: :array,
           description: nil,
           element_type: {
-            type: :hash,
+            type: :struct,
             description: nil,
             fields: {
               name: {
@@ -296,16 +296,16 @@ RSpec.describe Lluminary::Schema do
     end
   end
 
-  describe "#hash" do
-    it "requires a block for hash fields" do
-      expect { schema.hash(:config) }.to raise_error(
+  describe "#struct" do
+    it "requires a block for struct fields" do
+      expect { schema.struct(:config) }.to raise_error(
         ArgumentError,
-        "Hash fields must be defined with a block"
+        "Struct fields must be defined with a block"
       )
     end
 
-    it "adds a hash field with nested fields to the schema" do
-      schema.hash(:config, description: "Configuration") do
+    it "adds a struct field with nested fields to the schema" do
+      schema.struct(:config, description: "Configuration") do
         string :host, description: "The server hostname"
         integer :port
       end
@@ -313,7 +313,7 @@ RSpec.describe Lluminary::Schema do
       expect(schema.fields).to eq(
         {
           config: {
-            type: :hash,
+            type: :struct,
             description: "Configuration",
             fields: {
               host: {
@@ -330,13 +330,13 @@ RSpec.describe Lluminary::Schema do
       )
     end
 
-    it "supports nested hashes" do
-      schema.hash(:config) do
+    it "supports nested structs" do
+      schema.struct(:config) do
         string :name
-        hash :database do
+        struct :database do
           string :host
           integer :port
-          hash :credentials do
+          struct :credentials do
             string :username
             string :password
           end
@@ -345,7 +345,7 @@ RSpec.describe Lluminary::Schema do
 
       expect(schema.fields[:config]).to eq(
         {
-          type: :hash,
+          type: :struct,
           description: nil,
           fields: {
             name: {
@@ -353,7 +353,7 @@ RSpec.describe Lluminary::Schema do
               description: nil
             },
             database: {
-              type: :hash,
+              type: :struct,
               description: nil,
               fields: {
                 host: {
@@ -365,7 +365,7 @@ RSpec.describe Lluminary::Schema do
                   description: nil
                 },
                 credentials: {
-                  type: :hash,
+                  type: :struct,
                   description: nil,
                   fields: {
                     username: {
@@ -385,8 +385,8 @@ RSpec.describe Lluminary::Schema do
       )
     end
 
-    it "supports arrays inside hashes" do
-      schema.hash(:config) do
+    it "supports arrays inside structs" do
+      schema.struct(:config) do
         string :name
         array :tags do
           string
@@ -395,7 +395,7 @@ RSpec.describe Lluminary::Schema do
 
       expect(schema.fields[:config]).to eq(
         {
-          type: :hash,
+          type: :struct,
           description: nil,
           fields: {
             name: {

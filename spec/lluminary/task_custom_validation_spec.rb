@@ -68,7 +68,7 @@ RSpec.describe "Task custom validations" do
       array :relevant_hashtags do
         string
       end
-      hash :analysis do
+      struct :analysis do
         string :top_hashtag
         integer :count
       end

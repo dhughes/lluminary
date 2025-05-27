@@ -437,16 +437,16 @@ RSpec.describe Lluminary::Models::Base do
         end
       end
 
-      context "with array containing hash" do
+      context "with array containing struct" do
         before do
           task_class.output_schema do
             array :contacts, description: "List of contacts" do
-              hash { string :name, description: "Contact name" }
+              struct { string :name, description: "Contact name" }
             end
           end
         end
 
-        it "formats array of hashes field description correctly" do
+        it "formats array of structs field description correctly" do
           prompt = model.format_prompt(task)
 
           expected_description = <<~DESCRIPTION.chomp
@@ -466,17 +466,17 @@ RSpec.describe Lluminary::Models::Base do
       end
     end
 
-    context "with hash fields" do
-      context "with simple hash with one field" do
+    context "with struct fields" do
+      context "with simple struct with one field" do
         before do
           task_class.output_schema do
-            hash :person do
+            struct :person do
               string :name, description: "The person's name"
             end
           end
         end
 
-        it "formats hash field description correctly" do
+        it "formats struct field description correctly" do
           prompt = model.format_prompt(task)
 
           expected_description = <<~DESCRIPTION.chomp
@@ -494,17 +494,17 @@ RSpec.describe Lluminary::Models::Base do
         end
       end
 
-      context "with hash with two fields (one with description)" do
+      context "with struct with two fields (one with description)" do
         before do
           task_class.output_schema do
-            hash :person, description: "A person" do
+            struct :person, description: "A person" do
               string :name, description: "The person's name"
               integer :age
             end
           end
         end
 
-        it "formats hash field descriptions correctly" do
+        it "formats struct field descriptions correctly" do
           prompt = model.format_prompt(task)
 
           expected_description = <<~DESCRIPTION.chomp
@@ -527,17 +527,17 @@ RSpec.describe Lluminary::Models::Base do
         end
       end
 
-      context "with hash containing datetime field" do
+      context "with struct containing datetime field" do
         before do
           task_class.output_schema do
-            hash :event, description: "An event" do
+            struct :event, description: "An event" do
               string :title
               datetime :scheduled_at, description: "When the event is scheduled"
             end
           end
         end
 
-        it "formats hash with datetime field description correctly" do
+        it "formats struct with datetime field description correctly" do
           prompt = model.format_prompt(task)
 
           expected_description = <<~DESCRIPTION.chomp
@@ -560,10 +560,10 @@ RSpec.describe Lluminary::Models::Base do
         end
       end
 
-      context "with hash containing array field" do
+      context "with struct containing array field" do
         before do
           task_class.output_schema do
-            hash :user, description: "A user profile" do
+            struct :user, description: "A user profile" do
               string :name, description: "The person's name"
               array :tags, description: "User tags" do
                 string
@@ -572,7 +572,7 @@ RSpec.describe Lluminary::Models::Base do
           end
         end
 
-        it "formats hash with array field description correctly" do
+        it "formats struct with array field description correctly" do
           prompt = model.format_prompt(task)
 
           expected_description = <<~DESCRIPTION.chomp
@@ -596,20 +596,20 @@ RSpec.describe Lluminary::Models::Base do
         end
       end
 
-      context "with nested hashes (mixed descriptions)" do
+      context "with nested structs (mixed descriptions)" do
         before do
           task_class.output_schema do
-            hash :person, description: "A person profile" do
+            struct :person, description: "A person profile" do
               string :name, description: "The person's name"
               integer :age
-              hash :address do
+              struct :address do
                 string :street, description: "Street name"
                 string :city
                 string :country
               end
-              hash :preferences, description: "User preferences" do
+              struct :preferences, description: "User preferences" do
                 boolean :notifications
-                hash :theme do
+                struct :theme do
                   string :color, description: "Theme color"
                   boolean :dark_mode
                 end
@@ -618,7 +618,7 @@ RSpec.describe Lluminary::Models::Base do
           end
         end
 
-        it "formats nested hash fields correctly with mixed descriptions" do
+        it "formats nested struct fields correctly with mixed descriptions" do
           prompt = model.format_prompt(task)
 
           expected_description = <<~DESCRIPTION.chomp
@@ -1006,11 +1006,12 @@ RSpec.describe Lluminary::Models::Base do
         end
       end
 
-      context "hash validations" do
+      context "struct validations" do
         context "presence validation" do
           before do
             task_class.output_schema do
-              hash :user_settings, description: "User configuration settings" do
+              struct :user_settings,
+                     description: "User configuration settings" do
                 string :theme
                 boolean :notifications_enabled
               end
@@ -1018,7 +1019,7 @@ RSpec.describe Lluminary::Models::Base do
             end
           end
 
-          it "includes presence validation in hash field description" do
+          it "includes presence validation in struct field description" do
             prompt = model.format_prompt(task)
 
             expected_description = <<~DESCRIPTION.chomp
@@ -1329,10 +1330,10 @@ RSpec.describe Lluminary::Models::Base do
         end
       end
 
-      context "with hash fields" do
-        it "generates correct JSON example for simple hash" do
+      context "with struct fields" do
+        it "generates correct JSON example for simple struct" do
           task_class.output_schema do
-            hash :config, description: "Configuration options" do
+            struct :config, description: "Configuration options" do
               string :host, description: "Server hostname"
               integer :port
             end
@@ -1352,11 +1353,11 @@ RSpec.describe Lluminary::Models::Base do
           expect(prompt).to include(expected_json)
         end
 
-        it "generates correct JSON example for nested hash" do
+        it "generates correct JSON example for nested struct" do
           task_class.output_schema do
-            hash :user, description: "User profile" do
+            struct :user, description: "User profile" do
               string :name
-              hash :address do
+              struct :address do
                 string :street
                 string :city
                 string :country
@@ -1382,9 +1383,9 @@ RSpec.describe Lluminary::Models::Base do
           expect(prompt).to include(expected_json)
         end
 
-        it "generates correct JSON example for hash with array" do
+        it "generates correct JSON example for struct with array" do
           task_class.output_schema do
-            hash :user_data, description: "User data" do
+            struct :user_data, description: "User data" do
               string :username
               array :permissions do
                 string

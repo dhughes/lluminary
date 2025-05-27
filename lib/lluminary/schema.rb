@@ -43,16 +43,16 @@ module Lluminary
       @fields[name] = field
     end
 
-    def hash(name, description: nil, &block)
+    def struct(name, description: nil, &block)
       unless block
-        raise ArgumentError, "Hash fields must be defined with a block"
+        raise ArgumentError, "Struct fields must be defined with a block"
       end
 
       nested_schema = Schema.new
       nested_schema.instance_eval(&block)
 
       @fields[name] = {
-        type: :hash,
+        type: :struct,
         description: description,
         fields: nested_schema.fields
       }
@@ -120,15 +120,19 @@ module Lluminary
         field
       end
 
-      def hash(description: nil, &block)
+      def struct(description: nil, &block)
         unless block
-          raise ArgumentError, "Hash fields must be defined with a block"
+          raise ArgumentError, "Struct fields must be defined with a block"
         end
 
         nested_schema = Schema.new
         nested_schema.instance_eval(&block)
 
-        { type: :hash, description: description, fields: nested_schema.fields }
+        {
+          type: :struct,
+          description: description,
+          fields: nested_schema.fields
+        }
       end
     end
   end

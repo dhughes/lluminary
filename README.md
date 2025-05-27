@@ -119,12 +119,12 @@ Lluminary supports these field types:
    end
    ```
 
-   Arrays can also contain hashes (objects), allowing for lists of structured data:
+   Arrays can also contain structs (objects in JSON with predefined keys), allowing for lists of structured data:
    ```ruby
    class ProductListTask < Lluminary::Task
      output_schema do
        array :products, description: "List of products" do
-         hash do
+         struct do
            string :name, description: "Product name"
            float :price, description: "Product price"
            integer :stock, description: "Units in stock"
@@ -136,17 +136,17 @@ Lluminary supports these field types:
 
    When used in output schemas, the LLM will be instructed to return arrays in the appropriate format based on the element type.
 
-7. **Hash** (Object)  
-   Hashes allow you to define nested structured data with their own sets of fields. You can nest hashes within each other to create complex data structures.
+7. **Struct** (Object)  
+   Structs allow you to define nested structured data with their own sets of fields. You can nest structs within each other to create complex data structures. These are not the same thing as Ruby `Struct`, they're just hashes (or JSON objects) where the keys and their types have been predefined.
    
    Usage example:  
    ```ruby
    class UserProfileTask < Lluminary::Task
      output_schema do
-       hash :user, description: "User profile data" do
+       struct :user, description: "User profile data" do
          string :name, description: "User's full name"
          integer :age
-         hash :address do
+         struct :address do
            string :street, description: "Street address"
            string :city
            string :country
@@ -156,23 +156,23 @@ Lluminary supports these field types:
    end
    ```
 
-   Hash fields can contain any other field types, including nested hashes, arrays, and primitive types:
+   Struct fields can contain any other field types, including nested structs, arrays, and primitive types:
    ```ruby
    class UserDataTask < Lluminary::Task
      output_schema do
-       hash :user_data, description: "Complete user information" do
+       struct :user_data, description: "Complete user information" do
          string :username
-         # Nested hash
-         hash :contact_info do
+         # Nested struct
+         struct :contact_info do
            string :email
            string :phone
          end
-         # Array within a hash
+         # Array within a struct
          array :permissions do
            string
          end
-         # Hash with datetime
-         hash :account_info do
+         # Struct with datetime
+         struct :account_info do
            datetime :created_at, description: "Account creation date"
            boolean :is_active
          end
@@ -181,7 +181,7 @@ Lluminary supports these field types:
    end
    ```
 
-   When used in output schemas, the LLM will be instructed to return the hash with all its nested fields in the correct structure. All hash keys will be strings, not symbols, since Lluminary is creating hashes from deserialized JSON returned by the LLM.
+   When used in output schemas, the LLM will be instructed to return the struct with all its nested fields in the correct structure. All struct keys will be strings, not symbols, since Lluminary is creating structs from deserialized JSON returned by the LLM. Also, the data will be deserialized into a Ruby `Hash` (not a real `Struct`).
 
 All of these field definitions allow nil values by default, ensuring that optional data can be omitted.
 

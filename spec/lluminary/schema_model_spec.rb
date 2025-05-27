@@ -220,11 +220,11 @@ RSpec.describe Lluminary::SchemaModel do
     end
   end
 
-  describe "hash field with array validation" do
+  describe "struct field with array validation" do
     let(:fields) do
       {
         config: {
-          type: :hash,
+          type: :struct,
           description: "Configuration",
           fields: {
             name: {
@@ -245,7 +245,7 @@ RSpec.describe Lluminary::SchemaModel do
     end
     let(:model_class) { described_class.build(fields: fields, validations: []) }
 
-    it "validates arrays inside hashes" do
+    it "validates arrays inside structs" do
       instance =
         model_class.new(
           config: {
@@ -260,11 +260,11 @@ RSpec.describe Lluminary::SchemaModel do
     end
   end
 
-  describe "nested hash validation" do
+  describe "nested struct validation" do
     let(:fields) do
       {
         config: {
-          type: :hash,
+          type: :struct,
           description: nil,
           fields: {
             name: {
@@ -272,7 +272,7 @@ RSpec.describe Lluminary::SchemaModel do
               description: nil
             },
             database: {
-              type: :hash,
+              type: :struct,
               description: nil,
               fields: {
                 host: {
@@ -284,7 +284,7 @@ RSpec.describe Lluminary::SchemaModel do
                   description: nil
                 },
                 credentials: {
-                  type: :hash,
+                  type: :struct,
                   description: nil,
                   fields: {
                     username: {
@@ -305,7 +305,7 @@ RSpec.describe Lluminary::SchemaModel do
     end
     let(:model_class) { described_class.build(fields: fields, validations: []) }
 
-    it "validates nested hashes" do
+    it "validates nested structs" do
       instance =
         model_class.new(
           config: {
@@ -330,11 +330,11 @@ RSpec.describe Lluminary::SchemaModel do
     end
   end
 
-  describe "hash type enforcement" do
+  describe "struct type enforcement" do
     let(:fields) do
       {
         config: {
-          type: :hash,
+          type: :struct,
           description: nil,
           fields: {
             host: {
@@ -356,14 +356,14 @@ RSpec.describe Lluminary::SchemaModel do
     end
   end
 
-  describe "array of hashes validation" do
+  describe "array of structs validation" do
     let(:fields) do
       {
         users: {
           type: :array,
           description: nil,
           element_type: {
-            type: :hash,
+            type: :struct,
             description: nil,
             fields: {
               name: {
@@ -381,7 +381,7 @@ RSpec.describe Lluminary::SchemaModel do
     end
     let(:model_class) { described_class.build(fields: fields, validations: []) }
 
-    it "validates hashes inside arrays" do
+    it "validates structs inside arrays" do
       instance =
         model_class.new(
           users: [

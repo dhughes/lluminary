@@ -57,8 +57,8 @@ module Lluminary
 
       def format_field_description(name, field, name_for_example = nil)
         case field[:type]
-        when :hash
-          format_hash_description(name, field, name_for_example)
+        when :struct
+          format_struct_description(name, field, name_for_example)
         when :array
           format_array_description(name, field, name_for_example)
         else
@@ -66,12 +66,12 @@ module Lluminary
         end
       end
 
-      def format_hash_description(name, field, name_for_example = nil)
+      def format_struct_description(name, field, name_for_example = nil)
         return nil unless field[:fields]
 
         lines = build_field_description_lines(name, field, name_for_example)
 
-        # Add descriptions for each field in the hash
+        # Add descriptions for each field in the struct
         field[:fields].each do |subname, subfield|
           lines << "\n#{format_field_description("#{name}.#{subname}", subfield, subname)}"
         end
@@ -104,7 +104,7 @@ module Lluminary
             nested_description =
               format_array_description("#{name}[]", element_field, "item")
             lines << "\n#{nested_description}"
-          elsif field[:element_type][:type] == :hash &&
+          elsif field[:element_type][:type] == :struct &&
                 field[:element_type][:fields]
             field[:element_type][:fields].each do |subname, subfield|
               inner_field = {
@@ -168,12 +168,12 @@ module Lluminary
             "array of arrays"
           elsif field[:element_type][:type] == :datetime
             "array of datetimes in ISO8601 format"
-          elsif field[:element_type][:type] == :hash
+          elsif field[:element_type][:type] == :struct
             "array of objects"
           else
             "array of #{field[:element_type][:type]}s"
           end
-        when :hash
+        when :struct
           "object"
         else
           field[:type].to_s
@@ -268,8 +268,8 @@ module Lluminary
 
       def generate_example_json_object(fields)
         example =
-          fields.each_with_object({}) do |(name, field), hash|
-            hash[name] = generate_example_value(name, field)
+          fields.each_with_object({}) do |(name, field), object|
+            object[name] = generate_example_value(name, field)
           end
         JSON.pretty_generate(example)
       end
@@ -292,8 +292,8 @@ module Lluminary
           0.0
         when :array
           generate_array_example(name, field)
-        when :hash
-          generate_hash_example(name, field)
+        when :struct
+          generate_struct_example(name, field)
         end
       end
 
@@ -318,14 +318,14 @@ module Lluminary
           else
             [[], []]
           end
-        when :hash
+        when :struct
           example =
-            generate_hash_example(name.to_s.singularize, field[:element_type])
+            generate_struct_example(name.to_s.singularize, field[:element_type])
           [example, example]
         end
       end
 
-      def generate_hash_example(name, field)
+      def generate_struct_example(name, field)
         return {} unless field[:fields]
 
         field[:fields].each_with_object({}) do |(subname, subfield), hash|
