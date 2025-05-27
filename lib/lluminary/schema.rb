@@ -36,7 +36,7 @@ module Lluminary
       field = { type: :array, description: description }
 
       if block
-        element_schema = ArrayElementSchema.new
+        element_schema = ElementTypeSchema.new
         field[:element_type] = element_schema.instance_eval(&block)
       end
 
@@ -55,6 +55,21 @@ module Lluminary
         type: :hash,
         description: description,
         fields: nested_schema.fields
+      }
+    end
+
+    def dictionary(name, description: nil, &block)
+      unless block
+        raise ArgumentError, "Dictionary fields must be defined with a block"
+      end
+
+      element_schema = ElementTypeSchema.new
+      value_type = element_schema.instance_eval(&block)
+
+      @fields[name] = {
+        type: :dictionary,
+        description: description,
+        value_type: value_type
       }
     end
 
@@ -90,8 +105,8 @@ module Lluminary
         )
     end
 
-    # Internal class for defining array element types
-    class ArrayElementSchema
+    # Internal class for defining element types for arrays and dictionaries (or any other container-type objects)
+    class ElementTypeSchema
       def string(description: nil)
         { type: :string, description: description }
       end
@@ -114,7 +129,7 @@ module Lluminary
 
       def array(description: nil, &block)
         field = { type: :array, description: description }
-        field[:element_type] = ArrayElementSchema.new.instance_eval(
+        field[:element_type] = ElementTypeSchema.new.instance_eval(
           &block
         ) if block
         field
@@ -129,6 +144,17 @@ module Lluminary
         nested_schema.instance_eval(&block)
 
         { type: :hash, description: description, fields: nested_schema.fields }
+      end
+
+      def dictionary(description: nil, &block)
+        unless block
+          raise ArgumentError, "Dictionary fields must be defined with a block"
+        end
+
+        element_schema = ElementTypeSchema.new
+        value_type = element_schema.instance_eval(&block)
+
+        { type: :dictionary, description: description, value_type: value_type }
       end
     end
   end

@@ -294,6 +294,25 @@ RSpec.describe Lluminary::Schema do
         }
       )
     end
+
+    it "supports dictionaries inside arrays" do
+      schema.array(:configs) { dictionary { string } }
+
+      expect(schema.fields[:configs]).to eq(
+        {
+          type: :array,
+          description: nil,
+          element_type: {
+            type: :dictionary,
+            description: nil,
+            value_type: {
+              type: :string,
+              description: nil
+            }
+          }
+        }
+      )
+    end
   end
 
   describe "#hash" do
@@ -409,6 +428,210 @@ RSpec.describe Lluminary::Schema do
                 type: :string,
                 description: nil
               }
+            }
+          }
+        }
+      )
+    end
+
+    it "supports dictionaries inside hashes" do
+      schema.hash(:config) do
+        string :name
+        dictionary :settings do
+          string
+        end
+      end
+
+      expect(schema.fields[:config]).to eq(
+        {
+          type: :hash,
+          description: nil,
+          fields: {
+            name: {
+              type: :string,
+              description: nil
+            },
+            settings: {
+              type: :dictionary,
+              description: nil,
+              value_type: {
+                type: :string,
+                description: nil
+              }
+            }
+          }
+        }
+      )
+    end
+  end
+
+  describe "#dictionary" do
+    it "adds a dictionary field to the schema" do
+      schema.dictionary(:tags) { string }
+      expect(schema.fields).to eq(
+        {
+          tags: {
+            type: :dictionary,
+            description: nil,
+            value_type: {
+              type: :string,
+              description: nil
+            }
+          }
+        }
+      )
+    end
+
+    it "adds a dictionary field with description" do
+      schema.dictionary(:tags, description: "A map of tags") { string }
+      expect(schema.fields).to eq(
+        {
+          tags: {
+            type: :dictionary,
+            description: "A map of tags",
+            value_type: {
+              type: :string,
+              description: nil
+            }
+          }
+        }
+      )
+    end
+
+    it "requires a name for the dictionary field" do
+      expect { schema.dictionary }.to raise_error(ArgumentError)
+    end
+
+    it "requires a block for dictionary fields" do
+      expect { schema.dictionary(:tags) }.to raise_error(
+        ArgumentError,
+        "Dictionary fields must be defined with a block"
+      )
+    end
+
+    it "accepts string type without a name" do
+      schema.dictionary(:tags) { string }
+      expect(schema.fields).to eq(
+        {
+          tags: {
+            type: :dictionary,
+            description: nil,
+            value_type: {
+              type: :string,
+              description: nil
+            }
+          }
+        }
+      )
+    end
+
+    it "accepts integer type without a name" do
+      schema.dictionary(:scores) { integer }
+      expect(schema.fields).to eq(
+        {
+          scores: {
+            type: :dictionary,
+            description: nil,
+            value_type: {
+              type: :integer,
+              description: nil
+            }
+          }
+        }
+      )
+    end
+
+    it "accepts boolean type without a name" do
+      schema.dictionary(:flags) { boolean }
+      expect(schema.fields).to eq(
+        {
+          flags: {
+            type: :dictionary,
+            description: nil,
+            value_type: {
+              type: :boolean,
+              description: nil
+            }
+          }
+        }
+      )
+    end
+
+    it "accepts float type without a name" do
+      schema.dictionary(:ratings) { float }
+      expect(schema.fields).to eq(
+        {
+          ratings: {
+            type: :dictionary,
+            description: nil,
+            value_type: {
+              type: :float,
+              description: nil
+            }
+          }
+        }
+      )
+    end
+
+    it "accepts datetime type without a name" do
+      schema.dictionary(:timestamps) { datetime }
+      expect(schema.fields).to eq(
+        {
+          timestamps: {
+            type: :dictionary,
+            description: nil,
+            value_type: {
+              type: :datetime,
+              description: nil
+            }
+          }
+        }
+      )
+    end
+
+    it "supports hashes as dictionary values" do
+      schema.dictionary(:users) do
+        hash do
+          string :name
+          integer :age
+        end
+      end
+
+      expect(schema.fields[:users]).to eq(
+        {
+          type: :dictionary,
+          description: nil,
+          value_type: {
+            type: :hash,
+            description: nil,
+            fields: {
+              name: {
+                type: :string,
+                description: nil
+              },
+              age: {
+                type: :integer,
+                description: nil
+              }
+            }
+          }
+        }
+      )
+    end
+
+    it "supports arrays as dictionary values" do
+      schema.dictionary(:categories) { array { string } }
+
+      expect(schema.fields[:categories]).to eq(
+        {
+          type: :dictionary,
+          description: nil,
+          value_type: {
+            type: :array,
+            description: nil,
+            element_type: {
+              type: :string,
+              description: nil
             }
           }
         }
