@@ -71,14 +71,11 @@ module Lluminary
 
             case field[:type]
             when :hash
-              validate_hash_field(record, name.to_s.capitalize, value, field)
+              validate_hash_field(record, name, value, field)
             when :array
-              validate_array_field(
-                record,
-                name.to_s.capitalize,
-                value,
-                field[:element_type]
-              )
+              validate_array_field(record, name, value, field[:element_type])
+            when :dictionary
+              validate_dictionary_field(record, name, value, field[:value_type])
             when :string
               unless value.is_a?(String)
                 record.errors.add(name.to_s.capitalize, "must be a String")
@@ -113,6 +110,72 @@ module Lluminary
 
         private
 
+        def validate_dictionary_field(
+          record,
+          name,
+          value,
+          value_type,
+          path = nil
+        )
+          field_name = path || name
+
+          unless value.is_a?(Hash)
+            record.errors.add(field_name, "must be a Hash")
+            return
+          end
+
+          value.each do |key, val|
+            current_path = "#{field_name}[#{key}]"
+
+            case value_type[:type]
+            when :string
+              unless val.is_a?(String)
+                record.errors.add(current_path, "must be a String")
+              end
+            when :integer
+              unless val.is_a?(Integer)
+                record.errors.add(current_path, "must be an Integer")
+              end
+            when :boolean
+              unless [true, false].include?(val)
+                record.errors.add(current_path, "must be true or false")
+              end
+            when :float
+              unless val.is_a?(Float)
+                record.errors.add(current_path, "must be a float")
+              end
+            when :datetime
+              unless val.is_a?(DateTime)
+                record.errors.add(current_path, "must be a DateTime")
+              end
+            when :hash
+              validate_hash_field(
+                record,
+                current_path,
+                val,
+                value_type,
+                current_path
+              )
+            when :array
+              validate_array_field(
+                record,
+                current_path,
+                val,
+                value_type[:element_type],
+                current_path
+              )
+            when :dictionary
+              validate_dictionary_field(
+                record,
+                current_path,
+                val,
+                value_type[:value_type],
+                current_path
+              )
+            end
+          end
+        end
+
         def validate_hash_field(
           record,
           name,
@@ -143,6 +206,14 @@ module Lluminary
                 key,
                 field_value,
                 field[:element_type],
+                current_path
+              )
+            when :dictionary
+              validate_dictionary_field(
+                record,
+                key,
+                field_value,
+                field[:value_type],
                 current_path
               )
             when :string
@@ -197,6 +268,14 @@ module Lluminary
                 name,
                 element,
                 element_type[:element_type],
+                current_path
+              )
+            when :dictionary
+              validate_dictionary_field(
+                record,
+                name,
+                element,
+                element_type[:value_type],
                 current_path
               )
             when :string
