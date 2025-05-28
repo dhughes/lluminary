@@ -183,6 +183,47 @@ Lluminary supports these field types:
 
    When used in output schemas, the LLM will be instructed to return the hash with all its nested fields in the correct structure. All hash keys will be strings, not symbols, since Lluminary is creating hashes from deserialized JSON returned by the LLM.
 
+8. **Dictionary** (Object with typed values)  
+   Dictionaries are similar to hashes, but they are specifically designed for key-value pairs where all values must be of the same type. This is useful for representing collections of items where the keys are dynamic but the values follow a consistent structure.
+   
+   Usage example with float values:  
+   ```ruby
+   class EmotionAnalyzer < Lluminary::Task
+     output_schema do
+       dictionary :emotion_scores, description: "Scores for each detected emotion" do
+         float
+       end
+     end
+   end
+   ```
+
+   Usage example with array values:
+   ```ruby
+   class CategoryOrganizer < Lluminary::Task
+     output_schema do
+       dictionary :categories, description: "Categories and their items" do
+         array { string }
+       end
+     end
+   end
+   ```
+
+   Usage example with hash values:
+   ```ruby
+   class UserDirectory < Lluminary::Task
+     output_schema do
+       dictionary :users, description: "User profiles" do
+         hash do
+           string :name
+           integer :age
+         end
+       end
+     end
+   end
+   ```
+
+   When used in output schemas, the LLM will be instructed to return a JSON object where all values conform to the specified type. The keys can be any string, but the values must match the type defined in the block.
+
 All of these field definitions allow nil values by default, ensuring that optional data can be omitted.
 
 ### Validations
