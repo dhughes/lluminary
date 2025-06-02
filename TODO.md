@@ -28,6 +28,7 @@
 - [ ] Test this for support of older versions of Rails. (I think it might not work below Rails 8)
 - [x] Add support for additional LLM providers (Anthropic, Google, etc.)
   - [x] Add support for Amazon Bedrock
+- [ ] Research OpenRouter.ai API integration (OpenAI-compatible)
 - [ ] Add support for local LLM providers
   - [ ] Integrate with Ollama for local model support
   - [ ] Add support for LM Studio

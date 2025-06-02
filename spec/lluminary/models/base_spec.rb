@@ -1409,6 +1409,147 @@ RSpec.describe Lluminary::Models::Base do
           expect(prompt).to include(expected_json)
         end
       end
+
+      context "with dictionary fields" do
+        it "formats dictionary field description correctly" do
+          task_class.output_schema do
+            dictionary :emotion_scores,
+                       description: "Scores for each detected emotion" do
+              float
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
+            # emotion_scores
+            Description: Scores for each detected emotion
+            Type: object with float values
+            Example: {"some_key":1.0,"other_key":2.0}
+          DESCRIPTION
+
+          expect(prompt).to include(expected_description)
+        end
+
+        it "formats dictionary of arrays field description correctly" do
+          task_class.output_schema do
+            dictionary :categories, description: "Categories and their items" do
+              array { string }
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
+            # categories
+            Description: Categories and their items
+            Type: object with array values
+            Example: {"some_key":["first item","second item"],"other_key":["first item","second item"]}
+          DESCRIPTION
+
+          expect(prompt).to include(expected_description)
+        end
+
+        it "formats dictionary of objects field description correctly" do
+          task_class.output_schema do
+            dictionary :users, description: "User profiles" do
+              hash do
+                string :name
+                integer :age
+              end
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_description = <<~DESCRIPTION.chomp
+            # users
+            Description: User profiles
+            Type: object with object values
+            Example: {"some_key":{"name":"your name here","age":0},"other_key":{"name":"your name here","age":0}}
+          DESCRIPTION
+
+          expect(prompt).to include(expected_description)
+        end
+
+        it "generates correct JSON example for dictionary of floats" do
+          task_class.output_schema do
+            dictionary :scores, description: "Scores for each item" do
+              float
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+            {
+              "scores": {
+                "some_key": 1.0,
+                "other_key": 2.0
+              }
+            }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+
+        it "generates correct JSON example for dictionary of arrays" do
+          task_class.output_schema do
+            dictionary :categories, description: "Categories and their items" do
+              array { string }
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+            {
+              "categories": {
+                "some_key": [
+                  "first item",
+                  "second item"
+                ],
+                "other_key": [
+                  "first item",
+                  "second item"
+                ]
+              }
+            }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+
+        it "generates correct JSON example for dictionary of objects" do
+          task_class.output_schema do
+            dictionary :users, description: "User profiles" do
+              hash do
+                string :name
+                integer :age
+              end
+            end
+          end
+
+          prompt = model.format_prompt(task)
+
+          expected_json = <<~JSON.chomp
+            {
+              "users": {
+                "some_key": {
+                  "name": "your name here",
+                  "age": 0
+                },
+                "other_key": {
+                  "name": "your name here",
+                  "age": 0
+                }
+              }
+            }
+          JSON
+
+          expect(prompt).to include(expected_json)
+        end
+      end
     end
   end
 end

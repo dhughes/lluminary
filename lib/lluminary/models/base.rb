@@ -175,6 +175,18 @@ module Lluminary
           end
         when :hash
           "object"
+        when :dictionary
+          if field[:value_type].nil?
+            "object"
+          elsif field[:value_type][:type] == :array
+            "object with array values"
+          elsif field[:value_type][:type] == :datetime
+            "object with datetime values in ISO8601 format"
+          elsif field[:value_type][:type] == :hash
+            "object with object values"
+          else
+            "object with #{field[:value_type][:type]} values"
+          end
         else
           field[:type].to_s
         end
@@ -294,6 +306,8 @@ module Lluminary
           generate_array_example(name, field)
         when :hash
           generate_hash_example(name, field)
+        when :dictionary
+          generate_dictionary_example(name, field)
         end
       end
 
@@ -330,6 +344,37 @@ module Lluminary
 
         field[:fields].each_with_object({}) do |(subname, subfield), hash|
           hash[subname] = generate_example_value(subname, subfield)
+        end
+      end
+
+      def generate_dictionary_example(name, field)
+        return {} unless field[:value_type]
+
+        case field[:value_type][:type]
+        when :string
+          { "some_key" => "first value", "other_key" => "second value" }
+        when :integer
+          { "some_key" => 1, "other_key" => 2 }
+        when :float
+          { "some_key" => 1.0, "other_key" => 2.0 }
+        when :boolean
+          { "some_key" => true, "other_key" => false }
+        when :datetime
+          {
+            "some_key" => "2024-01-01T12:00:00+00:00",
+            "other_key" => "2024-01-02T12:00:00+00:00"
+          }
+        when :array
+          if field[:value_type][:element_type]
+            inner_example = generate_array_example("item", field[:value_type])
+            { "some_key" => inner_example, "other_key" => inner_example }
+          else
+            { "some_key" => [], "other_key" => [] }
+          end
+        when :hash
+          example =
+            generate_hash_example(name.to_s.singularize, field[:value_type])
+          { "some_key" => example, "other_key" => example }
         end
       end
 

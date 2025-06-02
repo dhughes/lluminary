@@ -428,4 +428,238 @@ RSpec.describe Lluminary::SchemaModel do
       )
     end
   end
+
+  describe "dictionary type enforcement" do
+    let(:fields) do
+      {
+        tags: {
+          type: :dictionary,
+          description: nil,
+          value_type: {
+            type: :string,
+            description: nil
+          }
+        }
+      }
+    end
+    let(:model_class) { described_class.build(fields: fields, validations: []) }
+
+    it "validates that value is a hash" do
+      instance = model_class.new(tags: "not a hash")
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Tags must be a Hash"
+      )
+    end
+
+    it "validates dictionary value types" do
+      instance = model_class.new(tags: { "tag1" => "valid", "tag2" => 123 })
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Tags[tag2] must be a String"
+      )
+    end
+
+    it "accepts valid dictionary values" do
+      instance =
+        model_class.new(tags: { "tag1" => "valid", "tag2" => "also valid" })
+      expect(instance.valid?).to be true
+    end
+  end
+
+  describe "nested dictionary validation" do
+    let(:fields) do
+      {
+        config: {
+          type: :hash,
+          description: nil,
+          fields: {
+            settings: {
+              type: :dictionary,
+              description: nil,
+              value_type: {
+                type: :integer,
+                description: nil
+              }
+            }
+          }
+        }
+      }
+    end
+    let(:model_class) { described_class.build(fields: fields, validations: []) }
+
+    it "validates dictionaries inside hashes" do
+      instance =
+        model_class.new(
+          config: {
+            settings: {
+              "timeout" => 30,
+              "retries" => "3" # should be integer
+            }
+          }
+        )
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Config[settings][retries] must be an Integer"
+      )
+    end
+  end
+
+  describe "dictionary of hashes validation" do
+    let(:fields) do
+      {
+        users: {
+          type: :dictionary,
+          description: nil,
+          value_type: {
+            type: :hash,
+            description: nil,
+            fields: {
+              name: {
+                type: :string,
+                description: nil
+              },
+              age: {
+                type: :integer,
+                description: nil
+              }
+            }
+          }
+        }
+      }
+    end
+    let(:model_class) { described_class.build(fields: fields, validations: []) }
+
+    it "validates hashes inside dictionaries" do
+      instance =
+        model_class.new(
+          users: {
+            "user1" => {
+              name: "Alice",
+              age: 30
+            },
+            "user2" => {
+              name: 123,
+              age: "invalid"
+            } # name should be string, age should be integer
+          }
+        )
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Users[user2][name] must be a String",
+        "Users[user2][age] must be an Integer"
+      )
+    end
+  end
+
+  describe "dictionary of arrays validation" do
+    let(:fields) do
+      {
+        categories: {
+          type: :dictionary,
+          description: nil,
+          value_type: {
+            type: :array,
+            description: nil,
+            element_type: {
+              type: :string,
+              description: nil
+            }
+          }
+        }
+      }
+    end
+    let(:model_class) { described_class.build(fields: fields, validations: []) }
+
+    it "validates arrays inside dictionaries" do
+      instance =
+        model_class.new(
+          categories: {
+            "fruits" => %w[apple banana],
+            "numbers" => ["one", 2, "three"] # should all be strings
+          }
+        )
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Categories[numbers][1] must be a String"
+      )
+    end
+  end
+
+  describe "array of dictionaries validation" do
+    let(:fields) do
+      {
+        configs: {
+          type: :array,
+          description: nil,
+          element_type: {
+            type: :dictionary,
+            description: nil,
+            value_type: {
+              type: :string,
+              description: nil
+            }
+          }
+        }
+      }
+    end
+    let(:model_class) { described_class.build(fields: fields, validations: []) }
+
+    it "validates dictionaries inside arrays" do
+      instance =
+        model_class.new(
+          configs: [
+            { "key1" => "value1", "key2" => "value2" },
+            { "key3" => "value3", "key4" => 123 } # should be string
+          ]
+        )
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Configs[1][key4] must be a String"
+      )
+    end
+  end
+
+  describe "hash with dictionary validation" do
+    let(:fields) do
+      {
+        config: {
+          type: :hash,
+          description: "Configuration",
+          fields: {
+            name: {
+              type: :string,
+              description: nil
+            },
+            settings: {
+              type: :dictionary,
+              description: nil,
+              value_type: {
+                type: :boolean,
+                description: nil
+              }
+            }
+          }
+        }
+      }
+    end
+    let(:model_class) { described_class.build(fields: fields, validations: []) }
+
+    it "validates dictionaries inside hashes" do
+      instance =
+        model_class.new(
+          config: {
+            name: "test",
+            settings: {
+              "enabled" => true,
+              "active" => "true" # should be boolean
+            }
+          }
+        )
+      expect(instance.valid?).to be false
+      expect(instance.errors.full_messages).to contain_exactly(
+        "Config[settings][active] must be true or false"
+      )
+    end
+  end
 end

@@ -4,6 +4,12 @@
 
 A Ruby library for building LLM-powered applications with structured outputs.
 
+## ⚠️ Early Development Notice
+
+Lluminary is currently in early development and is probably not yet ready prime time. The API, features, and implementation details may change significantly as the project evolves. 
+
+For planned features and upcoming development work, see [TODO.md](TODO.md). Please open issues to provide feedback. PRs are welcome.
+
 ## Features
 
 - Task-based architecture for LLM interactions
@@ -11,11 +17,198 @@ A Ruby library for building LLM-powered applications with structured outputs.
 - Input and output schema validation
 - Provider abstraction for different LLM services
 - Built-in support for OpenAI, AWS Bedrock, Anthropic, and Google (via AI Studio)
-- Easy to extend with custom providers
 - Field descriptions for better LLM understanding
 - Rich result objects with access to prompts and responses
 - Global and task-specific provider configuration
 - Custom validations using Rails-like API
+
+---
+
+## Effortless Task Creation & Prompting
+
+Lluminary makes it easy to define, prompt, and execute LLM-powered tasks. You simply create a Ruby class, define your input/output schemas, write a prompt, and call your task — Lluminary handles the rest, including validation and response parsing.
+
+Lluminary automatically generates detailed instructions for the LLM about the expected output format, based on your output schema. This means you don't need to describe the output structure or provide examples in your prompt—just focus on what you want the LLM to do. Your prompts stay concise, and your code is easier to maintain.
+
+> **Tip:** You don't need to explain the output format in your prompt. Lluminary's schema system takes care of that for you!
+
+### Quick Example
+
+```ruby
+class SummarizeText < Lluminary::Task
+  use_provider :openai  # Uses the global OpenAI configuration
+
+  input_schema do
+    string :text, description: "The text to be summarized"
+  end
+
+  output_schema do
+    string :summary, description: "A concise one-sentence summary of the input text"
+  end
+
+  def task_prompt
+    "Summarize the following text in one short sentence:\n\n#{text}"
+  end
+end
+
+# Use the task
+result = SummarizeText.call(text: "Your text here")
+puts result.output.summary
+```
+
+You can define any number of tasks, each with their own schemas and prompts. Lluminary automatically validates your inputs and outputs, and provides rich result objects for easy access.
+
+---
+
+## Usage
+
+### Basic Task
+
+Here's a complete example of a task that uses the global configuration:
+
+```ruby
+class SummarizeText < Lluminary::Task
+  use_provider :openai  # Uses the global OpenAI configuration
+
+  input_schema do
+    string :text, description: "The text to be summarized"
+  end
+
+  output_schema do
+    string :summary, description: "A concise one-sentence summary of the input text"
+  end
+
+  def task_prompt
+    "Summarize the following text in one short sentence:\n\n#{text}"
+  end
+end
+
+# Use the task
+result = SummarizeText.call(text: "Your text here")
+puts result.output.summary
+```
+
+### Schema Descriptions
+
+The schema system supports optional descriptions for each field. These descriptions help the LLM understand exactly what each field should contain:
+
+```ruby
+class AnalyzeText < Lluminary::Task
+  use_provider :openai  # Uses the global OpenAI configuration
+
+  input_schema do
+    string :text, description: "The text to analyze"
+  end
+
+  output_schema do
+    string :sentiment, description: "The overall emotional tone (positive, negative, or neutral)"
+    string :key_points, description: "The main ideas or arguments presented in the text"
+    integer :word_count, description: "Total number of words in the text"
+  end
+
+  def task_prompt
+    "Analyze the following text and determine its sentiment, key points, and word count:\n\n#{text}"
+  end
+end
+```
+
+These descriptions are automatically formatted and included in prompts to the LLM, helping it understand the expected structure and content of each field, including nested objects and arrays.
+
+### Input and Output Validation
+
+Tasks support validation through the schema system using ActiveModel validations. This means you have access to all standard ActiveModel validations for both input and output schemas.
+
+#### Input Validation
+
+```ruby
+class WordCounter < Lluminary::Task
+  use_provider :openai
+
+  input_schema do
+    string :text
+    integer :min_length
+    string :language, description: "The language of the text"
+
+    # Standard validations
+    validates :text, presence: true
+    validates :min_length, presence: true, numericality: { greater_than: 0 }
+    
+    # Format validation
+    validates :language, format: { with: /\A[a-z]{2}\z/, message: "must be a two-letter language code" }
+  end
+end
+```
+
+Common validations include:
+- `presence`: Ensures a value is provided
+- `numericality`: Validates numeric values
+- `format`: Validates against a regular expression
+- `inclusion`: Ensures a value is in a given set
+- `length`: Validates string length
+- `uniqueness`: Ensures a value is unique
+
+For a complete list of validations, see the [ActiveModel Validations documentation](https://guides.rubyonrails.org/active_record_validations.html).
+
+#### Output Validation
+
+Output validation ensures that the LLM's response meets your requirements. The same validation rules available for input schemas can be used in output schemas:
+
+```ruby
+class AnalyzeText < Lluminary::Task
+  use_provider :openai
+
+  output_schema do
+    string :sentiment, description: "The overall emotional tone"
+    validates :sentiment, inclusion: { in: %w[positive negative neutral] }
+    
+    string :key_points, description: "The main ideas or arguments"
+    validates :key_points, presence: true
+    
+    integer :word_count, description: "Total number of words"
+    validates :word_count, numericality: { greater_than: 0 }
+    
+    # Custom validation
+    validate :validate_word_count_consistency
+  end
+  
+  def validate_word_count_consistency
+    # Ensure the word count is reasonable compared to the key points
+    if word_count && key_points && word_count < key_points.split.size
+      errors.add(:word_count, "should be at least as large as the word count in key_points")
+    end
+  end
+end
+```
+
+Additional updates planned for future releases include:
+- Retry mechanisms for failed output validation (with validation errors provided as counter-examples to help the LLM correct its mistakes)
+
+#### Accessing Validation Results
+
+You can check validation results and access input/output values through the result object:
+
+```ruby
+result = SomeTask.call(input_params)
+
+# Check input validation
+result.input.valid?  # => true/false
+result.input.errors # => ActiveModel::Errors object
+
+# Access input values defined in input_schema
+result.input.text   # => "input text value"
+
+# Check output validation
+result.output.valid?  # => true/false
+result.output.errors # => ActiveModel::Errors object
+
+# Access output values defined in output_schema
+result.output.summary # => "output summary value"
+
+# Access raw LLM response (available even when validation fails)
+result.raw_response # => Raw response from the LLM
+```
+
+---
 
 ## Lluminary Schemas
 
@@ -182,6 +375,47 @@ Lluminary supports these field types:
    ```
 
    When used in output schemas, the LLM will be instructed to return the hash with all its nested fields in the correct structure. All hash keys will be strings, not symbols, since Lluminary is creating hashes from deserialized JSON returned by the LLM.
+
+8. **Dictionary** (Object with typed values)  
+   Dictionaries are similar to hashes, but they are specifically designed for key-value pairs where all values must be of the same type. This is useful for representing collections of items where the keys are dynamic but the values follow a consistent structure.
+   
+   Usage example with float values:  
+   ```ruby
+   class EmotionAnalyzer < Lluminary::Task
+     output_schema do
+       dictionary :emotion_scores, description: "Scores for each detected emotion" do
+         float
+       end
+     end
+   end
+   ```
+
+   Usage example with array values:
+   ```ruby
+   class CategoryOrganizer < Lluminary::Task
+     output_schema do
+       dictionary :categories, description: "Categories and their items" do
+         array { string }
+       end
+     end
+   end
+   ```
+
+   Usage example with hash values:
+   ```ruby
+   class UserDirectory < Lluminary::Task
+     output_schema do
+       dictionary :users, description: "User profiles" do
+         hash do
+           string :name
+           integer :age
+         end
+       end
+     end
+   end
+   ```
+
+   When used in output schemas, the LLM will be instructed to return a JSON object where all values conform to the specified type. The keys can be any string, but the values must match the type defined in the block.
 
 All of these field definitions allow nil values by default, ensuring that optional data can be omitted.
 
@@ -432,147 +666,6 @@ class AnthropicTask < Lluminary::Task
   use_provider :anthropic, 
     model: Lluminary::Models::Anthropic::ClaudeV3Opus
 end
-```
-
-## Usage
-
-### Basic Task
-
-Here's a complete example of a task that uses the global configuration:
-
-```ruby
-class SummarizeText < Lluminary::Task
-  use_provider :openai  # Uses the global OpenAI configuration
-
-  input_schema do
-    string :text, description: "The text to be summarized"
-  end
-
-  output_schema do
-    string :summary, description: "A concise one-sentence summary of the input text"
-  end
-
-  def task_prompt
-    "Summarize the following text in one short sentence:\n\n#{text}"
-  end
-end
-
-# Use the task
-result = SummarizeText.call(text: "Your text here")
-puts result.output.summary
-```
-
-### Schema Descriptions
-
-The schema system supports optional descriptions for each field. These descriptions help the LLM understand exactly what each field should contain:
-
-```ruby
-class AnalyzeText < Lluminary::Task
-  use_provider :openai  # Uses the global OpenAI configuration
-
-  output_schema do
-    string :sentiment, description: "The overall emotional tone (positive, negative, or neutral)"
-    string :key_points, description: "The main ideas or arguments presented in the text"
-    integer :word_count, description: "Total number of words in the text"
-  end
-end
-```
-
-These descriptions are automatically formatted and included in prompts to the LLM, helping it understand the expected structure and content of each field, including nested objects and arrays.
-
-### Input and Output Validation
-
-Tasks support validation through the schema system using ActiveModel validations. This means you have access to all standard ActiveModel validations for both input and output schemas.
-
-#### Input Validation
-
-```ruby
-class WordCounter < Lluminary::Task
-  use_provider :openai
-
-  input_schema do
-    string :text
-    integer :min_length
-    string :language, description: "The language of the text"
-
-    # Standard validations
-    validates :text, presence: true
-    validates :min_length, presence: true, numericality: { greater_than: 0 }
-    
-    # Format validation
-    validates :language, format: { with: /\A[a-z]{2}\z/, message: "must be a two-letter language code" }
-  end
-end
-```
-
-Common validations include:
-- `presence`: Ensures a value is provided
-- `numericality`: Validates numeric values
-- `format`: Validates against a regular expression
-- `inclusion`: Ensures a value is in a given set
-- `length`: Validates string length
-- `uniqueness`: Ensures a value is unique
-
-
-For a complete list of validations, see the [ActiveModel Validations documentation](https://guides.rubyonrails.org/active_record_validations.html).
-
-#### Output Validation
-
-Output validation ensures that the LLM's response meets your requirements. The same validation rules available for input schemas can be used in output schemas:
-
-```ruby
-class AnalyzeText < Lluminary::Task
-  use_provider :openai
-
-  output_schema do
-    string :sentiment, description: "The overall emotional tone"
-    validates :sentiment, inclusion: { in: %w[positive negative neutral] }
-    
-    string :key_points, description: "The main ideas or arguments"
-    validates :key_points, presence: true
-    
-    integer :word_count, description: "Total number of words"
-    validates :word_count, numericality: { greater_than: 0 }
-    
-    # Custom validation
-    validate :validate_word_count_consistency
-  end
-  
-  def validate_word_count_consistency
-    # Ensure the word count is reasonable compared to the key points
-    if word_count && key_points && word_count < key_points.split.size
-      errors.add(:word_count, "should be at least as large as the word count in key_points")
-    end
-  end
-end
-```
-
-Additional updates planned for future releases include:
-- Retry mechanisms for failed output validation
-
-#### Accessing Validation Results
-
-You can check validation results and access input/output values through the result object:
-
-```ruby
-result = SomeTask.call(input_params)
-
-# Check input validation
-result.input.valid?  # => true/false
-result.input.errors # => ActiveModel::Errors object
-
-# Access input values defined in input_schema
-result.input.text   # => "input text value"
-
-# Check output validation
-result.output.valid?  # => true/false
-result.output.errors # => ActiveModel::Errors object
-
-# Access output values defined in output_schema
-result.output.summary # => "output summary value"
-
-# Access raw LLM response (available even when validation fails)
-result.raw_response # => Raw response from the LLM
 ```
 
 ## Running Examples
