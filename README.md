@@ -4,6 +4,14 @@
 
 A Ruby library for building LLM-powered applications with structured outputs.
 
+## I need your opinion, please!
+
+I started working on Lluminary out of a desire to learn more about LLM providers, their APIs, capabilities, implementations, prompt engineering, etc. I wanted to create a Ruby gem that makes working with LLMs feel more natural to me - more Rails-ish. I'd recently worked on a project at my day job which had me thinking about these ideas. I've had a lot of fun working on Lluminary so far, and it's foundation is mostly built. However, I'm torn on whether it's worth continuing put time into it. 
+
+As you can see in [TODO.md](TODO.md), I have lots of ideas. What _should_ come next is finalizing the system for picking models (what's there right now is not great) and then all the cool stuff like tools use, file uploads, streaming, etc.
+
+But, I've decided to pause on Lluminary for a bit. I want to see if it's actually of interest to people and, if so, what they really want out of it. So, if you think Lluminary could potentially be valuable to you, please leave a message in the [discussions](https://github.com/dhughes/lluminary/discussions) star the repo. I welcome all feedback. If there seems like there might be a legitimate need or interest in the project, then I'll keep going. Thank you!
+
 ## ⚠️ Early Development Notice
 
 Lluminary is currently in early development and is probably not yet ready prime time. The API, features, and implementation details may change significantly as the project evolves. 
